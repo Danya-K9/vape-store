@@ -1,0 +1,45 @@
+.notice-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 12px 20px;
+  background: #2a2a2a;
+  color: #fff;
+  font-size: 13px;
+  position: relative;
+}
+
+.notice-chevron {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 20px;
+  cursor: default;
+  user-select: none;
+}
+
+.notice-content {
+  flex: 1;
+  overflow: hidden;
+  max-width: 800px;
+}
+
+.notice-track {
+  display: flex;
+  width: 300%;
+}
+
+.notice-text {
+  flex: 0 0 33.333%;
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 600px) {
+  .notice-text {
+    white-space: normal;
+    text-align: center;
+  }
+}

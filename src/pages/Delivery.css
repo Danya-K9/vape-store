@@ -1,0 +1,34 @@
+.delivery-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.delivery-page .breadcrumb {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.delivery-page .breadcrumb a {
+  color: #000;
+  text-decoration: none;
+}
+
+.delivery-page .breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.delivery-page h1 {
+  font-size: 32px;
+  color: #1a1a1a;
+  margin: 0 0 32px;
+}
+
+.delivery-unavailable {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e53935;
+  text-align: center;
+  margin: 0;
+}

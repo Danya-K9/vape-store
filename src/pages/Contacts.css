@@ -1,0 +1,244 @@
+.contacts-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.contacts-page .breadcrumb {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.contacts-page .breadcrumb a {
+  color: #000;
+  text-decoration: none;
+}
+
+.contacts-page .breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.contacts-page h1 {
+  font-size: 28px;
+  color: #1a1a1a;
+  margin: 0 0 16px;
+}
+
+.contacts-director-btn {
+  margin-bottom: 32px;
+  padding: 10px 20px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.contacts-director-btn:hover {
+  background: #1d4ed8;
+}
+
+.contacts-map-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 40px;
+  height: 400px;
+  background: #f5f5f5;
+}
+
+.contacts-yandex-map {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.contacts-map-link {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #fff;
+  color: #e31e24;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.contacts-map-link:hover {
+  background: #f8f8f8;
+}
+
+.contacts-stores {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.contact-store-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.contact-store-image {
+  aspect-ratio: 4/3;
+  overflow: hidden;
+}
+
+.contact-store-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contact-store-info {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.contact-store-address {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px;
+}
+
+.contact-store-hours {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 12px;
+}
+
+.contact-store-phone {
+  font-size: 15px;
+  color: #2563eb;
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+
+.contact-store-phone:hover {
+  text-decoration: underline;
+}
+
+.btn-details {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  border-radius: 8px;
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.btn-details:hover {
+  background: #1d4ed8;
+}
+
+.contacts-social-section {
+  margin-top: 48px;
+}
+
+.contacts-social-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 24px;
+}
+
+.contacts-social-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.contacts-social-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #1a1a1a;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.contacts-social-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-color: #ddd;
+}
+
+.contacts-social-icon,
+.contacts-social-icon-img {
+  width: 40px;
+  height: 40px;
+  display: block;
+  object-fit: contain;
+  margin-bottom: 12px;
+  background: transparent !important;
+  border: none !important;
+}
+
+.contacts-social-item {
+  background: #fff;
+}
+
+.contacts-icon-tg { background: #29b6f6; color: #fff; }
+.contacts-icon-insta { background: linear-gradient(45deg, #f09433, #e4405f); color: #fff; }
+.contacts-icon-viber { background: #7360f2; color: #fff; }
+.contacts-icon-yt { background: #ff0000; color: #fff; }
+.contacts-icon-whatsapp { background: #25d366; color: #fff; }
+
+.contacts-social-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.contacts-social-desc {
+  font-size: 12px;
+  color: #666;
+}
+
+.contacts-banner {
+  margin-top: 48px;
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 24px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+@media (max-width: 600px) {
+  .contact-store-card {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-store-info {
+    padding: 20px;
+  }
+
+  .contacts-social-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

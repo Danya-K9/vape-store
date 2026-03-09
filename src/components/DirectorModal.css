@@ -1,0 +1,147 @@
+.director-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.director-modal {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.director-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+}
+
+.director-modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.director-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #888;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.director-modal-close:hover {
+  color: #333;
+}
+
+.director-auth-required {
+  padding: 24px;
+  text-align: center;
+}
+
+.director-auth-required p {
+  margin: 0 0 16px;
+  color: #555;
+}
+
+.director-login-link {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.director-login-link:hover {
+  background: #1d4ed8;
+}
+
+.director-modal-form {
+  padding: 24px;
+}
+
+.director-form-group {
+  margin-bottom: 16px;
+}
+
+.director-form-group input,
+.director-form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #f9f9f9;
+}
+
+.director-form-group input::placeholder,
+.director-form-group textarea::placeholder {
+  color: #999;
+}
+
+.director-form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.director-file-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.director-file-btn {
+  padding: 10px 20px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.director-file-btn:hover {
+  background: #1d4ed8;
+}
+
+.director-file-name {
+  font-size: 14px;
+  color: #666;
+}
+
+.director-submit-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.director-submit-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.director-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

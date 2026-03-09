@@ -1,0 +1,253 @@
+.profile-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.profile-logout {
+  padding: 8px 16px;
+  border: 1px solid #333;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.profile-header h1 {
+  font-size: 32px;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.profile-subtitle {
+  color: #888;
+  font-size: 16px;
+  margin: 0;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+}
+
+.profile-sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+.profile-nav {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.profile-nav a {
+  display: block;
+  padding: 12px 16px;
+  color: #aaa;
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: all 0.2s;
+}
+
+.profile-nav a:hover {
+  color: #fff;
+  background: #252525;
+}
+
+.profile-nav a.active {
+  color: #000;
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.profile-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+}
+
+.profile-card h2 {
+  font-size: 20px;
+  color: #1a1a1a;
+  margin: 0 0 24px;
+}
+
+.profile-info {
+  margin-bottom: 24px;
+}
+
+.info-row {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #252525;
+}
+
+.info-row:last-of-type {
+  border-bottom: none;
+}
+
+.info-row .label {
+  color: #888;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.info-row .value {
+  color: #fff;
+}
+
+.btn-edit {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #000;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-edit:hover {
+  background: #333;
+  color: #fff;
+}
+
+.profile-auth-placeholder ul {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+
+.profile-auth-placeholder li {
+  margin: 6px 0;
+}
+
+.profile-auth-note {
+  color: #888;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+.profile-empty {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.profile-orders {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-order {
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.order-status {
+  margin-left: 8px;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.order-status-pending { background: #fef3c7; color: #92400e; }
+.order-status-confirmed { background: #d1fae5; color: #065f46; }
+.order-status-cancelled { background: #fee2e2; color: #991b1b; }
+
+.profile-card .form-group {
+  margin-bottom: 16px;
+}
+
+.profile-card .form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #666;
+}
+
+.profile-card .form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.profile-card .form-group input:disabled {
+  background: #f5f5f5;
+}
+
+.profile-save-notification {
+  position: fixed;
+  top: 100px;
+  right: 24px;
+  padding: 12px 24px;
+  background: #22c55e;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1100;
+  animation: profileNotifyIn 0.3s ease;
+}
+
+@keyframes profileNotifyIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.quick-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.quick-action {
+  padding: 12px 24px;
+  background: #252525;
+  color: #000;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+
+.quick-action:hover {
+  background: rgba(212, 175, 55, 0.1);
+}
+
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-sidebar {
+    position: static;
+  }
+
+  .profile-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .profile-nav a {
+    margin: 0;
+  }
+}

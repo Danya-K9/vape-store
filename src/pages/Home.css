@@ -1,0 +1,524 @@
+.home {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.section-title-viking {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 28px;
+  text-align: center;
+}
+
+.filter-tabs-viking {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+
+.filter-tab-viking {
+  padding: 10px 22px;
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-tab-viking:hover {
+  color: #000;
+  border-color: #000;
+}
+
+.filter-tab-viking.active {
+  background: #333;
+  color: #fff;
+  border-color: #333;
+}
+
+.products-grid-viking {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.section.section-about-viking {
+  background: #f8f8f8;
+  margin: 0;
+  padding: 60px 20px;
+  border-top: 1px solid #eee;
+  max-width: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section-about-viking .about-content-with-image {
+  max-width: 1200px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.about-content h2,
+.about-text h2 {
+  font-size: 22px;
+  color: #1a1a1a;
+  margin: 0 0 28px;
+  text-align: center;
+}
+
+.about-content ul,
+.about-text ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+}
+
+.about-content li,
+.about-text li {
+  color: #555;
+  padding: 10px 0;
+  padding-left: 28px;
+  position: relative;
+}
+
+.about-content li::before,
+.about-text li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #000;
+  font-weight: bold;
+}
+
+.btn-learn-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: #000;
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  border-radius: 10px;
+  border: 1px solid #444;
+  transition: all 0.3s ease;
+}
+
+.btn-learn-more:hover {
+  background: #222;
+}
+
+.btn-learn-arrow {
+  font-size: 18px;
+}
+
+.about-image {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.about-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.btn-link-viking {
+  color: #000;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn-link-viking:hover {
+  text-decoration: underline;
+}
+
+.section-blog {
+  padding-top: 40px;
+}
+
+.section-blog .blog-layout {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.blog-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.blog-view-all {
+  color: #1a1a1a;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.blog-view-all:hover {
+  color: #000;
+}
+
+.blog-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.blog-featured {
+  background: #fff !important;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.blog-featured-link {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  text-decoration: none;
+  color: inherit;
+  height: 180px;
+  min-height: 180px;
+  max-height: 180px;
+}
+
+.blog-featured .blog-card-link {
+  height: 180px;
+  min-height: 180px;
+  max-height: 180px;
+}
+
+.blog-featured-text {
+  padding: 20px 24px;
+}
+
+.blog-featured-text .blog-date {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.blog-featured-text h3 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: #1a1a1a;
+}
+
+.blog-featured-text .blog-link {
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0;
+}
+
+.blog-featured-image {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.blog-featured-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.blog-card-link {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  text-decoration: none;
+  color: inherit;
+  height: 180px;
+  min-height: 180px;
+  max-height: 180px;
+}
+
+.blog-card-text {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.blog-card-text .blog-date {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.blog-card-text h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 6px;
+}
+
+.blog-card-text .blog-link {
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0;
+}
+
+.blog-card-image {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.blog-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.blog-grid-secondary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.section.section-reviews {
+  background: #f8f8f8;
+  margin: 0;
+  padding: 60px 20px;
+  border-top: 1px solid #eee;
+  max-width: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section-reviews .section-title-viking {
+  text-align: center;
+}
+
+.reviews-two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 1200px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reviews-column {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  border: 1px solid #eee;
+}
+
+.reviews-column h3 {
+  font-size: 16px;
+  color: #1a1a1a;
+  margin: 0 0 20px;
+  font-weight: 700;
+}
+
+.reviews-column-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.reviews-rating {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.reviews-count {
+  font-size: 14px;
+  color: #666;
+}
+
+.btn-leave-review {
+  margin-left: auto;
+  padding: 8px 16px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.btn-more-reviews {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.review-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+}
+
+.review-stars {
+  margin-bottom: 12px;
+}
+
+.review-stars .star {
+  color: #ddd;
+}
+
+.review-stars .star.active {
+  color: #f59e0b;
+}
+
+.review-text {
+  color: #555;
+  line-height: 1.6;
+  margin: 0 0 16px;
+  font-style: italic;
+}
+
+.review-author {
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 4px;
+}
+
+.review-date {
+  font-size: 12px;
+  color: #888;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .reviews-two-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-content-with-image {
+    grid-template-columns: 1fr;
+  }
+
+  .about-image {
+    order: -1;
+  }
+
+  .blog-featured-link,
+  .blog-card-link {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-featured-image,
+  .blog-card-image {
+    min-height: 150px;
+  }
+
+  .blog-featured-link,
+  .blog-card-link {
+    height: auto;
+    min-height: 200px;
+    max-height: none;
+  }
+
+  .blog-featured .blog-card-link {
+    height: auto;
+    min-height: 200px;
+    max-height: none;
+  }
+
+  .blog-grid-secondary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.blog-card-viking {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+  border: 1px solid #eee;
+}
+
+.blog-card-viking:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.blog-card-viking a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.btn-view-all-viking {
+  display: block;
+  text-align: center;
+  color: #000;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 14px;
+}
+
+.btn-view-all-viking:hover {
+  text-decoration: underline;
+}
+
