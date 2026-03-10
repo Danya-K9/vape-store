@@ -30,18 +30,15 @@ export default function Header() {
     const onScroll = () => {
       const y = window.scrollY || window.pageYOffset || 0;
       // "Гистерезис": чтобы панель не дёргалась туда‑сюда около нуля.
-      setScrolled((prev) => {
-        if (y > 140) return true;
-        if (y < 40) return false;
-        return prev;
-      });
+      if (!scrolled && y > 140) setScrolled(true);
+      else if (scrolled && y < 40) setScrolled(false);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => {
       window.removeEventListener('scroll', onScroll);
     };
-  }, []);
+  }, [scrolled]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
@@ -53,7 +50,10 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    if (!catalogOpen) return;
+    // Для десктопного дропдауна каталога — закрываем по клику вне только,
+    // когда бургер-меню закрыто. На мобильном внутри бургера закрываем
+    // каталог только повторным нажатием на кнопку "Каталог".
+    if (!catalogOpen || menuOpen) return;
     const handleClickOutside = (e) => {
       const inside = catalogRefCompact.current?.contains(e.target) || catalogRefNav.current?.contains(e.target);
       if (!inside) setCatalogOpen(false);
@@ -64,7 +64,7 @@ export default function Header() {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, [catalogOpen]);
+  }, [catalogOpen, menuOpen]);
 
   return (
     <header className={`header header-light ${scrolled ? 'header-scrolled' : ''}`}>
@@ -270,6 +270,7 @@ export default function Header() {
                 )}
               </div>
               <div className="mobile-menu-links">
+                <Link to="/" onClick={() => setMenuOpen(false)}>Главная</Link>
                 <Link to="/delivery" onClick={() => setMenuOpen(false)}>Доставка</Link>
                 <Link to="/payment" onClick={() => setMenuOpen(false)}>Оплата</Link>
                 <Link to="/about" onClick={() => setMenuOpen(false)}>О нас</Link>
