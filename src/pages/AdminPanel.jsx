@@ -626,7 +626,7 @@ export default function AdminPanel() {
             <tbody>
               {orders.map((o) => (
                 <tr key={o.id}>
-                  <td>{o.id.slice(0, 8)}</td>
+                  <td>{String(o.id).slice(0, 8)}</td>
                   <td>{o.user?.login || o.userId}</td>
                   <td>{o.store?.address}</td>
                   <td>{o.paymentMethod === 'cash' ? 'Наличные' : 'Карта'}</td>

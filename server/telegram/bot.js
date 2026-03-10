@@ -241,9 +241,10 @@ export async function sendTelegramOrderNotification(order) {
 
 export async function sendTelegramOrderStatusToUser(telegramId, orderId, status) {
   if (!bot || !telegramId) return;
+  const shortId = String(orderId || '').slice(0, 8);
   const msg = status === 'confirmed'
-    ? `✅ Ваша бронь подтверждена! Заказ: ${orderId.slice(0, 8)}...`
-    : `❌ Ваша бронь отменена. Заказ: ${orderId.slice(0, 8)}...`;
+    ? `✅ Ваша бронь подтверждена! Заказ: ${shortId}...`
+    : `❌ Ваша бронь отменена. Заказ: ${shortId}...`;
   try {
     await bot.sendMessage(String(telegramId), msg);
   } catch (e) {

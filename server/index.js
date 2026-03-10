@@ -40,6 +40,14 @@ app.use('/api/admin', adminRoutes);
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));
 
+// Serve frontend (Vite build) from the same Railway service
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+  res.sendFile(path.join(distPath, 'index.html'));
+});
+
 async function main() {
   await prisma.$connect();
   startTelegramBot();
