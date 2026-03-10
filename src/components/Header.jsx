@@ -21,7 +21,10 @@ export default function Header() {
   const [cartOpen, setCartOpen] = useState(false);
   const [directorModalOpen, setDirectorModalOpen] = useState(false);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth <= 768;
+  });
   const catalogRefCompact = useRef(null);
   const catalogRefNav = useRef(null);
   const [canHover, setCanHover] = useState(true);

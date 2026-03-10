@@ -191,12 +191,26 @@ export default function CatalogFilters({
     </>
   );
 
+  const podSystemsFilters = () => (
+    <>
+      <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
+        {renderCheckbox(LIQUIDS_MANUFACTURERS.concat('Vaporesso'), manufacturers, onManufacturerToggle)}
+      </FilterSection>
+      <FilterSection title="Регулировка мощности" open={isOpen('power')} onToggle={() => toggleSection('power')}>
+        {renderCheckbox(POWER_ADJ, powerValues, onPowerToggle)}
+      </FilterSection>
+      <FilterSection title="Ёмкость АКБ" open={isOpen('battery')} onToggle={() => toggleSection('battery')}>
+        {renderCheckbox(BATTERY, batteryValues, onBatteryToggle)}
+      </FilterSection>
+    </>
+  );
+
   const getFilters = () => {
     if (category === 'disposables') return disposablesFilters();
     if (category === 'liquids') return liquidsFilters();
     if (category === 'accessories') return accessoriesFilters();
     if (category === 'pouches') return pouchesFilters();
-    if (category === 'pod-systems') return disposablesFilters();
+    if (category === 'pod-systems') return podSystemsFilters();
     return disposablesFilters();
   };
 
