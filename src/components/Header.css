@@ -330,6 +330,15 @@
   background: #333;
 }
 
+.btn-catalog.open {
+  background: #fbbf24;
+  color: #111827 !important;
+}
+
+.btn-catalog.open:hover {
+  background: #f59e0b;
+}
+
 .nav-categories {
   display: flex;
   flex-wrap: wrap;
@@ -725,6 +734,11 @@
   background: #1d4ed8;
 }
 
+.btn-catalog-compact.open {
+  background: #fbbf24;
+  color: #111827 !important;
+}
+
 .header-center-compact {
   margin-left: 24px;
 }
@@ -774,7 +788,7 @@
   }
 
   .header-action span,
-  .header-cart-trigger span {
+  .header-cart-trigger > span:not(.cart-count) {
     display: none;
   }
 

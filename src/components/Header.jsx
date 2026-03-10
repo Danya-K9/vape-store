@@ -24,11 +24,21 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const catalogRefCompact = useRef(null);
   const catalogRefNav = useRef(null);
+  const [canHover, setCanHover] = useState(true);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mql = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const update = () => setCanHover(!!mql.matches);
+    update();
+    mql.addEventListener?.('change', update);
+    return () => mql.removeEventListener?.('change', update);
   }, []);
 
   useEffect(() => {
@@ -106,12 +116,12 @@ export default function Header() {
               <div
                 ref={catalogRefCompact}
                 className="nav-catalog-trigger nav-catalog-compact"
-                onMouseEnter={() => setCatalogOpen(true)}
-                onMouseLeave={() => setCatalogOpen(false)}
+                onMouseEnter={canHover ? () => setCatalogOpen(true) : undefined}
+                onMouseLeave={canHover ? () => setCatalogOpen(false) : undefined}
               >
                 <button
                   type="button"
-                  className="btn-catalog btn-catalog-compact"
+                  className={`btn-catalog btn-catalog-compact ${catalogOpen ? 'open' : ''}`}
                   onClick={(e) => { e.stopPropagation(); setCatalogOpen((prev) => !prev); }}
                   aria-expanded={catalogOpen}
                   aria-haspopup="true"
@@ -175,12 +185,12 @@ export default function Header() {
           <div
             ref={catalogRefNav}
             className="nav-catalog-trigger"
-            onMouseEnter={() => setCatalogOpen(true)}
-            onMouseLeave={() => setCatalogOpen(false)}
+            onMouseEnter={canHover ? () => setCatalogOpen(true) : undefined}
+            onMouseLeave={canHover ? () => setCatalogOpen(false) : undefined}
           >
             <button
               type="button"
-              className="btn-catalog"
+              className={`btn-catalog ${catalogOpen ? 'open' : ''}`}
               onClick={(e) => { e.stopPropagation(); setCatalogOpen((prev) => !prev); }}
               aria-expanded={catalogOpen}
               aria-haspopup="true"
