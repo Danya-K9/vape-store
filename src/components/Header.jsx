@@ -30,10 +30,13 @@ export default function Header() {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY || window.pageYOffset || 0;
+      const isMobile = window.innerWidth <= 768;
+      const upper = isMobile ? 40 : 140;
+      const lower = isMobile ? 10 : 40;
       // Гистерезис: не дёргать панель около нуля.
       setScrolled((prev) => {
-        if (y > 20) return true;
-        if (y < 5) return false;
+        if (y > upper) return true;
+        if (y < lower) return false;
         return prev;
       });
     };
