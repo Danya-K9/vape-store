@@ -10,7 +10,6 @@ import './Catalog.css';
 const categoryNames = {
   disposables: 'Одноразки',
   liquids: 'Жидкости',
-  'pod-systems': 'POD системы',
   pouches: 'Никотиновые паучи',
   accessories: 'Комплектующие',
 };

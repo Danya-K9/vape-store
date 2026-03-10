@@ -21,22 +21,17 @@ export default function Header() {
   const [cartOpen, setCartOpen] = useState(false);
   const [directorModalOpen, setDirectorModalOpen] = useState(false);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth <= 768;
-  });
+  const [scrolled, setScrolled] = useState(false);
   const catalogRefCompact = useRef(null);
   const catalogRefNav = useRef(null);
   const [canHover, setCanHover] = useState(true);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.innerWidth <= 768 || window.scrollY > 1);
+    const onScroll = () => setScrolled(window.scrollY > 1);
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
     onScroll();
     return () => {
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
     };
   }, []);
 
@@ -141,8 +136,6 @@ export default function Header() {
                   <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости</Link>
                   <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
                   <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
-                  <Link to="/catalog/pod-systems" onClick={() => setCatalogOpen(false)}>POD системы</Link>
-                  <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Электронные парогенераторы</Link>
                   <Link to="/about" onClick={() => setCatalogOpen(false)}>Иное</Link>
                 </div>
               </div>
@@ -210,8 +203,6 @@ export default function Header() {
               <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости</Link>
               <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
               <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
-              <Link to="/catalog/pod-systems" onClick={() => setCatalogOpen(false)}>POD системы</Link>
-              <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Электронные парогенераторы</Link>
               <Link to="/about" onClick={() => setCatalogOpen(false)}>Иное</Link>
             </div>
           </div>
@@ -220,7 +211,6 @@ export default function Header() {
             <Link to="/catalog/liquids" className={location.pathname.includes('/liquids') ? 'active' : ''}>Жидкости</Link>
             <Link to="/catalog/accessories" className={location.pathname.includes('/accessories') ? 'active' : ''}>Комплектующие</Link>
             <Link to="/catalog/pouches" className={location.pathname.includes('/pouches') ? 'active' : ''}>Никотиновые паучи</Link>
-            <Link to="/catalog/pod-systems" className={location.pathname.includes('/pod-systems') ? 'active' : ''}>Электронные парогенераторы</Link>
             <Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>Иное</Link>
           </nav>
         </div>
@@ -264,7 +254,6 @@ export default function Header() {
                     <Link to="/catalog/liquids" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Жидкости</Link>
                     <Link to="/catalog/accessories" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Комплектующие</Link>
                     <Link to="/catalog/pouches" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Никотиновые паучи</Link>
-                    <Link to="/catalog/pod-systems" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Электронные парогенераторы</Link>
                   </div>
                 )}
               </div>
