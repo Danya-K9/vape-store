@@ -180,6 +180,13 @@
     padding: 16px;
   }
 
+  .admin-section table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
   .admin-form-row {
     flex-direction: column;
     align-items: flex-start;

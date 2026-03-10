@@ -77,6 +77,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 48px;
   align-items: center;
+  justify-items: center;
 }
 
 .about-content h2,
@@ -459,6 +460,7 @@
   .about-content-with-image {
     grid-template-columns: 1fr;
     gap: 24px;
+    justify-items: center;
   }
 
   .about-image {
@@ -467,6 +469,7 @@
 
   .about-text {
     width: 100%;
+    max-width: 480px;
   }
 
   .about-text h2 {
