@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './DirectorModal.css';
 
+const API_BASE = (() => {
+  const raw = import.meta?.env?.VITE_API_URL;
+  if (!raw) return '/api';
+  return String(raw).replace(/\/+$/, '');
+})();
+
 export default function DirectorModal({ isOpen, onClose }) {
   const [form, setForm] = useState({
     name: '',
@@ -24,7 +30,7 @@ export default function DirectorModal({ isOpen, onClose }) {
       fd.append('message', form.message);
       if (file) fd.append('file', file);
 
-      const res = await fetch('/api/director', {
+      const res = await fetch(`${API_BASE}/director`, {
         method: 'POST',
         body: fd,
       });

@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
 
-const API = '/api';
+const API_BASE = (() => {
+  const raw = import.meta?.env?.VITE_API_URL;
+  if (!raw) return '/api';
+  return String(raw).replace(/\/+$/, '');
+})();
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -26,19 +30,19 @@ export default function AdminPanel() {
   }, [token]);
 
   const fetchUsers = async () => {
-    const r = await fetch(`${API}/admin/users`, { headers: headers() });
+    const r = await fetch(`${API_BASE}/admin/users`, { headers: headers() });
     if (r.status === 401) { logout(); return; }
     setUsers(await r.json());
   };
 
   const fetchProducts = async () => {
-    const r = await fetch(`${API}/admin/products`, { headers: headers() });
+    const r = await fetch(`${API_BASE}/admin/products`, { headers: headers() });
     if (r.status === 401) { logout(); return; }
     setProducts(await r.json());
   };
 
   const fetchOrders = async () => {
-    const r = await fetch(`${API}/admin/orders`, { headers: headers() });
+    const r = await fetch(`${API_BASE}/admin/orders`, { headers: headers() });
     if (r.status === 401) { logout(); return; }
     setOrders(await r.json());
   };
@@ -46,12 +50,13 @@ export default function AdminPanel() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-    const r = await fetch(`${API}/auth/admin/login`, {
+    const r = await fetch(`${API_BASE}/auth/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ login, password }),
     });
-    const data = await r.json();
+    const text = await r.text();
+    const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
     if (!r.ok) { setError(data.error || 'Ошибка входа'); return; }
     localStorage.setItem('adminToken', data.token);
     setToken(data.token);
@@ -64,19 +69,19 @@ export default function AdminPanel() {
 
   const deleteUser = async (id) => {
     if (!confirm('Удалить пользователя?')) return;
-    await fetch(`${API}/admin/users/${id}`, { method: 'DELETE', headers: headers() });
+    await fetch(`${API_BASE}/admin/users/${id}`, { method: 'DELETE', headers: headers() });
     fetchUsers();
   };
 
   const saveUser = async () => {
     if (editing && editing !== 'new') {
-      await fetch(`${API}/admin/users/${editing.id}`, {
+      await fetch(`${API_BASE}/admin/users/${editing.id}`, {
         method: 'PATCH',
         headers: { ...headers(), 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
     } else {
-      await fetch(`${API}/admin/users`, {
+      await fetch(`${API_BASE}/admin/users`, {
         method: 'POST',
         headers: { ...headers(), 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -89,7 +94,7 @@ export default function AdminPanel() {
 
   const deleteProduct = async (id) => {
     if (!confirm('Удалить товар?')) return;
-    await fetch(`${API}/admin/products/${id}`, { method: 'DELETE', headers: headers() });
+    await fetch(`${API_BASE}/admin/products/${id}`, { method: 'DELETE', headers: headers() });
     fetchProducts();
   };
 
@@ -104,13 +109,13 @@ export default function AdminPanel() {
       body.append('image', form.image);
     }
     if (editing && editing !== 'new') {
-      await fetch(`${API}/admin/products/${editing.id}`, {
+      await fetch(`${API_BASE}/admin/products/${editing.id}`, {
         method: 'PATCH',
         headers: headers(),
         body,
       });
     } else {
-      await fetch(`${API}/admin/products`, {
+      await fetch(`${API_BASE}/admin/products`, {
         method: 'POST',
         headers: headers(),
         body,
@@ -123,7 +128,7 @@ export default function AdminPanel() {
   };
 
   const updateOrderStatus = async (id, status) => {
-    await fetch(`${API}/admin/orders/${id}`, {
+    await fetch(`${API_BASE}/admin/orders/${id}`, {
       method: 'PATCH',
       headers: { ...headers(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),

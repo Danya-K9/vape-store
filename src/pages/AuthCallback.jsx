@@ -3,6 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { setToken } from '../lib/api';
 
+const API_BASE = (() => {
+  const raw = import.meta?.env?.VITE_API_URL;
+  if (!raw) return '/api';
+  return String(raw).replace(/\/+$/, '');
+})();
+
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -15,7 +21,7 @@ export default function AuthCallback() {
       return;
     }
     setToken(token);
-    fetch('/api/users/me', {
+    fetch(`${API_BASE}/users/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())

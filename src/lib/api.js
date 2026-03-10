@@ -1,4 +1,8 @@
-const API = '/api';
+const API = (() => {
+  const raw = import.meta?.env?.VITE_API_URL;
+  if (!raw) return '/api';
+  return String(raw).replace(/\/+$/, '');
+})();
 
 export function getToken() {
   return localStorage.getItem('token');
@@ -17,7 +21,8 @@ export async function api(path, options = {}) {
   };
   if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(`${API}${path}`, { ...options, headers });
-  const data = res.ok ? await res.json().catch(() => ({})) : await res.json().catch(() => ({}));
+  const text = await res.text();
+  const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
   if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
   return data;
 }
@@ -27,7 +32,8 @@ export async function apiForm(path, formData, method = 'POST') {
   const headers = {};
   if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(`${API}${path}`, { method, headers, body: formData });
-  const data = res.ok ? await res.json().catch(() => ({})) : await res.json().catch(() => ({}));
+  const text = await res.text();
+  const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
   if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
   return data;
 }
