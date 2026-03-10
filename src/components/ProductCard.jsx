@@ -67,12 +67,10 @@ export default function ProductCard({ product, index = 0, isFavorite = false, on
           )}
         </div>
         <h3 className="product-name">{product.name}</h3>
-        {(nicotineType || strength) && (
-          <div className="product-meta">
-            {nicotineType && <span>Тип никотина {nicotineType}</span>}
-            {strength && <span>Крепость {strength}</span>}
-          </div>
-        )}
+        <div className={`product-meta ${!(nicotineType || strength) ? 'empty' : ''}`}>
+          {nicotineType && <span>Тип никотина {nicotineType}</span>}
+          {strength && <span>Крепость {strength}</span>}
+        </div>
         <div className="product-price">{product.price} руб.</div>
       </Link>
       <div className="product-quantity">
