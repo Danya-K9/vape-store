@@ -305,6 +305,12 @@
   transition: max-height 0.35s ease, opacity 0.3s ease;
 }
 
+/* Когда открыт каталог — не обрезаем выпадашку */
+.header.catalog-open .header-nav-bar {
+  overflow: visible;
+  max-height: 420px;
+}
+
 .header-nav-inner {
   max-width: 1400px;
   margin: 0 auto;
@@ -756,7 +762,13 @@
 
 @media (max-width: 768px) {
   .nav-catalog-compact .catalog-dropdown {
-    top: calc(100% + 14px);
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    top: 170px;
+    margin-top: 0;
+    min-width: 0;
+    border-radius: 14px;
   }
 }
 
