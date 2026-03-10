@@ -754,6 +754,12 @@
   left: 0;
 }
 
+@media (max-width: 768px) {
+  .nav-catalog-compact .catalog-dropdown {
+    top: calc(100% + 14px);
+  }
+}
+
 @media (max-width: 992px) {
   .header-center {
     display: none;
