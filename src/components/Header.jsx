@@ -129,8 +129,6 @@ export default function Header() {
               <div
                 ref={catalogRefCompact}
                 className="nav-catalog-trigger nav-catalog-compact"
-                onMouseEnter={canHover ? () => setCatalogOpen(true) : undefined}
-                onMouseLeave={canHover ? () => setCatalogOpen(false) : undefined}
               >
                 <button
                   type="button"
@@ -197,8 +195,6 @@ export default function Header() {
           <div
             ref={catalogRefNav}
             className="nav-catalog-trigger"
-            onMouseEnter={canHover ? () => setCatalogOpen(true) : undefined}
-            onMouseLeave={canHover ? () => setCatalogOpen(false) : undefined}
           >
             <button
               type="button"
