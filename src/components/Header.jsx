@@ -27,13 +27,18 @@ export default function Header() {
   const [canHover, setCanHover] = useState(true);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 1);
+    const onScroll = () => {
+      const y = window.scrollY || window.pageYOffset || 0;
+      // "Гистерезис": чтобы панель не дёргалась туда‑сюда около нуля.
+      if (!scrolled && y > 140) setScrolled(true);
+      else if (scrolled && y < 40) setScrolled(false);
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => {
       window.removeEventListener('scroll', onScroll);
     };
-  }, []);
+  }, [scrolled]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
@@ -134,8 +139,9 @@ export default function Header() {
                 <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`}>
                   <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразки</Link>
                   <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости</Link>
-                  <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
                   <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
+                  <Link to="/catalog/pod-systems" onClick={() => setCatalogOpen(false)}>Электронные парогенераторы</Link>
+                  <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
                   <Link to="/about" onClick={() => setCatalogOpen(false)}>Иное</Link>
                 </div>
               </div>
@@ -201,16 +207,18 @@ export default function Header() {
             <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`}>
               <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразки</Link>
               <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости</Link>
-              <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
               <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
+              <Link to="/catalog/pod-systems" onClick={() => setCatalogOpen(false)}>Электронные парогенераторы</Link>
+              <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
               <Link to="/about" onClick={() => setCatalogOpen(false)}>Иное</Link>
             </div>
           </div>
           <nav className="nav-categories">
             <Link to="/catalog/disposables" className={location.pathname.includes('/disposables') ? 'active' : ''}>Одноразки</Link>
             <Link to="/catalog/liquids" className={location.pathname.includes('/liquids') ? 'active' : ''}>Жидкости</Link>
-            <Link to="/catalog/accessories" className={location.pathname.includes('/accessories') ? 'active' : ''}>Комплектующие</Link>
             <Link to="/catalog/pouches" className={location.pathname.includes('/pouches') ? 'active' : ''}>Никотиновые паучи</Link>
+            <Link to="/catalog/pod-systems" className={location.pathname.includes('/pod-systems') ? 'active' : ''}>Электронные парогенераторы</Link>
+            <Link to="/catalog/accessories" className={location.pathname.includes('/accessories') ? 'active' : ''}>Комплектующие</Link>
             <Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>Иное</Link>
           </nav>
         </div>
@@ -252,6 +260,7 @@ export default function Header() {
                   <div className="mobile-catalog-links">
                     <Link to="/catalog/disposables" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Одноразки</Link>
                     <Link to="/catalog/liquids" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Жидкости</Link>
+                    <Link to="/catalog/pod-systems" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Электронные парогенераторы</Link>
                     <Link to="/catalog/accessories" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Комплектующие</Link>
                     <Link to="/catalog/pouches" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Никотиновые паучи</Link>
                   </div>

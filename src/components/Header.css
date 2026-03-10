@@ -401,7 +401,7 @@
   visibility: hidden;
   transform: translateY(-8px);
   transition: all 0.25s;
-  z-index: 100;
+  z-index: 1300;
 }
 
 .catalog-dropdown.open {
