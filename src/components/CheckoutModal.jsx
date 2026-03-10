@@ -20,6 +20,17 @@ export default function CheckoutModal({ isOpen, onClose }) {
     storesApi.list().then(setStores).catch(() => setStores([]));
   }, [isOpen]);
 
+  // При каждом новом открытии сбрасываем форму и состояние "готово",
+  // чтобы можно было оформить бронь ещё раз без перезагрузки сайта.
+  useEffect(() => {
+    if (!isOpen) return;
+    setDone(false);
+    setCustomerName('');
+    setCustomerPhone('');
+    setPickupDate('');
+    setPaymentMethod('cash');
+  }, [isOpen]);
+
   useEffect(() => {
     if (stores.length && !storeId) setStoreId(stores[0].id);
   }, [stores, storeId]);
@@ -72,7 +83,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
         onClick={onClose}
       >
         <motion.div
-          className="checkout-modal"
+          className={`checkout-modal ${done ? 'checkout-modal-done' : ''}`}
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.96 }}
@@ -81,8 +92,9 @@ export default function CheckoutModal({ isOpen, onClose }) {
           {done ? (
             <div className="checkout-done">
               <h1>Бронь оформлена!</h1>
-              <p>Мы уведомили вас о заказе. Ожидайте подтверждения.</p>
-              <button type="button" onClick={onClose}>Закрыть</button>
+              <button type="button" className="checkout-done-btn" onClick={onClose}>
+                Закрыть
+              </button>
             </div>
           ) : (
             <>
