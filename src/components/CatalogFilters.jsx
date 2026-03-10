@@ -62,6 +62,20 @@ export default function CatalogFilters({
   onPuffToggle,
   nicotineTypes = [],
   onNicotineToggle,
+  flavors = [],
+  onFlavorToggle,
+  strengths = [],
+  onStrengthToggle,
+  volumes = [],
+  onVolumeToggle,
+  vgpgValues = [],
+  onVgpgToggle,
+  chargingValues = [],
+  onChargingToggle,
+  powerValues = [],
+  onPowerToggle,
+  batteryValues = [],
+  onBatteryToggle,
   onReset,
 }) {
   const [openSections, setOpenSections] = useState({
@@ -108,10 +122,25 @@ export default function CatalogFilters({
         {renderCheckbox(NICOTINE_TYPES, nicotineTypes, onNicotineToggle)}
       </FilterSection>
       <FilterSection title="Вкус" open={isOpen('flavor')} onToggle={() => toggleSection('flavor')}>
-        {renderCheckbox(FLAVORS, [], () => {}, 'flavor')}
+        {renderCheckbox(FLAVORS, flavors, onFlavorToggle)}
       </FilterSection>
       <FilterSection title="Крепость" open={isOpen('strength')} onToggle={() => toggleSection('strength')}>
-        {renderCheckbox([20], [], () => {}, 'strength')}
+        {renderCheckbox(STRENGTHS, strengths, onStrengthToggle)}
+      </FilterSection>
+      <FilterSection title="Объем" open={isOpen('volume')} onToggle={() => toggleSection('volume')}>
+        {renderCheckbox(VOLUMES, volumes, onVolumeToggle)}
+      </FilterSection>
+      <FilterSection title="VG/PG" open={isOpen('vgpg')} onToggle={() => toggleSection('vgpg')}>
+        {renderCheckbox(VGPG, vgpgValues, onVgpgToggle)}
+      </FilterSection>
+      <FilterSection title="Зарядка" open={isOpen('charging')} onToggle={() => toggleSection('charging')}>
+        {renderCheckbox(CHARGING, chargingValues, onChargingToggle)}
+      </FilterSection>
+      <FilterSection title="Регулировка мощности" open={isOpen('power')} onToggle={() => toggleSection('power')}>
+        {renderCheckbox(POWER_ADJ, powerValues, onPowerToggle)}
+      </FilterSection>
+      <FilterSection title="Емкость АКБ" open={isOpen('battery')} onToggle={() => toggleSection('battery')}>
+        {renderCheckbox(BATTERY, batteryValues, onBatteryToggle)}
       </FilterSection>
     </>
   );
@@ -125,22 +154,16 @@ export default function CatalogFilters({
         {renderCheckbox(LIQUIDS_NICOTINE, nicotineTypes, onNicotineToggle)}
       </FilterSection>
       <FilterSection title="Вкус" open={isOpen('flavor')} onToggle={() => toggleSection('flavor')}>
-        {renderCheckbox(FLAVORS, [], () => {}, 'flavor')}
-      </FilterSection>
-      <FilterSection title="Доступность в регионах РБ" open={isOpen('regions')} onToggle={() => toggleSection('regions')}>
-        {renderCheckbox(REGIONS_RB, [], () => {}, 'regions')}
-      </FilterSection>
-      <FilterSection title="Страна происхождения" open={isOpen('country')} onToggle={() => toggleSection('country')}>
-        {renderCheckbox(COUNTRIES, [], () => {}, 'country')}
+        {renderCheckbox(FLAVORS, flavors, onFlavorToggle)}
       </FilterSection>
       <FilterSection title="Крепость" open={isOpen('strength')} onToggle={() => toggleSection('strength')}>
-        {renderCheckbox(STRENGTHS, [], () => {}, 'strength')}
+        {renderCheckbox(STRENGTHS, strengths, onStrengthToggle)}
       </FilterSection>
       <FilterSection title="Объем" open={isOpen('volume')} onToggle={() => toggleSection('volume')}>
-        {renderCheckbox(VOLUMES, [], () => {}, 'volume')}
+        {renderCheckbox(VOLUMES, volumes, onVolumeToggle)}
       </FilterSection>
       <FilterSection title="VG/PG" open={isOpen('vgpg')} onToggle={() => toggleSection('vgpg')}>
-        {renderCheckbox(VGPG, [], () => {}, 'vgpg')}
+        {renderCheckbox(VGPG, vgpgValues, onVgpgToggle)}
       </FilterSection>
     </>
   );
@@ -156,32 +179,14 @@ export default function CatalogFilters({
       <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
         {renderCheckbox(LIQUIDS_MANUFACTURERS.concat('Glitch'), manufacturers, onManufacturerToggle)}
       </FilterSection>
-      <FilterSection title="Количество затяжек" open={isOpen('puff')} onToggle={() => toggleSection('puff')}>
-        {renderCheckbox(PUFF_COUNTS, puffCounts, onPuffToggle)}
-      </FilterSection>
       <FilterSection title="Тип никотина" open={isOpen('nicotine')} onToggle={() => toggleSection('nicotine')}>
         {renderCheckbox(NICOTINE_TYPES, nicotineTypes, onNicotineToggle)}
       </FilterSection>
       <FilterSection title="Вкус" open={isOpen('flavor')} onToggle={() => toggleSection('flavor')}>
-        {renderCheckbox(FLAVORS, [], () => {}, 'flavor')}
-      </FilterSection>
-      <FilterSection title="Страна происхождения" open={isOpen('country')} onToggle={() => toggleSection('country')}>
-        {renderCheckbox(COUNTRIES, [], () => {}, 'country')}
+        {renderCheckbox(FLAVORS, flavors, onFlavorToggle)}
       </FilterSection>
       <FilterSection title="Крепость" open={isOpen('strength')} onToggle={() => toggleSection('strength')}>
-        {renderCheckbox(STRENGTHS, [], () => {}, 'strength')}
-      </FilterSection>
-      <FilterSection title="Регулировка мощности" open={isOpen('power')} onToggle={() => toggleSection('power')}>
-        {renderCheckbox(POWER_ADJ, [], () => {}, 'power')}
-      </FilterSection>
-      <FilterSection title="Емкость АКБ" open={isOpen('battery')} onToggle={() => toggleSection('battery')}>
-        {renderCheckbox(BATTERY, [], () => {}, 'battery')}
-      </FilterSection>
-      <FilterSection title="Цвет" open={isOpen('color')} onToggle={() => toggleSection('color')}>
-        {renderCheckbox(COLORS, [], () => {}, 'color')}
-      </FilterSection>
-      <FilterSection title="Дисплей" open={isOpen('display')} onToggle={() => toggleSection('display')}>
-        {renderCheckbox(DISPLAY, [], () => {}, 'display')}
+        {renderCheckbox(STRENGTHS, strengths, onStrengthToggle)}
       </FilterSection>
     </>
   );

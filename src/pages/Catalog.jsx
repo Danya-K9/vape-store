@@ -44,6 +44,13 @@ export default function Catalog() {
   const [manufacturers, setManufacturers] = useState([]);
   const [puffCounts, setPuffCounts] = useState([]);
   const [nicotineTypes, setNicotineTypes] = useState([]);
+  const [flavors, setFlavors] = useState([]);
+  const [strengths, setStrengths] = useState([]);
+  const [volumes, setVolumes] = useState([]);
+  const [vgpgValues, setVgpgValues] = useState([]);
+  const [chargingValues, setChargingValues] = useState([]);
+  const [powerValues, setPowerValues] = useState([]);
+  const [batteryValues, setBatteryValues] = useState([]);
   const [apiProducts, setApiProducts] = useState(null);
 
   useEffect(() => { setSearch(searchParams.get('search') || ''); }, [searchParams]);
@@ -52,8 +59,15 @@ export default function Catalog() {
     if (manufacturers.length) params.manufacturer = manufacturers.join(',');
     if (puffCounts.length) params.puffCount = puffCounts.join(',');
     if (nicotineTypes.length) params.nicotineType = nicotineTypes.join(',');
+    if (flavors.length) params.flavor = flavors.join(',');
+    if (strengths.length) params.strength = strengths.join(',');
+    if (volumes.length) params.volume = volumes.join(',');
+    if (vgpgValues.length) params.vgpg = vgpgValues.join(',');
+    if (chargingValues.length) params.charging = chargingValues.join(',');
+    if (powerValues.length) params.powerAdj = powerValues.join(',');
+    if (batteryValues.length) params.battery = batteryValues.join(',');
     productsApi.list(params).then(setApiProducts).catch(() => setApiProducts([]));
-  }, [category, search, priceMin, priceMax, manufacturers, puffCounts, nicotineTypes]);
+  }, [category, search, priceMin, priceMax, manufacturers, puffCounts, nicotineTypes, flavors, strengths, volumes, vgpgValues, chargingValues, powerValues, batteryValues]);
 
   const products = apiProducts ?? localProducts;
   const fromApi = apiProducts !== null;
@@ -108,12 +122,23 @@ export default function Catalog() {
     );
   };
 
+  const toggleArray = (setter) => (value) => {
+    setter((prev) => (prev.includes(value) ? prev.filter((x) => x !== value) : [...prev, value]));
+  };
+
   const handleReset = () => {
     setPriceMin(0);
     setPriceMax(150);
     setManufacturers([]);
     setPuffCounts([]);
     setNicotineTypes([]);
+    setFlavors([]);
+    setStrengths([]);
+    setVolumes([]);
+    setVgpgValues([]);
+    setChargingValues([]);
+    setPowerValues([]);
+    setBatteryValues([]);
   };
 
   return (
@@ -153,6 +178,20 @@ export default function Catalog() {
         onPuffToggle={handlePuffToggle}
         nicotineTypes={nicotineTypes}
         onNicotineToggle={handleNicotineToggle}
+        flavors={flavors}
+        onFlavorToggle={toggleArray(setFlavors)}
+        strengths={strengths}
+        onStrengthToggle={toggleArray(setStrengths)}
+        volumes={volumes}
+        onVolumeToggle={toggleArray(setVolumes)}
+        vgpgValues={vgpgValues}
+        onVgpgToggle={toggleArray(setVgpgValues)}
+        chargingValues={chargingValues}
+        onChargingToggle={toggleArray(setChargingValues)}
+        powerValues={powerValues}
+        onPowerToggle={toggleArray(setPowerValues)}
+        batteryValues={batteryValues}
+        onBatteryToggle={toggleArray(setBatteryValues)}
         onReset={handleReset}
       />
 

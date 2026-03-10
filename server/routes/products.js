@@ -5,7 +5,25 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    const { category, search, newOnly, bestsellers, priceMin, priceMax, manufacturer, puffCount, nicotineType, flavor, country, strength, volume, vgpg } = req.query;
+    const {
+      category,
+      search,
+      newOnly,
+      bestsellers,
+      priceMin,
+      priceMax,
+      manufacturer,
+      puffCount,
+      nicotineType,
+      flavor,
+      country,
+      strength,
+      volume,
+      vgpg,
+      charging,
+      powerAdj,
+      battery,
+    } = req.query;
     const where = {};
     if (category) where.category = category;
     if (search) {
@@ -26,6 +44,9 @@ router.get('/', async (req, res) => {
     if (strength) where.strength = { in: strength.split(',').map(Number) };
     if (volume) where.volume = { in: volume.split(',').map(Number) };
     if (vgpg) where.vgpg = { in: vgpg.split(',') };
+    if (charging) where.charging = { in: charging.split(',') };
+    if (powerAdj) where.powerAdj = { in: powerAdj.split(',') };
+    if (battery) where.battery = { in: battery.split(',').map(Number) };
     const products = await prisma.product.findMany({
       where,
       orderBy: { createdAt: 'desc' },
