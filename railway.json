@@ -1,0 +1,10 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "buildCommand": "npm ci && npm run build && npm ci --prefix server && npm run db:generate --prefix server"
+  },
+  "deploy": {
+    "startCommand": "cd server && npm run db:push && npm start"
+  }
+}
+

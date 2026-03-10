@@ -15,7 +15,8 @@ function getVisibleCount() {
 }
 
 export default function ProductCarousel({ products = [] }) {
-  const items = products.slice(0, 10);
+  const safeProducts = Array.isArray(products) ? products : [];
+  const items = safeProducts.slice(0, 10);
   const totalPages = items.length;
   const extendedItems = [...items, ...items, ...items];
   const [currentIndex, setCurrentIndex] = useState(totalPages);

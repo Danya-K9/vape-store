@@ -23,10 +23,14 @@ export default function Home() {
   const [bestsellerProducts, setBestsellerProducts] = useState([]);
 
   useEffect(() => {
-    productsApi.list({ newOnly: 'true' }).then(setNewProducts).catch(() => setNewProducts([]));
+    productsApi.list({ newOnly: 'true' })
+      .then((data) => setNewProducts(Array.isArray(data) ? data : []))
+      .catch(() => setNewProducts([]));
   }, []);
   useEffect(() => {
-    productsApi.list({ bestsellers: 'true' }).then(setBestsellerProducts).catch(() => setBestsellerProducts([]));
+    productsApi.list({ bestsellers: 'true' })
+      .then((data) => setBestsellerProducts(Array.isArray(data) ? data : []))
+      .catch(() => setBestsellerProducts([]));
   }, []);
 
   const filteredNew = newFilter === 'all'
