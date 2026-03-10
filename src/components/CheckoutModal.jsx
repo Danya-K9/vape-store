@@ -86,7 +86,10 @@ export default function CheckoutModal({ isOpen, onClose }) {
             </div>
           ) : (
             <>
-              <h2 className="checkout-modal-title">Оформление брони</h2>
+              <div className="checkout-modal-top">
+                <h2 className="checkout-modal-title">Оформление брони</h2>
+                <button type="button" className="checkout-modal-close" onClick={onClose} aria-label="Закрыть">×</button>
+              </div>
               <p className="checkout-note">
                 Корзина на сайте служит для предварительного бронирования товара.
                 Забрать товар вы можете в любом из наших магазинов, которые указаны ниже.

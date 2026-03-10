@@ -10,6 +10,18 @@
   width: 100%;
 }
 
+@media (max-width: 992px) {
+  .layout-body {
+    padding-top: 170px;
+  }
+}
+
+@media (max-width: 600px) {
+  .layout-body {
+    padding-top: 150px;
+  }
+}
+
 .main-content {
   flex: 1;
   width: 100%;

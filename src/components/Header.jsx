@@ -74,7 +74,12 @@ export default function Header() {
 
       <div className="header-main-bar">
         <div className="header-main-inner">
-          <button className="burger-btn" onClick={() => setMenuOpen(!menuOpen)} aria-label="Меню">
+          <button
+            className="burger-btn"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Меню"
+            aria-expanded={menuOpen}
+          >
             <span></span><span></span><span></span>
           </button>
           <div className="header-logo-catalog">
@@ -206,6 +211,62 @@ export default function Header() {
       <DirectorModal isOpen={directorModalOpen} onClose={() => setDirectorModalOpen(false)} />
       <CheckoutModal isOpen={checkoutModalOpen} onClose={() => setCheckoutModalOpen(false)} />
       <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            className="mobile-menu-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMenuOpen(false)}
+          >
+            <motion.div
+              className="mobile-menu"
+              initial={{ x: -320 }}
+              animate={{ x: 0 }}
+              exit={{ x: -320 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 320 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mobile-menu-header">
+                <span>Меню</span>
+                <button type="button" className="mobile-menu-close" onClick={() => setMenuOpen(false)} aria-label="Закрыть">×</button>
+              </div>
+              <div className="mobile-menu-section">
+                <button
+                  type="button"
+                  className="mobile-catalog-btn"
+                  onClick={() => setCatalogOpen((v) => !v)}
+                  aria-expanded={catalogOpen}
+                >
+                  ☰ Каталог
+                </button>
+                {catalogOpen && (
+                  <div className="mobile-catalog-links">
+                    <Link to="/catalog/disposables" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Одноразки</Link>
+                    <Link to="/catalog/liquids" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Жидкости</Link>
+                    <Link to="/catalog/accessories" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Комплектующие</Link>
+                    <Link to="/catalog/pouches" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Никотиновые паучи</Link>
+                    <Link to="/catalog/pod-systems" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Электронные парогенераторы</Link>
+                  </div>
+                )}
+              </div>
+              <div className="mobile-menu-links">
+                <Link to="/delivery" onClick={() => setMenuOpen(false)}>Доставка</Link>
+                <Link to="/payment" onClick={() => setMenuOpen(false)}>Оплата</Link>
+                <Link to="/about" onClick={() => setMenuOpen(false)}>О нас</Link>
+                <Link to="/contacts" onClick={() => setMenuOpen(false)}>Контакты и магазины</Link>
+              </div>
+              <div className="mobile-menu-footer">
+                <a href={`tel:${PHONE.replace(/\\D/g, '')}`} className="mobile-menu-phone">{PHONE_DISPLAY}</a>
+                <div className="mobile-menu-socials">
+                  <a href={VIBER_LINK} className="header-social-icon viber" aria-label="Viber"><img src={SOCIAL_ICONS.viber} alt="" /></a>
+                  <a href="https://t.me/Manager_VapeStoree" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS.telegram} alt="" /></a>
+                  <a href={`https://wa.me/${PHONE.replace(/\\D/g, '')}`} className="header-social-icon whatsapp" target="_blank" rel="noreferrer" aria-label="WhatsApp"><img src={SOCIAL_ICONS.whatsapp} alt="" /></a>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
         {cartOpen && (
           <motion.div className="cart-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setCartOpen(false)}>
             <motion.div className="cart-drawer" initial={{ x: 420 }} animate={{ x: 0 }} exit={{ x: 420 }} transition={{ type: 'spring', damping: 30, stiffness: 300 }} onClick={(e) => e.stopPropagation()}>
