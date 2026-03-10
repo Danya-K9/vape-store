@@ -242,7 +242,7 @@ export default function Header() {
               <div className="mobile-menu-section">
                 <button
                   type="button"
-                  className="mobile-catalog-btn"
+                  className={`mobile-catalog-btn ${catalogOpen ? 'open' : ''}`}
                   onClick={() => setCatalogOpen((v) => !v)}
                   aria-expanded={catalogOpen}
                 >

@@ -10,6 +10,7 @@ import './Catalog.css';
 const categoryNames = {
   disposables: 'Одноразки',
   liquids: 'Жидкости',
+  'pod-systems': 'Электронные парогенераторы',
   pouches: 'Никотиновые паучи',
   accessories: 'Комплектующие',
 };
