@@ -387,10 +387,11 @@
 }
 
 .catalog-dropdown {
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: 130px; /* чуть ниже полной панели */
   left: 0;
-  margin-top: 8px;
+  right: 0;
+  margin-top: 0;
   background: #fff;
   min-width: 260px;
   padding: 12px 0;

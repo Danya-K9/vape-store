@@ -17,7 +17,8 @@ export default function Header() {
   const [searchVal, setSearchVal] = useState('');
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false); // десктопный/верхний каталог
+  const [mobileCatalogOpen, setMobileCatalogOpen] = useState(false); // каталог внутри бургера
   const [cartOpen, setCartOpen] = useState(false);
   const [directorModalOpen, setDirectorModalOpen] = useState(false);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
@@ -29,16 +30,19 @@ export default function Header() {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY || window.pageYOffset || 0;
-      // "Гистерезис": чтобы панель не дёргалась туда‑сюда около нуля.
-      if (!scrolled && y > 140) setScrolled(true);
-      else if (scrolled && y < 40) setScrolled(false);
+      // Гистерезис: не дёргать панель около нуля.
+      setScrolled((prev) => {
+        if (y > 140) return true;
+        if (y < 40) return false;
+        return prev;
+      });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => {
       window.removeEventListener('scroll', onScroll);
     };
-  }, [scrolled]);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
@@ -50,10 +54,8 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    // Для десктопного дропдауна каталога — закрываем по клику вне только,
-    // когда бургер-меню закрыто. На мобильном внутри бургера закрываем
-    // каталог только повторным нажатием на кнопку "Каталог".
-    if (!catalogOpen || menuOpen) return;
+    // Десктопный дропдаун закрываем по клику вне (бургер‑каталог живёт отдельно).
+    if (!catalogOpen) return;
     const handleClickOutside = (e) => {
       const inside = catalogRefCompact.current?.contains(e.target) || catalogRefNav.current?.contains(e.target);
       if (!inside) setCatalogOpen(false);
@@ -64,7 +66,7 @@ export default function Header() {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, [catalogOpen, menuOpen]);
+  }, [catalogOpen]);
 
   return (
     <header className={`header header-light ${scrolled ? 'header-scrolled' : ''}`}>
@@ -253,19 +255,19 @@ export default function Header() {
               <div className="mobile-menu-section">
                 <button
                   type="button"
-                  className={`mobile-catalog-btn ${catalogOpen ? 'open' : ''}`}
-                  onClick={() => setCatalogOpen((v) => !v)}
-                  aria-expanded={catalogOpen}
+                  className={`mobile-catalog-btn ${mobileCatalogOpen ? 'open' : ''}`}
+                  onClick={() => setMobileCatalogOpen((v) => !v)}
+                  aria-expanded={mobileCatalogOpen}
                 >
                   ☰ Каталог
                 </button>
-                {catalogOpen && (
+                {mobileCatalogOpen && (
                   <div className="mobile-catalog-links">
-                    <Link to="/catalog/disposables" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Одноразки</Link>
-                    <Link to="/catalog/liquids" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Жидкости</Link>
-                    <Link to="/catalog/pod-systems" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Электронные парогенераторы</Link>
-                    <Link to="/catalog/accessories" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Комплектующие</Link>
-                    <Link to="/catalog/pouches" onClick={() => { setCatalogOpen(false); setMenuOpen(false); }}>Никотиновые паучи</Link>
+                    <Link to="/catalog/disposables" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Одноразки</Link>
+                    <Link to="/catalog/liquids" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Жидкости</Link>
+                    <Link to="/catalog/pod-systems" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Электронные парогенераторы</Link>
+                    <Link to="/catalog/accessories" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Комплектующие</Link>
+                    <Link to="/catalog/pouches" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Никотиновые паучи</Link>
                   </div>
                 )}
               </div>
