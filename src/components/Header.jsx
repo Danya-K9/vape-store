@@ -32,8 +32,8 @@ export default function Header() {
       const y = window.scrollY || window.pageYOffset || 0;
       // Гистерезис: не дёргать панель около нуля.
       setScrolled((prev) => {
-        if (y > 140) return true;
-        if (y < 40) return false;
+        if (y > 20) return true;
+        if (y < 5) return false;
         return prev;
       });
     };
@@ -67,6 +67,17 @@ export default function Header() {
       document.removeEventListener('touchstart', handleClickOutside);
     };
   }, [catalogOpen]);
+
+  const dropdownStyle = scrolled
+    ? {}
+    : {
+        position: 'fixed',
+        top: 260,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'min(320px, 100%)',
+        right: 'auto',
+      };
 
   return (
     <header className={`header header-light ${scrolled ? 'header-scrolled' : ''}`}>
@@ -139,7 +150,7 @@ export default function Header() {
                 >
                   ☰ КАТАЛОГ
                 </button>
-                <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`}>
+                <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`} style={dropdownStyle}>
                   <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразки</Link>
                   <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости</Link>
                   <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
@@ -205,7 +216,7 @@ export default function Header() {
             >
               ☰ КАТАЛОГ
             </button>
-            <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`}>
+            <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`} style={dropdownStyle}>
               <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразки</Link>
               <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости</Link>
               <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
