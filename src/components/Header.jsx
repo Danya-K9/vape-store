@@ -30,15 +30,18 @@ export default function Header() {
     const onScroll = () => {
       const y = window.scrollY || window.pageYOffset || 0;
       // "Гистерезис": чтобы панель не дёргалась туда‑сюда около нуля.
-      if (!scrolled && y > 140) setScrolled(true);
-      else if (scrolled && y < 40) setScrolled(false);
+      setScrolled((prev) => {
+        if (y > 140) return true;
+        if (y < 40) return false;
+        return prev;
+      });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => {
       window.removeEventListener('scroll', onScroll);
     };
-  }, [scrolled]);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
