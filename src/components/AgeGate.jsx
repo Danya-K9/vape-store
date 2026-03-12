@@ -2,14 +2,20 @@ import { useEffect, useMemo, useState } from 'react';
 import './AgeGate.css';
 
 const STORAGE_KEY = 'vape_store_age_gate';
+const REMEMBER_KEY = 'vape_store_age_gate_remember';
 
 export default function AgeGate({ children }) {
   const [status, setStatus] = useState('unknown'); // unknown | allowed | denied
+  const [remember, setRemember] = useState(false);
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === 'allowed') setStatus('allowed');
+      const savedRemember = localStorage.getItem(REMEMBER_KEY) === 'true';
+      if (saved === 'allowed' && savedRemember) {
+        setStatus('allowed');
+        setRemember(true);
+      }
       // "denied" не кешируем — при перезагрузке спросим снова
     } catch {
       // ignore
@@ -49,12 +55,30 @@ export default function AgeGate({ children }) {
             <div className="agegate-badge">18+</div>
             <h2>Подтверждение возраста</h2>
             <p>Сайт предназначен только для лиц старше 18 лет. Вам уже есть 18?</p>
+            <label className="agegate-remember">
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+              />
+              <span>Запомнить меня</span>
+            </label>
             <div className="agegate-actions">
               <button
                 type="button"
                 className="agegate-btn agegate-btn-yes"
                 onClick={() => {
-                  try { localStorage.setItem(STORAGE_KEY, 'allowed'); } catch { /* ignore */ }
+                  try {
+                    if (remember) {
+                      localStorage.setItem(STORAGE_KEY, 'allowed');
+                      localStorage.setItem(REMEMBER_KEY, 'true');
+                    } else {
+                      localStorage.removeItem(STORAGE_KEY);
+                      localStorage.removeItem(REMEMBER_KEY);
+                    }
+                  } catch {
+                    // ignore
+                  }
                   setStatus('allowed');
                 }}
               >

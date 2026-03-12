@@ -19,14 +19,11 @@ export default function License() {
       </nav>
 
       <h1>Лицензия</h1>
-      <p className="license-hint">
-        Здесь будет фотография лицензии. Вы сможете заменить изображение позже.
-      </p>
 
       <div className="license-image-wrap">
         <img
           src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200"
-          alt="Лицензия (пример)"
+          alt="Лицензия"
         />
       </div>
     </motion.div>

@@ -112,14 +112,6 @@ export default function ProductCarousel({ products = [] }) {
             />
           ))}
         </div>
-        <div className="product-carousel-arrows">
-          <button type="button" className="product-carousel-arrow" onClick={prev} aria-label="Предыдущий">
-            ‹
-          </button>
-          <button type="button" className="product-carousel-arrow" onClick={next} aria-label="Следующий">
-            ›
-          </button>
-        </div>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import ProductCarousel from '../components/ProductCarousel';
 import HeroCarousel from '../components/HeroCarousel';
 import SocialCarousel from '../components/SocialCarousel';
-import { blogPosts, reviews } from '../data/products';
+import { blogPosts, reviews, products as localProducts } from '../data/products';
 import { productsApi } from '../lib/api';
 import './Home.css';
 
@@ -22,15 +22,24 @@ export default function Home() {
   const [newProducts, setNewProducts] = useState([]);
   const [bestsellerProducts, setBestsellerProducts] = useState([]);
 
+  const newFallback = (localProducts || []).filter((p) => p.badge === 'Новинка');
+  const bestsellerFallback = (localProducts || []).filter((p) => p.badge === 'Хит' || p.badge === 'Советуем');
+
   useEffect(() => {
     productsApi.list({ newOnly: 'true' })
-      .then((data) => setNewProducts(Array.isArray(data) ? data : []))
-      .catch(() => setNewProducts([]));
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : [];
+        setNewProducts(arr.length > 0 ? arr : newFallback);
+      })
+      .catch(() => setNewProducts(newFallback));
   }, []);
   useEffect(() => {
     productsApi.list({ bestsellers: 'true' })
-      .then((data) => setBestsellerProducts(Array.isArray(data) ? data : []))
-      .catch(() => setBestsellerProducts([]));
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : [];
+        setBestsellerProducts(arr.length > 0 ? arr : bestsellerFallback);
+      })
+      .catch(() => setBestsellerProducts(bestsellerFallback));
   }, []);
 
   const filteredNew = newFilter === 'all'

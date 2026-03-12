@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
@@ -52,9 +52,14 @@ export default function Catalog() {
   const [powerValues, setPowerValues] = useState([]);
   const [batteryValues, setBatteryValues] = useState([]);
   const [apiProducts, setApiProducts] = useState(null);
+  const prevCategoryRef = useRef(category);
 
   useEffect(() => { setSearch(searchParams.get('search') || ''); }, [searchParams]);
   useEffect(() => {
+    if (prevCategoryRef.current !== category) {
+      prevCategoryRef.current = category;
+      setApiProducts(null);
+    }
     const params = { category: category || undefined, search: search || undefined, priceMin, priceMax };
     if (manufacturers.length) params.manufacturer = manufacturers.join(',');
     if (puffCounts.length) params.puffCount = puffCounts.join(',');
