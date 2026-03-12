@@ -1,6 +1,6 @@
 const API = (() => {
   const raw = import.meta?.env?.VITE_API_URL;
-  const base = raw ? String(raw).replace(/\/+$/, '') : '';
+  const base = raw ? String(raw).trim().replace(/^['"]|['"]$/g, '').replace(/\/+$/, '') : '';
   // If user provides only an origin (e.g. https://app), normalize to https://app/api
   if (!base) return '/api';
   return base.endsWith('/api') ? base : `${base}/api`;
@@ -23,9 +23,13 @@ export async function api(path, options = {}) {
   };
   if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(`${API}${path}`, { ...options, headers });
+  const contentType = res.headers.get('content-type') || '';
   const text = await res.text();
-  const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
-  if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
+  if (!contentType.includes('application/json')) {
+    throw new Error(`API вернул не JSON (${res.status}). Проверь VITE_API_URL и /api роуты.`);
+  }
+  const data = text ? JSON.parse(text) : null;
+  if (!res.ok) throw new Error(data?.error || 'Ошибка запроса');
   return data;
 }
 
@@ -34,9 +38,13 @@ export async function apiForm(path, formData, method = 'POST') {
   const headers = {};
   if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(`${API}${path}`, { method, headers, body: formData });
+  const contentType = res.headers.get('content-type') || '';
   const text = await res.text();
-  const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
-  if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
+  if (!contentType.includes('application/json')) {
+    throw new Error(`API вернул не JSON (${res.status}). Проверь VITE_API_URL и /api роуты.`);
+  }
+  const data = text ? JSON.parse(text) : null;
+  if (!res.ok) throw new Error(data?.error || 'Ошибка запроса');
   return data;
 }
 
