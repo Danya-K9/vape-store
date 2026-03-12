@@ -7,6 +7,7 @@ import Privacy from './pages/Privacy';
 import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
 import About from './pages/About';
+import License from './pages/License';
 import Contacts from './pages/Contacts';
 import Payment from './pages/Payment';
 import Delivery from './pages/Delivery';
@@ -28,6 +29,7 @@ function AppRoutes() {
           <Route path="blog" element={<Blog />} />
           <Route path="blog/:id" element={<BlogDetail />} />
           <Route path="about" element={<About />} />
+          <Route path="license" element={<License />} />
           <Route path="payment" element={<Payment />} />
           <Route path="delivery" element={<Delivery />} />
           <Route path="contacts" element={<Contacts />} />

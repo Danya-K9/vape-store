@@ -27,17 +27,18 @@ async function main() {
   const storeCount = await prisma.store.count();
   const storeData = {
     address: 'г. Орша, ул. Ленина, 17',
-    hours: 'Ежедневно с 10:00 до 20:00',
+    hours: 'Понедельник ~ пятница: с 10:00 до 20:00\nСуббота: с 10:00 до 19:00\nВоскресенье: Выходной',
     phone: '+375 (44) 599-84-94',
     image: 'https://images.pexels.com/photos/14279339/pexels-photo-14279339.jpeg?auto=compress&w=600',
   };
   if (storeCount === 0) {
     await prisma.store.create({ data: storeData });
   } else {
-    const oldStore = await prisma.store.findFirst({ where: { address: 'г. Орша, ул. Советская, 2В' } });
-    if (oldStore) {
-      await prisma.store.update({ where: { id: oldStore.id }, data: { address: storeData.address } });
-      console.log('Store address updated to Ленина, 17');
+    const store = await prisma.store.findFirst({ where: { address: storeData.address } })
+      || await prisma.store.findFirst({ where: { address: 'г. Орша, ул. Советская, 2В' } });
+    if (store) {
+      await prisma.store.update({ where: { id: store.id }, data: storeData });
+      console.log('Store updated');
     }
   }
   console.log('Store ready');

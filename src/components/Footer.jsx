@@ -38,10 +38,10 @@ export default function Footer() {
           </div>
           <div className="footer-column">
             <h4>Каталог</h4>
-            <Link to="/catalog/disposables">Вейпы</Link>
-            <Link to="/catalog/liquids">Жидкости</Link>
-            <Link to="/catalog/disposables">Одноразки</Link>
-            <Link to="/catalog/pouches">Паучи</Link>
+            <Link to="/catalog/pod-systems">Электронные парогенераторы</Link>
+            <Link to="/catalog/liquids">Жидкости для электронных парогенераторов</Link>
+            <Link to="/catalog/disposables">Одноразовые парогенераторы</Link>
+            <Link to="/catalog/pouches">Никотиновые паучи</Link>
             <Link to="/catalog/accessories">Комплектующие</Link>
           </div>
           <div className="footer-column">

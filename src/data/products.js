@@ -1,9 +1,9 @@
 export const categories = [
-  { id: 'disposables', name: 'Одноразки', slug: 'disposables' },
-  { id: 'liquids', name: 'Жидкости', slug: 'liquids' },
+  { id: 'disposables', name: 'Одноразовые парогенераторы', slug: 'disposables' },
+  { id: 'liquids', name: 'Жидкости для электронных парогенераторов', slug: 'liquids' },
   { id: 'accessories', name: 'Комплектующие', slug: 'accessories' },
   { id: 'pouches', name: 'Никотиновые паучи', slug: 'pouches' },
-  { id: 'pod-systems', name: 'POD системы', slug: 'pod-systems' },
+  { id: 'pod-systems', name: 'Электронные парогенераторы', slug: 'pod-systems' },
 ];
 
 export const products = [

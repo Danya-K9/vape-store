@@ -11,9 +11,9 @@ import './Home.css';
 const categoryFilters = [
   { id: 'all', name: 'Все' },
   { id: 'pod-systems', name: 'Электронные парогенераторы' },
-  { id: 'liquids', name: 'Жидкости' },
+  { id: 'liquids', name: 'Жидкости для электронных парогенераторов' },
   { id: 'pouches', name: 'Никотиновые паучи' },
-  { id: 'disposables', name: 'Одноразки' },
+  { id: 'disposables', name: 'Одноразовые парогенераторы' },
 ];
 
 export default function Home() {

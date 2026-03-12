@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import './About.css';
 
 export default function About() {
@@ -70,6 +71,10 @@ export default function About() {
           VAPE STORE — это всё для комфортного парения. Будем рады видеть вас в
           наших магазинах.
         </p>
+
+        <div className="about-actions">
+          <Link to="/license" className="about-license-btn">Лицензия</Link>
+        </div>
       </div>
     </motion.div>
   );

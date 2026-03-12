@@ -7,7 +7,7 @@ const STORES = [
   {
     id: 1,
     address: 'г. Орша, ул. Ленина, 17',
-    hours: 'Ежедневно с 10:00 до 20:00',
+    hours: 'Понедельник ~ пятница: с 10:00 до 20:00\nСуббота: с 10:00 до 19:00\nВоскресенье: Выходной',
     phone: PHONE,
     image: 'https://images.pexels.com/photos/14279339/pexels-photo-14279339.jpeg?auto=compress&w=600',
   },
@@ -85,10 +85,6 @@ export default function Contacts() {
             <img src={SOCIAL_ICONS.viber} alt="Viber" className="contacts-social-icon-img" />
             <span className="contacts-social-name">VIBER</span>
             <span className="contacts-social-desc">отвечаем быстро в чат</span>
-          </a>
-          <a href="https://youtube.com" target="_blank" rel="noreferrer" className="contacts-social-item">
-            <img src={SOCIAL_ICONS.youtube} alt="YouTube" className="contacts-social-icon-img" />
-            <span className="contacts-social-name">YOUTUBE</span>
           </a>
           <a href={`https://wa.me/${PHONE.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="contacts-social-item">
             <img src={SOCIAL_ICONS.whatsapp} alt="WhatsApp" className="contacts-social-icon-img" />

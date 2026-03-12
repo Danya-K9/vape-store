@@ -231,10 +231,10 @@ export default function AdminPanel() {
                         <input placeholder="Название" value={form.name ?? ''} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                         <input type="number" placeholder="Цена" value={form.price ?? ''} onChange={(e) => setForm({ ...form, price: e.target.value })} />
                         <select value={form.category ?? 'disposables'} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                          <option value="disposables">Одноразки</option>
-                          <option value="liquids">Жидкости</option>
-                          <option value="pod-systems">POD системы</option>
-                          <option value="pouches">Паучи</option>
+                          <option value="disposables">Одноразовые парогенераторы</option>
+                          <option value="liquids">Жидкости для электронных парогенераторов</option>
+                          <option value="pod-systems">Электронные парогенераторы</option>
+                          <option value="pouches">Никотиновые паучи</option>
                           <option value="accessories">Комплектующие</option>
                         </select>
                         <label><input type="checkbox" checked={form.showInNew ?? false} onChange={(e) => setForm({ ...form, showInNew: e.target.checked })} /> Новинки</label>
@@ -421,10 +421,10 @@ export default function AdminPanel() {
                           <input placeholder="Название" value={form.name ?? p.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                           <input type="number" placeholder="Цена" value={form.price ?? p.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
                           <select value={form.category ?? p.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                            <option value="disposables">Одноразки</option>
-                            <option value="liquids">Жидкости</option>
-                            <option value="pod-systems">POD системы</option>
-                            <option value="pouches">Паучи</option>
+                            <option value="disposables">Одноразовые парогенераторы</option>
+                            <option value="liquids">Жидкости для электронных парогенераторов</option>
+                            <option value="pod-systems">Электронные парогенераторы</option>
+                            <option value="pouches">Никотиновые паучи</option>
                             <option value="accessories">Комплектующие</option>
                           </select>
                           <label><input type="checkbox" checked={form.showInNew ?? p.showInNew} onChange={(e) => setForm({ ...form, showInNew: e.target.checked })} /> Новинки</label>

@@ -8,8 +8,8 @@ import { productsApi } from '../lib/api';
 import './Catalog.css';
 
 const categoryNames = {
-  disposables: 'Одноразки',
-  liquids: 'Жидкости',
+  disposables: 'Одноразовые парогенераторы',
+  liquids: 'Жидкости для электронных парогенераторов',
   'pod-systems': 'Электронные парогенераторы',
   pouches: 'Никотиновые паучи',
   accessories: 'Комплектующие',

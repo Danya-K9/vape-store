@@ -14,19 +14,19 @@ const mainSlides = [
   {
     id: 2,
     image: 'https://sun6-23.userapi.com/s/v1/ig2/P3iG3K4fKmcg_Zru-zmAWUfQtc9Ch3gNrCzaCAxSrirLMa90wQxZtHZOyG9PRDYSutl11lTb5TavcfpxV7HkY1jZ.jpg?size=1600x1600&quality=95&crop=0,0,1600,1600&ava=1',
-    title: 'Жидкости для вейпа',
+    title: 'Жидкости для электронных парогенераторов',
     badge: null,
   },
   {
     id: 3,
     image: 'https://cdn.pixabay.com/photo/2018/09/14/19/20/vape-3677946_1280.jpg',
-    title: 'POD системы',
+    title: 'Электронные парогенераторы',
     badge: '-30%',
   },
   {
     id: 4,
     image: 'https://th.bing.com/th/id/OIP.6B7YY7ehhpfnp8EinLOX7gHaEP?w=280&h=180&c=7&r=0&o=7&pid=1.7&rm=3',
-    title: 'Одноразки',
+    title: 'Одноразовые парогенераторы',
     badge: '-20%',
   },
 ];

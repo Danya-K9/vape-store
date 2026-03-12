@@ -34,3 +34,26 @@
   font-weight: 500;
   color: #ddd !important;
 }
+
+.about-actions {
+  margin-top: 18px;
+}
+
+.about-license-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.about-license-btn:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}

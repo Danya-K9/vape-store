@@ -10,7 +10,7 @@ export default function AgeGate({ children }) {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved === 'allowed') setStatus('allowed');
-      else if (saved === 'denied') setStatus('denied');
+      // "denied" не кешируем — при перезагрузке спросим снова
     } catch {
       // ignore
     }
@@ -64,7 +64,6 @@ export default function AgeGate({ children }) {
                 type="button"
                 className="agegate-btn agegate-btn-no"
                 onClick={() => {
-                  try { localStorage.setItem(STORAGE_KEY, 'denied'); } catch { /* ignore */ }
                   setStatus('denied');
                 }}
               >
