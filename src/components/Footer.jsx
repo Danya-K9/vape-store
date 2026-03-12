@@ -49,6 +49,7 @@ export default function Footer() {
             <Link to="/about">История</Link>
             <Link to="/contacts">Магазины</Link>
             <Link to="/privacy">Политика конфиденциальности</Link>
+            <Link to="/license">Лицензия</Link>
           </div>
           <div className="footer-column">
             <h4>Гостям</h4>

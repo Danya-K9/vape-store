@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { favoritesApi } from '../lib/api';
+import ProductImageCarousel from './ProductImageCarousel';
 import './ProductCard.css';
 
 export default function ProductCard({ product, index = 0, isFavorite = false, onFavoriteChange }) {
@@ -48,7 +49,15 @@ export default function ProductCard({ product, index = 0, isFavorite = false, on
     >
       <Link to={`/product/${product.id}`} className="product-link">
         <div className="product-image-wrap">
-          <img src={product.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=400'} alt={product.name} className="product-image" />
+          {product.category === 'pod-systems' && [product.image, ...(product.images || [])].filter(Boolean).length > 1 ? (
+            <ProductImageCarousel
+              images={[product.image, ...(product.images || [])].filter(Boolean)}
+              alt={product.name}
+              className="product-card-carousel"
+            />
+          ) : (
+            <img src={product.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=400'} alt={product.name} className="product-image" />
+          )}
           {product.badge && (
             <span className={`product-badge product-badge--${product.badge === 'Новинка' ? 'new' : product.badge === 'Советуем' ? 'rec' : 'hit'}`}>
               {product.badge}

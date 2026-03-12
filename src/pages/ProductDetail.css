@@ -54,6 +54,11 @@
   aspect-ratio: 1;
 }
 
+.product-main-image .product-image-carousel {
+  width: 100%;
+  height: 100%;
+}
+
 .product-main-image img {
   width: 100%;
   height: 100%;

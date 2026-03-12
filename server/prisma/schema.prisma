@@ -31,6 +31,7 @@ model Product {
   name            String
   description     String?
   image           String?
+  images          String[]  @default([]) // Multiple images for pod-systems (different colors)
   price           Float
   category        String
   badge           String?   // Новинка, Хит, Советуем
@@ -100,6 +101,16 @@ model OrderItem {
   price     Float
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+}
+
+model FilterOption {
+  id        String   @id @default(cuid())
+  category  String   // disposables | liquids | pod-systems | pouches | accessories
+  filterKey String   // manufacturer | flavor | nicotineType | strength | volume | vgpg | puffCount | charging | powerAdj | battery | country | color | display
+  value     String   // e.g. "HQD", "Ментол", "600"
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  @@unique([category, filterKey, value])
 }
 
 model AuthCode {

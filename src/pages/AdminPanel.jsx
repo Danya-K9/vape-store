@@ -15,12 +15,16 @@ export default function AdminPanel() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [tab, setTab] = useState('products');
+  const [filterOptions, setFilterOptions] = useState([]);
+  const [filterCategory, setFilterCategory] = useState('disposables');
+  const [filterForm, setFilterForm] = useState({ filterKey: 'manufacturer', value: '' });
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
   const [imageFile, setImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]); // Extra images for pod-systems
 
   const headers = () => ({ Authorization: `Bearer ${token}` });
 
@@ -28,6 +32,10 @@ export default function AdminPanel() {
     if (!token) return;
     fetchProducts();
   }, [token]);
+
+  useEffect(() => {
+    if (token && tab === 'filters') fetchFilterOptions();
+  }, [token, tab, filterCategory]);
 
   const fetchUsers = async () => {
     const r = await fetch(`${API_BASE}/admin/users`, { headers: headers() });
@@ -39,6 +47,12 @@ export default function AdminPanel() {
     const r = await fetch(`${API_BASE}/admin/products`, { headers: headers() });
     if (r.status === 401) { logout(); return; }
     setProducts(await r.json());
+  };
+
+  const fetchFilterOptions = async () => {
+    const r = await fetch(`${API_BASE}/admin/filters?category=${encodeURIComponent(filterCategory)}`, { headers: headers() });
+    if (r.status === 401) { logout(); return; }
+    setFilterOptions(await r.json());
   };
 
   const fetchOrders = async () => {
@@ -101,12 +115,19 @@ export default function AdminPanel() {
   const saveProduct = async () => {
     const body = new FormData();
     Object.entries(form).forEach(([k, v]) => {
-      if (v != null && v !== '' && k !== 'id' && k !== 'image') body.append(k, v);
+      if (v != null && v !== '' && k !== 'id' && k !== 'image' && k !== 'images') body.append(k, v);
     });
     if (imageFile) {
       body.append('image', imageFile);
     } else if (form.image) {
       body.append('image', form.image);
+    }
+    const cat = form.category ?? (editing && editing !== 'new' ? editing.category : 'disposables');
+    if (cat === 'pod-systems' && (imageFiles.length > 0 || (Array.isArray(form.images) && form.images.length > 0))) {
+      imageFiles.forEach((f) => body.append('images', f));
+      if (Array.isArray(form.images) && form.images.length > 0) {
+        body.append('imagesJson', JSON.stringify(form.images));
+      }
     }
     if (editing && editing !== 'new') {
       await fetch(`${API_BASE}/admin/products/${editing.id}`, {
@@ -124,7 +145,25 @@ export default function AdminPanel() {
     setEditing(null);
     setForm({});
     setImageFile(null);
+    setImageFiles([]);
     fetchProducts();
+  };
+
+  const addFilterOption = async () => {
+    if (!filterForm.value?.trim()) return;
+    await fetch(`${API_BASE}/admin/filters`, {
+      method: 'POST',
+      headers: { ...headers(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category: filterCategory, filterKey: filterForm.filterKey, value: filterForm.value.trim() }),
+    });
+    setFilterForm({ ...filterForm, value: '' });
+    fetchFilterOptions();
+  };
+
+  const deleteFilterOption = async (id) => {
+    if (!confirm('Удалить вариант?')) return;
+    await fetch(`${API_BASE}/admin/filters/${id}`, { method: 'DELETE', headers: headers() });
+    fetchFilterOptions();
   };
 
   const updateOrderStatus = async (id, status) => {
@@ -169,8 +208,55 @@ export default function AdminPanel() {
         <button onClick={logout}>Выход</button>
       </header>
       <nav className="admin-tabs">
-        <button className="active" onClick={() => setTab('products')}>Товары</button>
+        <button className={tab === 'products' ? 'active' : ''} onClick={() => setTab('products')}>Товары</button>
+        <button className={tab === 'filters' ? 'active' : ''} onClick={() => setTab('filters')}>Фильтры</button>
       </nav>
+
+      {tab === 'filters' && (
+        <section className="admin-section">
+          <h2>Управление вариантами фильтров по категориям</h2>
+          <p style={{ marginBottom: 16, color: '#666' }}>Добавляйте, удаляйте варианты для фильтрации (производители, вкусы и т.д.). Они будут отображаться в каталоге.</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+            <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+              <option value="disposables">Одноразовые парогенераторы</option>
+              <option value="liquids">Жидкости</option>
+              <option value="pod-systems">Электронные парогенераторы</option>
+              <option value="pouches">Никотиновые паучи</option>
+              <option value="accessories">Комплектующие</option>
+            </select>
+            <select value={filterForm.filterKey} onChange={(e) => setFilterForm({ ...filterForm, filterKey: e.target.value })}>
+              <option value="manufacturer">Производитель</option>
+              <option value="flavor">Вкус</option>
+              <option value="nicotineType">Тип никотина</option>
+              <option value="puffCount">Кол-во затяжек</option>
+              <option value="strength">Крепость</option>
+              <option value="volume">Объём</option>
+              <option value="vgpg">VG/PG</option>
+              <option value="charging">Зарядка</option>
+              <option value="powerAdj">Регулировка мощности</option>
+              <option value="battery">Ёмкость АКБ</option>
+              <option value="country">Страна</option>
+              <option value="color">Цвет</option>
+              <option value="display">Дисплей</option>
+            </select>
+            <input placeholder="Новое значение" value={filterForm.value} onChange={(e) => setFilterForm({ ...filterForm, value: e.target.value })} onKeyDown={(e) => e.key === 'Enter' && addFilterOption()} />
+            <button onClick={addFilterOption}>Добавить</button>
+          </div>
+          <table>
+            <thead><tr><th>Фильтр</th><th>Значение</th><th></th></tr></thead>
+            <tbody>
+              {filterOptions.map((o) => (
+                <tr key={o.id}>
+                  <td>{o.filterKey}</td>
+                  <td>{o.value}</td>
+                  <td><button onClick={() => deleteFilterOption(o.id)}>Удалить</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filterOptions.length === 0 && <p style={{ color: '#888' }}>Нет добавленных вариантов. Используются значения по умолчанию.</p>}
+        </section>
+      )}
 
       {false && tab === 'users' && (
         <section className="admin-section">
@@ -217,7 +303,7 @@ export default function AdminPanel() {
 
       {tab === 'products' && (
         <section className="admin-section">
-          <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'disposables', image: '', description: '', manufacturer: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', battery: '', color: '', display: '', badge: '' }); setImageFile(null); }}>Добавить товар</button>
+          <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'disposables', image: '', images: [], description: '', manufacturer: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', battery: '', color: '', display: '', badge: '' }); setImageFile(null); setImageFiles([]); }}>Добавить товар</button>
           <table>
             <thead>
               <tr><th>Название</th><th>Цена</th><th>Категория</th><th>Новинки</th><th>Лидеры</th><th></th></tr>
@@ -405,8 +491,15 @@ export default function AdminPanel() {
                         <input type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; setImageFile(f || null); if (f) setForm({ ...form, image: '' }); e.target.value = ''; }} title="Файл" />
                         <input placeholder="URL картинки" value={form.image ?? ''} onChange={(e) => { setForm({ ...form, image: e.target.value }); if (e.target.value) setImageFile(null); }} style={{ width: '200px' }} disabled={!!imageFile} />
                         {imageFile && <span style={{ fontSize: 11, color: '#0a0' }}>Файл: {imageFile.name}</span>}
+                        {(form.category ?? 'disposables') === 'pod-systems' && (
+                          <>
+                            <label style={{ marginLeft: 12 }}>Доп. фото (расцветки):</label>
+                            <input type="file" accept="image/*" multiple onChange={(e) => { const files = Array.from(e.target.files || []); setImageFiles(files); e.target.value = ''; }} />
+                            {imageFiles.length > 0 && <span style={{ fontSize: 11, color: '#0a0' }}>+{imageFiles.length} файл(ов)</span>}
+                          </>
+                        )}
                         <button onClick={saveProduct}>Сохранить</button>
-                        <button onClick={() => { setEditing(null); setImageFile(null); }}>Отмена</button>
+                        <button onClick={() => { setEditing(null); setImageFile(null); setImageFiles([]); }}>Отмена</button>
                       </div>
                     </div>
                   </td>
@@ -595,8 +688,16 @@ export default function AdminPanel() {
                           <input type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; setImageFile(f || null); if (f) setForm({ ...form, image: '' }); e.target.value = ''; }} title="Файл" />
                           <input placeholder="URL картинки" value={form.image ?? p.image ?? ''} onChange={(e) => { setForm({ ...form, image: e.target.value }); if (e.target.value) setImageFile(null); }} style={{ width: '200px' }} disabled={!!imageFile} />
                           {imageFile && <span style={{ fontSize: 11, color: '#0a0' }}>{imageFile.name}</span>}
+                          {(form.category ?? p.category ?? 'disposables') === 'pod-systems' && (
+                            <>
+                              <label style={{ marginLeft: 12 }}>Доп. фото:</label>
+                              <input type="file" accept="image/*" multiple onChange={(e) => { setImageFiles(Array.from(e.target.files || [])); e.target.value = ''; }} />
+                              {imageFiles.length > 0 && <span style={{ fontSize: 11, color: '#0a0' }}>+{imageFiles.length} файл(ов)</span>}
+                              {(p.images?.length > 0) && <span style={{ fontSize: 11, color: '#666' }}>Есть: {p.images.length} доп. фото</span>}
+                            </>
+                          )}
                           <button onClick={saveProduct}>Сохранить</button>
-                          <button onClick={() => { setEditing(null); setImageFile(null); }}>Отмена</button>
+                          <button onClick={() => { setEditing(null); setImageFile(null); setImageFiles([]); }}>Отмена</button>
                         </div>
                       </div>
                     </td>

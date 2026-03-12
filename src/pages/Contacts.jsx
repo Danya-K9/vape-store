@@ -7,7 +7,7 @@ const STORES = [
   {
     id: 1,
     address: 'г. Орша, ул. Ленина, 17',
-    hours: 'Понедельник ~ пятница: с 10:00 до 20:00\nСуббота: с 10:00 до 19:00\nВоскресенье: Выходной',
+    hours: 'Понедельник ~ пятница:\nС 10:00 до 20:00\nСуббота: с 10:00 до 19:00\nВоскресенье: Выходной',
     phone: PHONE,
     image: 'https://images.pexels.com/photos/14279339/pexels-photo-14279339.jpeg?auto=compress&w=600',
   },
@@ -95,7 +95,7 @@ export default function Contacts() {
       </section>
 
       <div className="contacts-banner">
-        <span>#VAPESTORE</span>
+        <img src="/footer-logo.png" alt="VAPE STORE" className="contacts-banner-logo" />
       </div>
     </motion.div>
   );

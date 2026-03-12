@@ -143,12 +143,11 @@ export default function Header() {
                   ☰ КАТАЛОГ
                 </button>
                 <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`}>
-                  <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразки</Link>
-                  <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости</Link>
+                  <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразовые парогенераторы</Link>
+                  <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости для электронных парогенераторов</Link>
                   <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
                   <Link to="/catalog/pod-systems" onClick={() => setCatalogOpen(false)}>Электронные парогенераторы</Link>
                   <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
-                  <Link to="/about" onClick={() => setCatalogOpen(false)}>Иное</Link>
                 </div>
               </div>
             )}
@@ -209,21 +208,19 @@ export default function Header() {
               ☰ КАТАЛОГ
             </button>
             <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`}>
-              <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразки</Link>
-              <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости</Link>
+              <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразовые парогенераторы</Link>
+              <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости для электронных парогенераторов</Link>
               <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
               <Link to="/catalog/pod-systems" onClick={() => setCatalogOpen(false)}>Электронные парогенераторы</Link>
               <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
-              <Link to="/about" onClick={() => setCatalogOpen(false)}>Иное</Link>
             </div>
           </div>
           <nav className="nav-categories">
-            <Link to="/catalog/disposables" className={location.pathname.includes('/disposables') ? 'active' : ''}>Одноразки</Link>
-            <Link to="/catalog/liquids" className={location.pathname.includes('/liquids') ? 'active' : ''}>Жидкости</Link>
+            <Link to="/catalog/disposables" className={location.pathname.includes('/disposables') ? 'active' : ''}>Одноразовые парогенераторы</Link>
+            <Link to="/catalog/liquids" className={location.pathname.includes('/liquids') ? 'active' : ''}>Жидкости для электронных парогенераторов</Link>
             <Link to="/catalog/pouches" className={location.pathname.includes('/pouches') ? 'active' : ''}>Никотиновые паучи</Link>
             <Link to="/catalog/pod-systems" className={location.pathname.includes('/pod-systems') ? 'active' : ''}>Электронные парогенераторы</Link>
             <Link to="/catalog/accessories" className={location.pathname.includes('/accessories') ? 'active' : ''}>Комплектующие</Link>
-            <Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>Иное</Link>
           </nav>
         </div>
       </div>
@@ -262,8 +259,8 @@ export default function Header() {
                 </button>
                 {mobileCatalogOpen && (
                   <div className="mobile-catalog-links">
-                    <Link to="/catalog/disposables" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Одноразки</Link>
-                    <Link to="/catalog/liquids" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Жидкости</Link>
+                    <Link to="/catalog/disposables" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Одноразовые парогенераторы</Link>
+                    <Link to="/catalog/liquids" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Жидкости для электронных парогенераторов</Link>
                     <Link to="/catalog/pod-systems" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Электронные парогенераторы</Link>
                     <Link to="/catalog/accessories" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Комплектующие</Link>
                     <Link to="/catalog/pouches" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Никотиновые паучи</Link>

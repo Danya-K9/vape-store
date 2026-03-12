@@ -18,6 +18,18 @@ const upload = multer({
   },
 });
 
+const uploadProductFiles = multer({
+  dest: path.join(__dirname, '../uploads'),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_, file, cb) => {
+    if (/^image\//.test(file.mimetype)) cb(null, true);
+    else cb(new Error('Только изображения'));
+  },
+}).fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'images', maxCount: 10 },
+]);
+
 router.use(authAdmin);
 
 router.get('/users', async (req, res) => {
@@ -83,13 +95,29 @@ router.get('/products', async (req, res) => {
   }
 });
 
-router.post('/products', upload.single('image'), async (req, res) => {
+router.post('/products', (req, res, next) => {
+  uploadProductFiles(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
   try {
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.image || null;
+    const imgFiles = (req.files?.image || [])[0];
+    const extraFiles = req.files?.images || [];
+    const imageUrl = req.body.image || (imgFiles ? `/uploads/${imgFiles.filename}` : null);
+    const extraUrls = extraFiles.map((f) => `/uploads/${f.filename}`);
+    let imagesArr = extraUrls;
+    if (req.body.images) {
+      try {
+        const parsed = typeof req.body.images === 'string' ? JSON.parse(req.body.images) : req.body.images;
+        if (Array.isArray(parsed)) imagesArr = [...extraUrls, ...parsed.filter(Boolean)];
+      } catch (_) {}
+    }
     const data = {
       name: req.body.name,
       description: req.body.description || null,
-      image: imageUrl || req.body.image,
+      image: imageUrl,
+      images: imagesArr,
       price: parseFloat(req.body.price),
       category: req.body.category || 'disposables',
       badge: req.body.badge || null,
@@ -116,11 +144,35 @@ router.post('/products', upload.single('image'), async (req, res) => {
   }
 });
 
-router.patch('/products/:id', upload.single('image'), async (req, res) => {
+router.patch('/products/:id', (req, res, next) => {
+  uploadProductFiles(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
   try {
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+    const imgFiles = (req.files?.image || [])[0];
+    const extraFiles = req.files?.images || [];
     const body = { ...req.body };
-    if (imageUrl) body.image = imageUrl;
+    if (imgFiles) body.image = `/uploads/${imgFiles.filename}`;
+    let imagesArr = [];
+    if (body.imagesJson) {
+      try {
+        const parsed = typeof body.imagesJson === 'string' ? JSON.parse(body.imagesJson) : body.imagesJson;
+        if (Array.isArray(parsed)) imagesArr = parsed.filter(Boolean);
+      } catch (_) {}
+    } else if (body.images !== undefined) {
+      try {
+        const parsed = typeof body.images === 'string' ? JSON.parse(body.images) : body.images;
+        if (Array.isArray(parsed)) imagesArr = parsed.filter(Boolean);
+      } catch (_) {}
+    }
+    if (extraFiles.length > 0) {
+      const extraUrls = extraFiles.map((f) => `/uploads/${f.filename}`);
+      body.images = [...extraUrls, ...imagesArr];
+    } else if (imagesArr.length > 0) {
+      body.images = imagesArr;
+    }
     const numFields = ['price', 'puffCount', 'strength', 'volume', 'battery'];
     numFields.forEach((f) => {
       if (body[f] !== undefined) body[f] = parseFloat(body[f]) || parseInt(body[f], 10) || null;
@@ -153,6 +205,61 @@ router.get('/orders', async (req, res) => {
       orderBy: { createdAt: 'desc' },
     });
     res.json(orders);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get('/filters', async (req, res) => {
+  try {
+    const { category } = req.query;
+    if (!category) return res.status(400).json({ error: 'category required' });
+    const options = await prisma.filterOption.findMany({
+      where: { category },
+      orderBy: [{ filterKey: 'asc' }, { sortOrder: 'asc' }, { value: 'asc' }],
+    });
+    res.json(options);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post('/filters', async (req, res) => {
+  try {
+    const { category, filterKey, value, sortOrder } = req.body;
+    if (!category || !filterKey || value === undefined) {
+      return res.status(400).json({ error: 'category, filterKey, value required' });
+    }
+    const opt = await prisma.filterOption.create({
+      data: { category, filterKey, value: String(value), sortOrder: sortOrder ?? 0 },
+    });
+    res.json(opt);
+  } catch (e) {
+    if (e.code === 'P2002') return res.status(400).json({ error: 'Такой вариант уже есть' });
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.patch('/filters/:id', async (req, res) => {
+  try {
+    const { value, sortOrder } = req.body;
+    const data = {};
+    if (value !== undefined) data.value = String(value);
+    if (sortOrder !== undefined) data.sortOrder = sortOrder;
+    const opt = await prisma.filterOption.update({
+      where: { id: req.params.id },
+      data,
+    });
+    res.json(opt);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.delete('/filters/:id', async (req, res) => {
+  try {
+    await prisma.filterOption.delete({ where: { id: req.params.id } });
+    res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

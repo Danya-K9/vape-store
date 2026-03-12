@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { filtersApi } from '../lib/api';
 import './CatalogFilters.css';
 
 const DISPOSABLES_MANUFACTURERS = [
@@ -78,6 +79,12 @@ export default function CatalogFilters({
   onBatteryToggle,
   onReset,
 }) {
+  const [dynamicOptions, setDynamicOptions] = useState(null);
+  useEffect(() => {
+    if (!category) { setDynamicOptions(null); return; }
+    filtersApi.list(category).then(setDynamicOptions).catch(() => setDynamicOptions(null));
+  }, [category]);
+
   const [openSections, setOpenSections] = useState({
     price: true,
     manufacturer: true,
@@ -90,7 +97,7 @@ export default function CatalogFilters({
   };
   const isOpen = (key) => openSections[key] !== false;
 
-  const renderCheckbox = (items, selected, onToggle, key) =>
+  const renderCheckbox = (items, selected, onToggle) =>
     items.map((item) => (
       <label key={item} className="filter-checkbox">
         <input
@@ -101,6 +108,8 @@ export default function CatalogFilters({
         <span>{typeof item === 'number' ? item : item}</span>
       </label>
     ));
+
+  const getOpt = (key) => (dynamicOptions?.[key]?.length > 0 ? dynamicOptions[key] : null);
 
   const disposablesFilters = () => (
     <>
@@ -113,34 +122,34 @@ export default function CatalogFilters({
         <p className="price-range-text">Цена: {priceMin} – {priceMax} BYN</p>
       </FilterSection>
       <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
-        {renderCheckbox(DISPOSABLES_MANUFACTURERS, manufacturers, onManufacturerToggle)}
+        {renderCheckbox(getOpt('manufacturer') ?? DISPOSABLES_MANUFACTURERS, manufacturers, onManufacturerToggle)}
       </FilterSection>
       <FilterSection title="Количество затяжек" open={isOpen('puff')} onToggle={() => toggleSection('puff')}>
-        {renderCheckbox(PUFF_COUNTS, puffCounts, onPuffToggle)}
+        {renderCheckbox((getOpt('puffCount') ?? PUFF_COUNTS).map((x) => (typeof x === 'string' ? parseInt(x, 10) : x)), puffCounts, onPuffToggle)}
       </FilterSection>
       <FilterSection title="Тип никотина" open={isOpen('nicotine')} onToggle={() => toggleSection('nicotine')}>
-        {renderCheckbox(NICOTINE_TYPES, nicotineTypes, onNicotineToggle)}
+        {renderCheckbox(getOpt('nicotineType') ?? NICOTINE_TYPES, nicotineTypes, onNicotineToggle)}
       </FilterSection>
       <FilterSection title="Вкус" open={isOpen('flavor')} onToggle={() => toggleSection('flavor')}>
-        {renderCheckbox(FLAVORS, flavors, onFlavorToggle)}
+        {renderCheckbox(getOpt('flavor') ?? FLAVORS, flavors, onFlavorToggle)}
       </FilterSection>
       <FilterSection title="Крепость" open={isOpen('strength')} onToggle={() => toggleSection('strength')}>
-        {renderCheckbox(STRENGTHS, strengths, onStrengthToggle)}
+        {renderCheckbox((getOpt('strength') ?? STRENGTHS).map((x) => (typeof x === 'string' ? parseInt(x, 10) : x)), strengths, onStrengthToggle)}
       </FilterSection>
       <FilterSection title="Объем" open={isOpen('volume')} onToggle={() => toggleSection('volume')}>
-        {renderCheckbox(VOLUMES, volumes, onVolumeToggle)}
+        {renderCheckbox((getOpt('volume') ?? VOLUMES).map((x) => (typeof x === 'string' ? parseInt(x, 10) : x)), volumes, onVolumeToggle)}
       </FilterSection>
       <FilterSection title="VG/PG" open={isOpen('vgpg')} onToggle={() => toggleSection('vgpg')}>
-        {renderCheckbox(VGPG, vgpgValues, onVgpgToggle)}
+        {renderCheckbox(getOpt('vgpg') ?? VGPG, vgpgValues, onVgpgToggle)}
       </FilterSection>
       <FilterSection title="Зарядка" open={isOpen('charging')} onToggle={() => toggleSection('charging')}>
-        {renderCheckbox(CHARGING, chargingValues, onChargingToggle)}
+        {renderCheckbox(getOpt('charging') ?? CHARGING, chargingValues, onChargingToggle)}
       </FilterSection>
       <FilterSection title="Регулировка мощности" open={isOpen('power')} onToggle={() => toggleSection('power')}>
-        {renderCheckbox(POWER_ADJ, powerValues, onPowerToggle)}
+        {renderCheckbox(getOpt('powerAdj') ?? POWER_ADJ, powerValues, onPowerToggle)}
       </FilterSection>
       <FilterSection title="Емкость АКБ" open={isOpen('battery')} onToggle={() => toggleSection('battery')}>
-        {renderCheckbox(BATTERY, batteryValues, onBatteryToggle)}
+        {renderCheckbox((getOpt('battery') ?? BATTERY).map((x) => (typeof x === 'string' ? parseInt(x, 10) : x)), batteryValues, onBatteryToggle)}
       </FilterSection>
     </>
   );
@@ -148,45 +157,45 @@ export default function CatalogFilters({
   const liquidsFilters = () => (
     <>
       <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
-        {renderCheckbox(LIQUIDS_MANUFACTURERS, manufacturers, onManufacturerToggle)}
+        {renderCheckbox(getOpt('manufacturer') ?? LIQUIDS_MANUFACTURERS, manufacturers, onManufacturerToggle)}
       </FilterSection>
       <FilterSection title="Тип никотина" open={isOpen('nicotine')} onToggle={() => toggleSection('nicotine')}>
-        {renderCheckbox(LIQUIDS_NICOTINE, nicotineTypes, onNicotineToggle)}
+        {renderCheckbox(getOpt('nicotineType') ?? LIQUIDS_NICOTINE, nicotineTypes, onNicotineToggle)}
       </FilterSection>
       <FilterSection title="Вкус" open={isOpen('flavor')} onToggle={() => toggleSection('flavor')}>
-        {renderCheckbox(FLAVORS, flavors, onFlavorToggle)}
+        {renderCheckbox(getOpt('flavor') ?? FLAVORS, flavors, onFlavorToggle)}
       </FilterSection>
       <FilterSection title="Крепость" open={isOpen('strength')} onToggle={() => toggleSection('strength')}>
-        {renderCheckbox(STRENGTHS, strengths, onStrengthToggle)}
+        {renderCheckbox((getOpt('strength') ?? STRENGTHS).map((x) => (typeof x === 'string' ? parseInt(x, 10) : x)), strengths, onStrengthToggle)}
       </FilterSection>
       <FilterSection title="Объем" open={isOpen('volume')} onToggle={() => toggleSection('volume')}>
-        {renderCheckbox(VOLUMES, volumes, onVolumeToggle)}
+        {renderCheckbox((getOpt('volume') ?? VOLUMES).map((x) => (typeof x === 'string' ? parseInt(x, 10) : x)), volumes, onVolumeToggle)}
       </FilterSection>
       <FilterSection title="VG/PG" open={isOpen('vgpg')} onToggle={() => toggleSection('vgpg')}>
-        {renderCheckbox(VGPG, vgpgValues, onVgpgToggle)}
+        {renderCheckbox(getOpt('vgpg') ?? VGPG, vgpgValues, onVgpgToggle)}
       </FilterSection>
     </>
   );
 
   const accessoriesFilters = () => (
     <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
-      {renderCheckbox(LIQUIDS_MANUFACTURERS.concat('Vaporesso'), manufacturers, onManufacturerToggle)}
+      {renderCheckbox(getOpt('manufacturer') ?? LIQUIDS_MANUFACTURERS.concat('Vaporesso'), manufacturers, onManufacturerToggle)}
     </FilterSection>
   );
 
   const pouchesFilters = () => (
     <>
       <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
-        {renderCheckbox(LIQUIDS_MANUFACTURERS.concat('Glitch'), manufacturers, onManufacturerToggle)}
+        {renderCheckbox(getOpt('manufacturer') ?? LIQUIDS_MANUFACTURERS.concat('Glitch'), manufacturers, onManufacturerToggle)}
       </FilterSection>
       <FilterSection title="Тип никотина" open={isOpen('nicotine')} onToggle={() => toggleSection('nicotine')}>
-        {renderCheckbox(NICOTINE_TYPES, nicotineTypes, onNicotineToggle)}
+        {renderCheckbox(getOpt('nicotineType') ?? NICOTINE_TYPES, nicotineTypes, onNicotineToggle)}
       </FilterSection>
       <FilterSection title="Вкус" open={isOpen('flavor')} onToggle={() => toggleSection('flavor')}>
-        {renderCheckbox(FLAVORS, flavors, onFlavorToggle)}
+        {renderCheckbox(getOpt('flavor') ?? FLAVORS, flavors, onFlavorToggle)}
       </FilterSection>
       <FilterSection title="Крепость" open={isOpen('strength')} onToggle={() => toggleSection('strength')}>
-        {renderCheckbox(STRENGTHS, strengths, onStrengthToggle)}
+        {renderCheckbox((getOpt('strength') ?? STRENGTHS).map((x) => (typeof x === 'string' ? parseInt(x, 10) : x)), strengths, onStrengthToggle)}
       </FilterSection>
     </>
   );
@@ -194,13 +203,13 @@ export default function CatalogFilters({
   const podSystemsFilters = () => (
     <>
       <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
-        {renderCheckbox(LIQUIDS_MANUFACTURERS.concat('Vaporesso'), manufacturers, onManufacturerToggle)}
+        {renderCheckbox(getOpt('manufacturer') ?? LIQUIDS_MANUFACTURERS.concat('Vaporesso'), manufacturers, onManufacturerToggle)}
       </FilterSection>
       <FilterSection title="Регулировка мощности" open={isOpen('power')} onToggle={() => toggleSection('power')}>
-        {renderCheckbox(POWER_ADJ, powerValues, onPowerToggle)}
+        {renderCheckbox(getOpt('powerAdj') ?? POWER_ADJ, powerValues, onPowerToggle)}
       </FilterSection>
       <FilterSection title="Ёмкость АКБ" open={isOpen('battery')} onToggle={() => toggleSection('battery')}>
-        {renderCheckbox(BATTERY, batteryValues, onBatteryToggle)}
+        {renderCheckbox((getOpt('battery') ?? BATTERY).map((x) => (typeof x === 'string' ? parseInt(x, 10) : x)), batteryValues, onBatteryToggle)}
       </FilterSection>
     </>
   );

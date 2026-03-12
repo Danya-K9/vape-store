@@ -6,6 +6,7 @@ import { productsApi } from '../lib/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { favoritesApi } from '../lib/api';
+import ProductImageCarousel from '../components/ProductImageCarousel';
 import './ProductDetail.css';
 
 export default function ProductDetail() {
@@ -103,7 +104,15 @@ export default function ProductDetail() {
           transition={{ delay: 0.1 }}
         >
           <div className="product-main-image">
-            <img src={product.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=600'} alt={product.name} />
+            {product.category === 'pod-systems' && [product.image, ...(product.images || [])].filter(Boolean).length > 1 ? (
+              <ProductImageCarousel
+                images={[product.image, ...(product.images || [])].filter(Boolean)}
+                alt={product.name}
+                className="product-detail-carousel"
+              />
+            ) : (
+              <img src={product.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=600'} alt={product.name} />
+            )}
             {product.badge && (
               <span className="product-badge">{product.badge}</span>
             )}

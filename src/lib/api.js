@@ -76,3 +76,7 @@ export const ordersApi = {
 export const storesApi = {
   list: () => api('/stores'),
 };
+
+export const filtersApi = {
+  list: (category) => api(`/filters?category=${encodeURIComponent(category)}`),
+};

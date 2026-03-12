@@ -1,0 +1,95 @@
+.product-image-carousel {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.product-carousel-single {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-carousel-slides {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.product-carousel-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.product-carousel-slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.product-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255, 255, 255, 0.85);
+  color: #333;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+}
+
+.product-carousel-arrow:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.product-carousel-arrow-left {
+  left: 8px;
+}
+
+.product-carousel-arrow-right {
+  right: 8px;
+}
+
+.product-carousel-indicators {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 3;
+}
+
+.product-carousel-indicator {
+  width: 32px;
+  height: 3px;
+  border: none;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 2px;
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+}
+
+.product-carousel-indicator-fill {
+  display: block;
+  height: 100%;
+  background: #000;
+  border-radius: 2px;
+  transition: width 0.05s linear;
+}
