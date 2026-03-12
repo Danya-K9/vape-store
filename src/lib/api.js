@@ -1,7 +1,9 @@
 const API = (() => {
   const raw = import.meta?.env?.VITE_API_URL;
-  if (!raw) return '/api';
-  return String(raw).replace(/\/+$/, '');
+  const base = raw ? String(raw).replace(/\/+$/, '') : '';
+  // If user provides only an origin (e.g. https://app), normalize to https://app/api
+  if (!base) return '/api';
+  return base.endsWith('/api') ? base : `${base}/api`;
 })();
 
 export function getToken() {

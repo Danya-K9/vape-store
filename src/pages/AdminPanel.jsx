@@ -4,8 +4,9 @@ import './AdminPanel.css';
 
 const API_BASE = (() => {
   const raw = import.meta?.env?.VITE_API_URL;
-  if (!raw) return '/api';
-  return String(raw).replace(/\/+$/, '');
+  const base = raw ? String(raw).replace(/\/+$/, '') : '';
+  if (!base) return '/api';
+  return base.endsWith('/api') ? base : `${base}/api`;
 })();
 
 export default function AdminPanel() {

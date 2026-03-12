@@ -12,7 +12,7 @@ export default function Footer() {
         <div className="footer-inner">
           <div className="footer-brand">
             <div className="footer-brand-row">
-              <img src="/logo-store.png" alt="VAPE STORE" className="footer-logo-img" />
+              <img src="/footer-logo.png" alt="VAPE STORE" className="footer-logo-img" />
               <span className="footer-brand-name">VAPE STORE</span>
             </div>
             <p className="footer-tagline">VAPE SHOP</p>
