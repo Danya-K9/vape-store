@@ -23,5 +23,5 @@ ENV PORT=3001
 EXPOSE 3001
 
 # Railway provides DATABASE_URL at runtime
-CMD ["bash", "-lc", "cd server && npx prisma db push --schema prisma/schema.prisma && node seed.js && node index.js"]
+CMD ["sh", "-lc", "cd server && npx prisma db push --schema prisma/schema.prisma && node seed.js && node index.js"]
 
