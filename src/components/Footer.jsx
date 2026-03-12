@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { PHONE, SOCIAL_ICONS } from '../constants/socialIcons';
+import { PHONE, SOCIAL_ICONS_FOOTER } from '../constants/socialIcons';
 import './Footer.css';
 
 const PHONE_DISPLAY = '+375 (29) 539-75-10';
@@ -21,18 +21,18 @@ export default function Footer() {
             <div className="footer-write">
               <span className="footer-label">Напишите нам</span>
               <div className="footer-messengers">
-                <a href={VIBER_LINK} aria-label="Viber" className="msg-icon msg-viber"><img src={SOCIAL_ICONS.viber} alt="" /></a>
-                <a href="https://t.me/Manager_VapeStoree" target="_blank" rel="noreferrer" aria-label="Telegram" className="msg-icon msg-telegram"><img src={SOCIAL_ICONS.telegram} alt="" /></a>
-                <a href={`https://wa.me/${PHONE.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="msg-icon msg-whatsapp"><img src={SOCIAL_ICONS.whatsapp} alt="" /></a>
+                <a href={VIBER_LINK} aria-label="Viber" className="msg-icon msg-viber"><img src={SOCIAL_ICONS_FOOTER.viber} alt="" /></a>
+                <a href="https://t.me/Manager_VapeStoree" target="_blank" rel="noreferrer" aria-label="Telegram" className="msg-icon msg-telegram"><img src={SOCIAL_ICONS_FOOTER.telegram} alt="" /></a>
+                <a href={`https://wa.me/${PHONE.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="msg-icon msg-whatsapp"><img src={SOCIAL_ICONS_FOOTER.whatsapp} alt="" /></a>
               </div>
             </div>
             <div className="footer-socials-block">
               <span className="footer-label">Мы в соц. сетях</span>
               <div className="footer-socials">
-                <a href="https://t.me/Orsha_Smoke" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS.telegram} alt="" /></a>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><img src={SOCIAL_ICONS.instagram} alt="" /></a>
-                <a href="https://tiktok.com" target="_blank" rel="noreferrer" aria-label="TikTok"><img src={SOCIAL_ICONS.tiktok} alt="" /></a>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube"><img src={SOCIAL_ICONS.youtube} alt="" /></a>
+                <a href="https://t.me/Orsha_Smoke" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_FOOTER.telegram} alt="" /></a>
+                <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><img src={SOCIAL_ICONS_FOOTER.instagram} alt="" /></a>
+                <a href="https://tiktok.com" target="_blank" rel="noreferrer" aria-label="TikTok"><img src={SOCIAL_ICONS_FOOTER.tiktok} alt="" /></a>
+                <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube"><img src={SOCIAL_ICONS_FOOTER.youtube} alt="" /></a>
               </div>
             </div>
           </div>
