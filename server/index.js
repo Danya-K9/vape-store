@@ -19,14 +19,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors({
+const corsOptions = {
   origin: [
     'http://localhost:5173',
     'http://localhost:3000',
     'https://vape-store-production.up.railway.app',
   ],
   credentials: true,
-}));
+};
+app.use(cors(corsOptions));
+// Explicitly handle preflight, otherwise OPTIONS may fall through to static and return 405
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

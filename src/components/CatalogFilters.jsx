@@ -62,6 +62,17 @@ export default function CatalogFilters({
   };
   const isOpen = (key) => openSections[key] !== false;
 
+  const PriceSection = () => (
+    <FilterSection title="Цена" open={isOpen('price')} onToggle={() => toggleSection('price')}>
+      <div className="price-inputs">
+        <div><label>От</label><input type="number" min={0} value={priceMin} onChange={(e) => onPriceChange?.(parseInt(e.target.value, 10) || 0, priceMax)} /></div>
+        <div><label>До</label><input type="number" min={0} value={priceMax} onChange={(e) => onPriceChange?.(priceMin, parseInt(e.target.value, 10) || 0)} /></div>
+      </div>
+      <input type="range" min={0} max={150} value={priceMax} onChange={(e) => onPriceChange?.(priceMin, parseInt(e.target.value, 10))} className="price-slider" />
+      <p className="price-range-text">Цена: {priceMin} – {priceMax} BYN</p>
+    </FilterSection>
+  );
+
   const renderCheckbox = (items, selected, onToggle) =>
     items.map((item) => (
       <label key={item} className="filter-checkbox">
@@ -79,14 +90,7 @@ export default function CatalogFilters({
 
   const disposablesFilters = () => (
     <>
-      <FilterSection title="Цена" open={isOpen('price')} onToggle={() => toggleSection('price')}>
-        <div className="price-inputs">
-          <div><label>От</label><input type="number" min={0} value={priceMin} onChange={(e) => onPriceChange?.(parseInt(e.target.value, 10) || 0, priceMax)} /></div>
-          <div><label>До</label><input type="number" min={0} value={priceMax} onChange={(e) => onPriceChange?.(priceMin, parseInt(e.target.value, 10) || 0)} /></div>
-        </div>
-        <input type="range" min={0} max={150} value={priceMax} onChange={(e) => onPriceChange?.(priceMin, parseInt(e.target.value, 10))} className="price-slider" />
-        <p className="price-range-text">Цена: {priceMin} – {priceMax} BYN</p>
-      </FilterSection>
+      <PriceSection />
       {hasOpt('manufacturer') && (
         <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
           {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}
@@ -142,6 +146,7 @@ export default function CatalogFilters({
 
   const liquidsFilters = () => (
     <>
+      <PriceSection />
       {hasOpt('manufacturer') && (
         <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
           {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}
@@ -176,15 +181,19 @@ export default function CatalogFilters({
   );
 
   const accessoriesFilters = () => (
-    hasOpt('manufacturer') ? (
-      <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
-        {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}
-      </FilterSection>
-    ) : null
+    <>
+      <PriceSection />
+      {hasOpt('manufacturer') ? (
+        <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
+          {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}
+        </FilterSection>
+      ) : null}
+    </>
   );
 
   const pouchesFilters = () => (
     <>
+      <PriceSection />
       {hasOpt('manufacturer') && (
         <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
           {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}
@@ -210,6 +219,7 @@ export default function CatalogFilters({
 
   const podSystemsFilters = () => (
     <>
+      <PriceSection />
       {hasOpt('manufacturer') && (
         <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
           {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}

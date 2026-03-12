@@ -5,5 +5,5 @@ export const SOCIAL_ICONS = {
   viber: '/viber_ikon.png',
   youtube: '/youtube_ikon.png',
   whatsapp: '/whatsapp_ikon.png',
-  tiktok: '/tiktok_ikon.png',
+  tiktok: '/tiktok_ikon.webp',
 };

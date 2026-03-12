@@ -95,7 +95,7 @@ export default function Contacts() {
       </section>
 
       <div className="contacts-banner">
-        <img src="/footer-logo.png" alt="VAPE STORE" className="contacts-banner-logo" />
+        <span>#VAPESTORE</span>
       </div>
     </motion.div>
   );
