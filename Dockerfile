@@ -19,7 +19,6 @@ COPY server ./server
 RUN npm run db:generate --prefix server
 
 ENV NODE_ENV=production
-ENV PORT=3001
 EXPOSE 3001
 
 # Railway provides DATABASE_URL at runtime
