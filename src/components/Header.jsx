@@ -9,7 +9,7 @@ import { PHONE, SOCIAL_ICONS_HEADER } from '../constants/socialIcons';
 import './Header.css';
 
 const PHONE_DISPLAY = '+375 (29) 539-75-10';
-const VIBER_LINK = `viber://chat?number=${PHONE.replace(/\D/g, '')}`;
+const VIBER_LINK = `https://viber.click/${PHONE.replace(/\D/g, '')}`;
 
 export default function Header() {
   const { cart, total, count, removeFromCart, updateQuantity } = useCart();

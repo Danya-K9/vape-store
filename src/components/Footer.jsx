@@ -3,7 +3,7 @@ import { PHONE, SOCIAL_ICONS_FOOTER } from '../constants/socialIcons';
 import './Footer.css';
 
 const PHONE_DISPLAY = '+375 (29) 539-75-10';
-const VIBER_LINK = `viber://chat?number=${PHONE.replace(/\D/g, '')}`;
+const VIBER_LINK = `https://viber.click/${PHONE.replace(/\D/g, '')}`;
 
 export default function Footer() {
   return (

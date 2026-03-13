@@ -20,7 +20,7 @@
   display: block;
   border-radius: 16px;
   overflow: hidden;
-  aspect-ratio: 16/10;
+  aspect-ratio: 16/9;
   text-decoration: none;
   color: #fff;
 }
@@ -28,9 +28,10 @@
 .social-card-bg {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center 35%;
+  background-size: contain;
+  background-position: center;
   background-repeat: no-repeat;
+  background-color: #000;
 }
 
 .social-card-bg::after {
