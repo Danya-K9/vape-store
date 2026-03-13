@@ -6,18 +6,16 @@ const BASE_ICONS = {
   whatsapp: '/whatsapp_ikon.png',
 };
 
-// Header (white bar): keep current YouTube, use new TikTok
+// Header (white bar)
 export const SOCIAL_ICONS_HEADER = {
   ...BASE_ICONS,
   tiktok: '/tiktok_header.png',
-  youtube: '/youtube_ikon.png',
 };
 
-// Footer (black bar): keep current TikTok, revert YouTube to previous image
+// Footer (black bar)
 export const SOCIAL_ICONS_FOOTER = {
   ...BASE_ICONS,
   tiktok: '/tiktok_ikon.webp',
-  youtube: '/youtube_footer.png',
 };
 
 // Default (used on some pages like Contacts) — match header style

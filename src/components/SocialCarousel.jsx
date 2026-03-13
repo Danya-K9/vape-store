@@ -4,14 +4,8 @@ const cards = [
   {
     id: 'telegram',
     title: 'МЫ В TELEGRAM',
-    link: 'https://t.me/Orsha_Smoke',
+    link: 'https://t.me/OblakoPara_Orsha',
     image: '/telegram-card.png',
-  },
-  {
-    id: 'youtube',
-    title: 'МЫ НА YOUTUBE',
-    link: 'https://youtube.com',
-    image: '/youtube.png',
   },
   {
     id: 'instagram',
@@ -38,9 +32,6 @@ export default function SocialCarousel() {
               <div className="social-card-content">
                 {card.id === 'telegram' && (
                   <span className="social-card-icon" style={{ color: '#29b6f6' }}>✈</span>
-                )}
-                {card.id === 'youtube' && (
-                  <span className="social-card-icon" style={{ color: '#ff0000' }}>▶</span>
                 )}
                 {card.id === 'instagram' && (
                   <span className="social-card-icon social-icon-instagram">📷</span>

@@ -11,7 +11,7 @@
 
 .social-carousel-viewport {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
 }
 
@@ -55,11 +55,6 @@
 
 .social-icon-telegram {
   color: #29b6f6;
-}
-
-.social-icon-youtube {
-  color: #ff0000;
-  font-size: 20px;
 }
 
 .social-icon-instagram {

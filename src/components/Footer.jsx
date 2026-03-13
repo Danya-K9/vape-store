@@ -17,7 +17,6 @@ export default function Footer() {
             </div>
             <p className="footer-tagline">VAPE SHOP</p>
             <a href={`tel:${PHONE.replace(/\D/g, '')}`} className="footer-phone">{PHONE_DISPLAY}</a>
-            <a href="mailto:vikingstradehouse@gmail.com" className="footer-email">vikingstradehouse@gmail.com</a>
             <div className="footer-write">
               <span className="footer-label">Напишите нам</span>
               <div className="footer-messengers">
@@ -32,7 +31,6 @@ export default function Footer() {
                 <a href="https://t.me/Orsha_Smoke" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_FOOTER.telegram} alt="" /></a>
                 <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><img src={SOCIAL_ICONS_FOOTER.instagram} alt="" /></a>
                 <a href="https://tiktok.com" target="_blank" rel="noreferrer" aria-label="TikTok"><img src={SOCIAL_ICONS_FOOTER.tiktok} alt="" /></a>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube"><img src={SOCIAL_ICONS_FOOTER.youtube} alt="" /></a>
               </div>
             </div>
           </div>

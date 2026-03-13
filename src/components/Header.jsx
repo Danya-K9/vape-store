@@ -159,7 +159,7 @@ export default function Header() {
                 <div className="header-socials-row">
                   <a href="https://instagram.com" target="_blank" rel="noreferrer" className="header-social-icon instagram" aria-label="Instagram"><img src={SOCIAL_ICONS_HEADER.instagram} alt="" /></a>
                   <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="header-social-icon tiktok" aria-label="TikTok"><img src={SOCIAL_ICONS_HEADER.tiktok} alt="" /></a>
-                  <a href="https://youtube.com" target="_blank" rel="noreferrer" className="header-social-icon youtube" aria-label="YouTube"><img src={SOCIAL_ICONS_HEADER.youtube} alt="" /></a>
+                  <a href="https://t.me/OblakoPara_Orsha" target="_blank" rel="noreferrer" className="header-social-icon telegram" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
                 </div>
               </>
             )}
@@ -277,9 +277,9 @@ export default function Header() {
               <div className="mobile-menu-footer">
                 <a href={`tel:${PHONE.replace(/\\D/g, '')}`} className="mobile-menu-phone">{PHONE_DISPLAY}</a>
                 <div className="mobile-menu-socials">
-                  <a href={VIBER_LINK} className="header-social-icon viber" aria-label="Viber"><img src={SOCIAL_ICONS.viber} alt="" /></a>
-                  <a href="https://t.me/Manager_VapeStoree" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS.telegram} alt="" /></a>
-                  <a href={`https://wa.me/${PHONE.replace(/\\D/g, '')}`} className="header-social-icon whatsapp" target="_blank" rel="noreferrer" aria-label="WhatsApp"><img src={SOCIAL_ICONS.whatsapp} alt="" /></a>
+                  <a href={VIBER_LINK} className="header-social-icon viber" aria-label="Viber"><img src={SOCIAL_ICONS_HEADER.viber} alt="" /></a>
+                  <a href="https://t.me/Manager_VapeStoree" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
+                  <a href={`https://wa.me/${PHONE.replace(/\\D/g, '')}`} className="header-social-icon whatsapp" target="_blank" rel="noreferrer" aria-label="WhatsApp"><img src={SOCIAL_ICONS_HEADER.whatsapp} alt="" /></a>
                 </div>
               </div>
             </motion.div>
