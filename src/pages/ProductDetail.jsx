@@ -46,27 +46,11 @@ export default function ProductDetail() {
     display: 'Дисплей',
   };
 
-  const getCategorySpecs = () => {
-    const cat = (product?.category || '').toLowerCase();
-    if (cat.includes('disposable') || cat === 'disposables') {
-      return ['manufacturer', 'puffCount', 'nicotineType', 'flavor', 'country', 'charging', 'powerAdj', 'battery'];
-    }
-    if (cat.includes('liquid') || cat === 'liquids') {
-      return ['manufacturer', 'strength', 'volume', 'vgpg', 'flavor', 'nicotineType', 'country'];
-    }
-    if (cat.includes('pod') || cat === 'pod-systems') {
-      return ['manufacturer', 'battery', 'charging', 'flavor', 'country', 'display', 'color'];
-    }
-    if (cat.includes('pouch') || cat === 'pouches') {
-      return ['manufacturer', 'strength', 'flavor', 'country'];
-    }
-    if (cat.includes('accessor') || cat === 'accessories') {
-      return ['manufacturer', 'country', 'color'];
-    }
-    return ['manufacturer', 'flavor', 'country'];
-  };
-
-  const specs = getCategorySpecs().filter((k) => product?.[k]);
+  // Показываем все заполненные характеристики для товара,
+  // чтобы всё, что добавлено через фильтры/админку, отображалось на карточке.
+  const specs = Object.keys(SPEC_LABELS).filter(
+    (k) => product && product[k] !== null && product[k] !== undefined && product[k] !== '',
+  );
   const formatSpecValue = (key, val) => {
     if (key === 'charging' || key === 'powerAdj') return val === 'yes' || val === 'есть' ? 'Есть' : val === 'no' || val === 'нет' ? 'Нет' : val;
     return val;
