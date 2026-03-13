@@ -15,6 +15,14 @@ export function startTelegramBot() {
   }
   bot = new TelegramBot(token, { polling: true });
 
+  bot.on('polling_error', (err) => {
+    if (err?.code === 'ETELEGRAM' && String(err.message || '').includes('409')) {
+      console.warn('Telegram polling 409 conflict (another getUpdates in progress), ignoring.');
+      return;
+    }
+    console.error('Telegram polling error:', err);
+  });
+
   bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
     const keyboard = {

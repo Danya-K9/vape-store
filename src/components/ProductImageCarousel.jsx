@@ -56,7 +56,7 @@ export default function ProductImageCarousel({ images = [], alt = '', className 
     if (e.cancelable && e.type.startsWith('touch')) e.preventDefault();
     const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
     const delta = dragStartRef.current.x - x;
-    const maxDrag = 120;
+    const maxDrag = 80;
     setDragOffset(Math.max(-maxDrag, Math.min(maxDrag, delta)));
   }, [isDragging]);
 
@@ -71,7 +71,7 @@ export default function ProductImageCarousel({ images = [], alt = '', className 
       if (!isDraggingRef.current) return;
       setIsDragging(false);
       const offset = dragOffsetRef.current;
-      const threshold = 50;
+      const threshold = 25;
       if (offset > threshold) prev();
       else if (offset < -threshold) next();
       setDragOffset(0);

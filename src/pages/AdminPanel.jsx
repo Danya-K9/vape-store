@@ -124,11 +124,8 @@ export default function AdminPanel() {
       body.append('image', form.image);
     }
     const cat = form.category ?? (editing && editing !== 'new' ? editing.category : 'disposables');
-    if (cat === 'pod-systems' && (imageFiles.length > 0 || (Array.isArray(form.images) && form.images.length > 0))) {
+    if (cat === 'pod-systems' && imageFiles.length > 0) {
       imageFiles.forEach((f) => body.append('images', f));
-      if (Array.isArray(form.images) && form.images.length > 0) {
-        body.append('imagesJson', JSON.stringify(form.images));
-      }
     }
     if (editing && editing !== 'new') {
       await fetch(`${API_BASE}/admin/products/${editing.id}`, {
