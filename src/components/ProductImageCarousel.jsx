@@ -63,11 +63,8 @@ export default function ProductImageCarousel({ images = [], alt = '', className 
   const handlePointerUp = useCallback(() => {
     if (!isDragging) return;
     setIsDragging(false);
-    const threshold = 50;
-    if (dragOffset > threshold) prev();
-    else if (dragOffset < -threshold) next();
     setDragOffset(0);
-  }, [isDragging, dragOffset, prev, next]);
+  }, [isDragging]);
 
   useEffect(() => {
     const handlePointerUpGlobal = () => {

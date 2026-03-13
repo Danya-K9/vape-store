@@ -279,9 +279,9 @@ export default function Header() {
                 <div className="mobile-menu-socials-block">
                   <span className="mobile-menu-socials-label">Мы в соц. сетях</span>
                   <div className="mobile-menu-socials">
-                    <a href={VIBER_LINK} className="header-social-icon viber" aria-label="Viber"><img src={SOCIAL_ICONS_HEADER.viber} alt="" /></a>
-                    <a href="https://t.me/Manager_VapeStoree" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
-                    <a href={`https://wa.me/${PHONE.replace(/\\D/g, '')}`} className="header-social-icon whatsapp" target="_blank" rel="noreferrer" aria-label="WhatsApp"><img src={SOCIAL_ICONS_HEADER.whatsapp} alt="" /></a>
+                    <a href="https://instagram.com" className="header-social-icon instagram" target="_blank" rel="noreferrer" aria-label="Instagram"><img src={SOCIAL_ICONS_HEADER.instagram} alt="" /></a>
+                    <a href="https://tiktok.com" className="header-social-icon tiktok" target="_blank" rel="noreferrer" aria-label="TikTok"><img src={SOCIAL_ICONS_HEADER.tiktok} alt="" /></a>
+                    <a href="https://t.me/OblakoPara_Orsha" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
                   </div>
                 </div>
               </div>

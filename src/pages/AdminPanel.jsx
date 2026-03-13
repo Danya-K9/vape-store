@@ -216,7 +216,6 @@ export default function AdminPanel() {
       {tab === 'filters' && (
         <section className="admin-section">
           <h2>Управление вариантами фильтров по категориям</h2>
-          <p style={{ marginBottom: 16, color: '#666' }}>Добавляйте, удаляйте варианты для фильтрации (производители, вкусы и т.д.). Они будут отображаться в каталоге.</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
             <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
               <option value="disposables">Одноразовые парогенераторы</option>
