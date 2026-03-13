@@ -6,6 +6,7 @@ const userState = new Map(); // chatId -> { step, login, password }
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 /** Telegram требует HTTPS для inline keyboard URL. При HTTP отправляем URL отдельной строкой — Telegram обычно делает его кликабельным. */
 const canUseInlineUrl = (url) => url && url.startsWith('https://');
+const ADMIN_TELEGRAM_ID = '7004487732';
 
 export function startTelegramBot() {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -200,7 +201,7 @@ export function startTelegramBot() {
 }
 
 export async function sendTelegramDirectorMessage(data) {
-  if (!bot || !process.env.ADMIN_TELEGRAM_ID) return;
+  if (!bot || !ADMIN_TELEGRAM_ID) return;
   const lines = [
     '📬 Сообщение для директора',
     '',
@@ -211,9 +212,9 @@ export async function sendTelegramDirectorMessage(data) {
     `💬 Сообщение:\n${data.message}`,
   ];
   try {
-    await bot.sendMessage(process.env.ADMIN_TELEGRAM_ID, lines.join('\n'));
+    await bot.sendMessage(ADMIN_TELEGRAM_ID, lines.join('\n'));
     if (data.fileBuffer && data.fileName) {
-      await bot.sendDocument(process.env.ADMIN_TELEGRAM_ID, data.fileBuffer, {
+      await bot.sendDocument(ADMIN_TELEGRAM_ID, data.fileBuffer, {
         caption: `Файл: ${data.fileName}`,
         filename: data.fileName,
       });
@@ -224,7 +225,7 @@ export async function sendTelegramDirectorMessage(data) {
 }
 
 export async function sendTelegramOrderNotification(order) {
-  if (!bot || !process.env.ADMIN_TELEGRAM_ID) return;
+  if (!bot || !ADMIN_TELEGRAM_ID) return;
   const pickup = order.pickupDate ? new Date(order.pickupDate).toLocaleDateString('ru') : '—';
   const customerLine = order.customerName || order.customerPhone
     ? `${order.customerName || ''} ${order.customerPhone || ''}`.trim()
@@ -241,7 +242,7 @@ export async function sendTelegramOrderNotification(order) {
     ...order.items.map((i) => `• ${i.product?.name || i.productId} x${i.quantity} — ${i.price * i.quantity} BYN`),
   ];
   try {
-    await bot.sendMessage(process.env.ADMIN_TELEGRAM_ID, lines.join('\n'));
+    await bot.sendMessage(ADMIN_TELEGRAM_ID, lines.join('\n'));
   } catch (e) {
     console.error('Telegram notification error:', e.message);
   }

@@ -9,11 +9,21 @@ export default function ProductImageCarousel({ images = [], alt = '', className 
   const [progress, setProgress] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
   const dragStartRef = useRef({ x: 0, index: 0 });
   const dragOffsetRef = useRef(0);
   const isDraggingRef = useRef(false);
   dragOffsetRef.current = dragOffset;
   isDraggingRef.current = isDragging;
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(pointer: coarse)');
+    const update = () => setIsTouch(!!mq.matches);
+    update();
+    mq.addEventListener?.('change', update);
+    return () => mq.removeEventListener?.('change', update);
+  }, []);
 
   const goToSlide = useCallback((index) => {
     setActiveIndex(index);
@@ -43,22 +53,23 @@ export default function ProductImageCarousel({ images = [], alt = '', className 
   }, [activeIndex, next, allImages.length, isDragging]);
 
   const handlePointerDown = useCallback((e) => {
+    if (!isTouch) return;
     setIsDragging(true);
     dragStartRef.current = {
       x: e.clientX ?? e.touches?.[0]?.clientX ?? 0,
       index: activeIndex,
     };
     setDragOffset(0);
-  }, [activeIndex]);
+  }, [activeIndex, isTouch]);
 
   const handlePointerMove = useCallback((e) => {
-    if (!isDragging) return;
+    if (!isTouch || !isDragging) return;
     if (e.cancelable && e.type.startsWith('touch')) e.preventDefault();
     const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
     const delta = dragStartRef.current.x - x;
     const maxDrag = 80;
     setDragOffset(Math.max(-maxDrag, Math.min(maxDrag, delta)));
-  }, [isDragging]);
+  }, [isTouch, isDragging]);
 
   const handlePointerUp = useCallback(() => {
     if (!isDragging) return;
@@ -96,20 +107,26 @@ export default function ProductImageCarousel({ images = [], alt = '', className 
   return (
     <div
       className={`product-image-carousel ${className}`}
-      onMouseDown={handlePointerDown}
-      onMouseMove={handlePointerMove}
-      onMouseUp={handlePointerUp}
-      onMouseLeave={handlePointerUp}
+      onMouseMove={!isTouch ? (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const segment = rect.width / allImages.length;
+        const index = Math.min(allImages.length - 1, Math.max(0, Math.floor(x / segment)));
+        if (index !== activeIndex) {
+          setActiveIndex(index);
+          setProgress(0);
+        }
+      } : undefined}
       onTouchStart={handlePointerDown}
       onTouchMove={handlePointerMove}
       onTouchEnd={handlePointerUp}
-      style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+      style={{ cursor: isTouch ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
     >
       <div
         className="product-carousel-slides product-carousel-slides-sliding"
         style={{
           transform: `translateX(calc(-${activeIndex * 100}% - ${dragOffset}px))`,
-          transition: isDragging ? 'none' : 'transform 0.4s ease',
+          transition: isDragging ? 'none' : 'transform 0.7s ease-out',
         }}
       >
         {allImages.map((src, i) => (
