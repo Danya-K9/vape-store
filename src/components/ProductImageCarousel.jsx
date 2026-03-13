@@ -53,7 +53,10 @@ export default function ProductImageCarousel({ images = [], alt = '', className 
   }, [activeIndex, next, allImages.length, isDragging]);
 
   const handlePointerDown = useCallback((e) => {
-    if (!isTouch) return;
+    if (e.touches && e.touches.length > 0) {
+      setIsTouch(true);
+    }
+    if (!isTouch && !e.touches) return;
     setIsDragging(true);
     dragStartRef.current = {
       x: e.clientX ?? e.touches?.[0]?.clientX ?? 0,
@@ -63,7 +66,7 @@ export default function ProductImageCarousel({ images = [], alt = '', className 
   }, [activeIndex, isTouch]);
 
   const handlePointerMove = useCallback((e) => {
-    if (!isTouch || !isDragging) return;
+    if (!isDragging) return;
     if (e.cancelable && e.type.startsWith('touch')) e.preventDefault();
     const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
     const delta = dragStartRef.current.x - x;
