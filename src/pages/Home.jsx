@@ -12,8 +12,8 @@ const categoryFilters = [
   { id: 'all', name: 'Все' },
   { id: 'pod-systems', name: 'Электронные парогенераторы' },
   { id: 'liquids', name: 'Жидкости для электронных парогенераторов' },
-  { id: 'pouches', name: 'Никотиновые паучи' },
   { id: 'disposables', name: 'Одноразовые парогенераторы' },
+  { id: 'pouches', name: 'Никотиновые паучи' },
 ];
 
 export default function Home() {

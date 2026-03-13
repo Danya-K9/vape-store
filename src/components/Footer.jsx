@@ -12,10 +12,10 @@ export default function Footer() {
         <div className="footer-inner">
           <div className="footer-brand">
             <div className="footer-brand-row">
-              <img src="/footer-logo.png" alt="VAPE STORE" className="footer-logo-img" />
-              <span className="footer-brand-name">VAPE STORE</span>
+              <img src="/footer-logo.png" alt="Облако пара" className="footer-logo-img" />
+              <span className="footer-brand-name">Облако пара</span>
             </div>
-            <p className="footer-tagline">VAPE SHOP</p>
+            <p className="footer-tagline">Магазин вейпов</p>
             <a href={`tel:${PHONE.replace(/\D/g, '')}`} className="footer-phone">{PHONE_DISPLAY}</a>
             <div className="footer-write">
               <span className="footer-label">Напишите нам</span>

@@ -220,7 +220,7 @@ export default function AdminPanel() {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
             <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
               <option value="disposables">Одноразовые парогенераторы</option>
-              <option value="liquids">Жидкости</option>
+              <option value="liquids">Жидкости для электронных парогенераторов</option>
               <option value="pod-systems">Электронные парогенераторы</option>
               <option value="pouches">Никотиновые паучи</option>
               <option value="accessories">Комплектующие</option>

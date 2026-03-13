@@ -27,6 +27,19 @@
   margin-bottom: 36px;
 }
 
+@media (max-width: 768px) {
+  .filter-tabs-viking {
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-tab-viking {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 .filter-tab-viking {
   padding: 10px 22px;
   background: #fff;

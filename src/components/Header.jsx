@@ -112,18 +112,18 @@ export default function Header() {
             <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>
               {scrolled ? (
                 <span className="logo-compact">
-                  <img src="/logo-store.png" alt="VAPE STORE" className="logo-img" />
+                  <img src="/logo-store.png" alt="Облако пара" className="logo-img" />
                   <span className="logo-text">
-                    <span className="logo-brand">VAPE STORE</span>
-                    <span className="logo-tagline">VAPE SHOP</span>
+                    <span className="logo-brand">Облако пара</span>
+                    <span className="logo-tagline">Магазин вейпов</span>
                   </span>
                 </span>
               ) : (
                 <span className="logo-compact logo-expanded">
-                  <img src="/logo-store.png" alt="VAPE STORE" className="logo-img" />
+                  <img src="/logo-store.png" alt="Облако пара" className="logo-img" />
                   <span className="logo-text">
-                    <span className="logo-brand">VAPE STORE</span>
-                    <span className="logo-tagline">VAPE SHOP</span>
+                    <span className="logo-brand">Облако пара</span>
+                    <span className="logo-tagline">Магазин вейпов</span>
                   </span>
                 </span>
               )}
@@ -276,10 +276,13 @@ export default function Header() {
               </div>
               <div className="mobile-menu-footer">
                 <a href={`tel:${PHONE.replace(/\\D/g, '')}`} className="mobile-menu-phone">{PHONE_DISPLAY}</a>
-                <div className="mobile-menu-socials">
-                  <a href={VIBER_LINK} className="header-social-icon viber" aria-label="Viber"><img src={SOCIAL_ICONS_HEADER.viber} alt="" /></a>
-                  <a href="https://t.me/Manager_VapeStoree" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
-                  <a href={`https://wa.me/${PHONE.replace(/\\D/g, '')}`} className="header-social-icon whatsapp" target="_blank" rel="noreferrer" aria-label="WhatsApp"><img src={SOCIAL_ICONS_HEADER.whatsapp} alt="" /></a>
+                <div className="mobile-menu-socials-block">
+                  <span className="mobile-menu-socials-label">Мы в соц. сетях</span>
+                  <div className="mobile-menu-socials">
+                    <a href={VIBER_LINK} className="header-social-icon viber" aria-label="Viber"><img src={SOCIAL_ICONS_HEADER.viber} alt="" /></a>
+                    <a href="https://t.me/Manager_VapeStoree" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
+                    <a href={`https://wa.me/${PHONE.replace(/\\D/g, '')}`} className="header-social-icon whatsapp" target="_blank" rel="noreferrer" aria-label="WhatsApp"><img src={SOCIAL_ICONS_HEADER.whatsapp} alt="" /></a>
+                  </div>
                 </div>
               </div>
             </motion.div>

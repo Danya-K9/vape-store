@@ -25,7 +25,7 @@ export function startTelegramBot() {
     };
     await bot.sendMessage(
       chatId,
-      'Привет! Я бот VAPE STORE.\n\nПродолжите авторизацию — выберите действие:',
+      'Привет! Я бот «Облако пара».\n\nПродолжите авторизацию — выберите действие:',
       { reply_markup: keyboard }
     );
   });

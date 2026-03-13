@@ -27,7 +27,7 @@ const uploadProductFiles = multer({
   },
 }).fields([
   { name: 'image', maxCount: 1 },
-  { name: 'images', maxCount: 10 },
+  { name: 'images', maxCount: 50 },
 ]);
 
 router.use(authAdmin);
