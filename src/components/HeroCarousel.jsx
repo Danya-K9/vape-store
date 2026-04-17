@@ -2,7 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import './HeroCarousel.css';
 
-const SLIDE_DURATION = 5000;
+const MAIN_SLIDE_DURATION = 5000;
+const SIDE1_DURATION = 3600;
+const SIDE2_DURATION = 6100;
+const TICK_MS = 50;
 
 const mainSlides = [
   {
@@ -48,8 +51,11 @@ const sideBanners = [
 
 export default function HeroCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [sideIndex, setSideIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [sideState, setSideState] = useState(() => ({
+    side1: { index: 0, progress: 0 },
+    side2: { index: 0, progress: 0 },
+  }));
 
   const goToSlide = useCallback((index) => {
     setActiveIndex(index);
@@ -69,12 +75,31 @@ export default function HeroCarousel() {
       setProgress((p) => {
         if (p >= 100) {
           next();
-          setSideIndex((prev) => (prev + 1) % 3);
           return 0;
         }
-        return p + (100 / (SLIDE_DURATION / 50));
+        return p + (100 / (MAIN_SLIDE_DURATION / TICK_MS));
       });
-    }, 50);
+      setSideState((prev) => {
+        const slides1Len = sideBanners[0]?.slides?.length || 1;
+        const slides2Len = sideBanners[1]?.slides?.length || 1;
+
+        const step1 = 100 / (SIDE1_DURATION / TICK_MS);
+        const step2 = 100 / (SIDE2_DURATION / TICK_MS);
+
+        const next1Progress = prev.side1.progress + step1;
+        const next2Progress = prev.side2.progress + step2;
+
+        const side1 = next1Progress >= 100
+          ? { index: (prev.side1.index + 1) % slides1Len, progress: 0 }
+          : { index: prev.side1.index, progress: next1Progress };
+
+        const side2 = next2Progress >= 100
+          ? { index: (prev.side2.index + 1) % slides2Len, progress: 0 }
+          : { index: prev.side2.index, progress: next2Progress };
+
+        return { side1, side2 };
+      });
+    }, TICK_MS);
     return () => clearInterval(interval);
   }, [activeIndex, next]);
 
@@ -147,12 +172,25 @@ export default function HeroCarousel() {
               {banner.slides.map((img, index) => (
                 <div
                   key={img}
-                  className={`hero-side-banner-bg ${index === sideIndex ? 'active' : ''}`}
+                  className={`hero-side-banner-bg ${index === (sideState[banner.id]?.index ?? 0) ? 'active' : ''}`}
                   style={{ backgroundImage: `url(${img})` }}
                 />
               ))}
-              <span className="hero-side-progress">
-                <span className="hero-side-progress-fill" style={{ width: `${progress}%` }} />
+              <span className="hero-side-indicators" aria-hidden="true">
+                {banner.slides.map((_, i) => (
+                  <span key={i} className="hero-side-indicator">
+                    <span
+                      className="hero-side-indicator-fill"
+                      style={{
+                        width: i === (sideState[banner.id]?.index ?? 0)
+                          ? `${sideState[banner.id]?.progress ?? 0}%`
+                          : i < (sideState[banner.id]?.index ?? 0)
+                            ? '100%'
+                            : '0%',
+                      }}
+                    />
+                  </span>
+                ))}
               </span>
             </Link>
           ))}

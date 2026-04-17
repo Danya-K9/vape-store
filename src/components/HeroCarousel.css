@@ -159,19 +159,25 @@
   opacity: 1;
 }
 
-.hero-side-progress {
+.hero-side-indicators {
   position: absolute;
   left: 12px;
   right: 12px;
   bottom: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.hero-side-indicator {
+  flex: 1;
   height: 4px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.35);
   overflow: hidden;
-  z-index: 2;
 }
 
-.hero-side-progress-fill {
+.hero-side-indicator-fill {
   display: block;
   height: 100%;
   background: #000;
