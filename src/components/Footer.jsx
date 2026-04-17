@@ -29,7 +29,7 @@ export default function Footer() {
               <span className="footer-label">Мы в соц. сетях</span>
               <div className="footer-socials">
                 <a href="https://t.me/Manager_OblakoPara" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_FOOTER.telegram} alt="" /></a>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><img src={SOCIAL_ICONS_FOOTER.instagram} alt="" /></a>
+                <a href="https://www.instagram.com/oblakopara_orsha?igsh=MXU1bmJiZHlnNng2MA%3D%3D&utm_source=qr" target="_blank" rel="noreferrer" aria-label="Instagram"><img src={SOCIAL_ICONS_FOOTER.instagram} alt="" /></a>
               </div>
             </div>
           </div>

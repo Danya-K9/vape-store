@@ -10,7 +10,7 @@ const cards = [
   {
     id: 'instagram',
     title: 'МЫ В INSTAGRAM',
-    link: 'https://instagram.com',
+    link: 'https://www.instagram.com/oblakopara_orsha?igsh=MXU1bmJiZHlnNng2MA%3D%3D&utm_source=qr',
     image: '/instagram-card.png',
   },
 ];

@@ -340,6 +340,11 @@ export default function AdminPanel() {
                           if (cat === 'liquids') {
                             return (
                               <>
+                                <input
+                                  placeholder="Поставщик"
+                                  value={form.supplier ?? ''}
+                                  onChange={(e) => setForm({ ...form, supplier: e.target.value })}
+                                />
                                 <select
                                   value={form.nicotineType ?? ''}
                                   onChange={(e) => setForm({ ...form, nicotineType: e.target.value })}
@@ -377,6 +382,11 @@ export default function AdminPanel() {
                           if (cat === 'disposables') {
                             return (
                               <>
+                                <input
+                                  placeholder="Поставщик"
+                                  value={form.supplier ?? ''}
+                                  onChange={(e) => setForm({ ...form, supplier: e.target.value })}
+                                />
                                 <input
                                   placeholder="Производитель"
                                   value={form.manufacturer ?? ''}
@@ -590,6 +600,7 @@ export default function AdminPanel() {
                             if (cat === 'liquids') {
                               return (
                                 <>
+                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
                                   <select
                                     value={form.nicotineType ?? p.nicotineType ?? ''}
                                     onChange={(e) => setForm({ ...form, nicotineType: e.target.value })}
@@ -627,6 +638,7 @@ export default function AdminPanel() {
                             if (cat === 'disposables') {
                               return (
                                 <>
+                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
                                   <input
                                     placeholder="Производитель"
                                     value={form.manufacturer ?? p.manufacturer ?? ''}

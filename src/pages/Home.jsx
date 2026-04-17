@@ -181,14 +181,14 @@ export default function Home() {
         </motion.h2>
         <div className="reviews-two-columns">
           <div className="reviews-column reviews-google">
-            <h3>Отзывы Яндекс Карт</h3>
+            <h3>ОТЗЫВЫ НА VAPE Google</h3>
             <div className="reviews-column-header">
-              <span className="reviews-rating">4,7 ★</span>
-              <span className="reviews-count">Отзывы клиентов</span>
+              <span className="reviews-rating">★ 4.6 / 5</span>
+              <span className="reviews-count">243 Отзывов</span>
               <button type="button" className="btn-leave-review">ОСТАВИТЬ ОТЗЫВ</button>
             </div>
             <div className="reviews-list">
-              {reviews.filter((r) => r.source === 'yandex').slice(0, 2).map((review, i) => (
+              {reviews.filter((r) => r.source === 'google').map((review, i) => (
                 <motion.div
                   key={review.id}
                   className="review-card"
@@ -217,7 +217,7 @@ export default function Home() {
               <button type="button" className="btn-leave-review">Оставить отзыв</button>
             </div>
             <div className="reviews-list">
-              {reviews.filter((r) => r.source === 'yandex').slice(2).map((review, i) => (
+              {reviews.filter((r) => r.source === 'yandex').map((review, i) => (
                 <motion.div
                   key={review.id}
                   className="review-card"

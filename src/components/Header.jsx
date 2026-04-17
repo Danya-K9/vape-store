@@ -159,7 +159,7 @@ export default function Header() {
               <>
                 <span className="header-socials-label">Мы в соц. сетях</span>
                 <div className="header-socials-row">
-                  <a href="https://instagram.com" target="_blank" rel="noreferrer" className="header-social-icon instagram" aria-label="Instagram"><img src={SOCIAL_ICONS_HEADER.instagram} alt="" /></a>
+                  <a href="https://www.instagram.com/oblakopara_orsha?igsh=MXU1bmJiZHlnNng2MA%3D%3D&utm_source=qr" target="_blank" rel="noreferrer" className="header-social-icon instagram" aria-label="Instagram"><img src={SOCIAL_ICONS_HEADER.instagram} alt="" /></a>
                   <a href="https://t.me/Manager_OblakoPara" target="_blank" rel="noreferrer" className="header-social-icon telegram" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
                 </div>
               </>
@@ -289,7 +289,7 @@ export default function Header() {
                 <div className="mobile-menu-socials-block">
                   <span className="mobile-menu-socials-label">Мы в соц. сетях</span>
                   <div className="mobile-menu-socials">
-                    <a href="https://instagram.com" className="header-social-icon instagram" target="_blank" rel="noreferrer" aria-label="Instagram"><img src={SOCIAL_ICONS_HEADER.instagram} alt="" /></a>
+                    <a href="https://www.instagram.com/oblakopara_orsha?igsh=MXU1bmJiZHlnNng2MA%3D%3D&utm_source=qr" className="header-social-icon instagram" target="_blank" rel="noreferrer" aria-label="Instagram"><img src={SOCIAL_ICONS_HEADER.instagram} alt="" /></a>
                     <a href="https://t.me/Manager_OblakoPara" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
                   </div>
                 </div>

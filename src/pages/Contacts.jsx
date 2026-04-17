@@ -40,6 +40,7 @@ export default function Contacts() {
           frameBorder="0"
           allowFullScreen
         />
+        <div className="contacts-map-pin-label">Облако пара | вейп-шоп</div>
         <a
           href="https://yandex.by/maps/?pt=30.426632,54.508801&z=17&l=map"
           target="_blank"
@@ -76,7 +77,7 @@ export default function Contacts() {
             <span className="contacts-social-name">TELEGRAM</span>
             <span className="contacts-social-desc">отвечаем макс. быстро</span>
           </a>
-          <a href="https://instagram.com" target="_blank" rel="noreferrer" className="contacts-social-item">
+          <a href="https://www.instagram.com/oblakopara_orsha?igsh=MXU1bmJiZHlnNng2MA%3D%3D&utm_source=qr" target="_blank" rel="noreferrer" className="contacts-social-item">
             <img src={SOCIAL_ICONS.instagram} alt="Instagram" className="contacts-social-icon-img" />
             <span className="contacts-social-name">INSTAGRAM</span>
             <span className="contacts-social-desc">в direct instagram</span>
