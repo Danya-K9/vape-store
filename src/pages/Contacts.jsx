@@ -6,7 +6,7 @@ import './Contacts.css';
 const STORES = [
   {
     id: 1,
-    address: 'г. Орша, ул. Ленина, 17',
+    address: 'г. Орша, ул. Владимира Ленина, 17',
     hours: 'Понедельник ~ пятница:\nС 10:00 до 20:00\nСуббота: с 10:00 до 19:00\nВоскресенье: Выходной',
     phone: PHONE,
     image: 'https://images.pexels.com/photos/14279339/pexels-photo-14279339.jpeg?auto=compress&w=600',
@@ -34,14 +34,14 @@ export default function Contacts() {
 
       <div className="contacts-map-wrap">
         <iframe
-          src="https://yandex.ru/map-widget/v1/?ll=30.426720%2C54.508848&z=17&pt=30.426720,54.508848,pm2rdm&l=map"
+          src="https://yandex.ru/map-widget/v1/?ll=30.426632%2C54.508801&z=17&pt=30.426632,54.508801,pm2rdm&l=map"
           title="Яндекс Карта — г. Орша, ул. Владимира Ленина, 17"
           className="contacts-yandex-map"
           frameBorder="0"
           allowFullScreen
         />
         <a
-          href="https://yandex.by/maps/10276/orsha/house/ulitsa_vladimira_lenina_17/?ll=30.426720%2C54.508848&z=17"
+          href="https://yandex.by/maps/?pt=30.426632,54.508801&z=17&l=map"
           target="_blank"
           rel="noreferrer"
           className="contacts-map-link"
@@ -62,7 +62,7 @@ export default function Contacts() {
               <a href={`tel:${store.phone.replace(/\D/g, '')}`} className="contact-store-phone">
                 +375 29 539-75-10
               </a>
-              <Link to="/catalog" className="btn-details">Подробнее</Link>
+              <Link to="/catalog" className="btn-details">Каталог</Link>
             </div>
           </div>
         ))}
@@ -71,7 +71,7 @@ export default function Contacts() {
       <section className="contacts-social-section">
         <h2 className="contacts-social-title">Также с нами можно связаться следующими способами:</h2>
         <div className="contacts-social-grid">
-          <a href="https://t.me/Manager_VapeStoree" target="_blank" rel="noreferrer" className="contacts-social-item">
+          <a href="https://t.me/Manager_OblakoPara" target="_blank" rel="noreferrer" className="contacts-social-item">
             <img src={SOCIAL_ICONS.telegram} alt="Telegram" className="contacts-social-icon-img" />
             <span className="contacts-social-name">TELEGRAM</span>
             <span className="contacts-social-desc">отвечаем макс. быстро</span>
@@ -95,7 +95,7 @@ export default function Contacts() {
       </section>
 
       <div className="contacts-banner">
-        <span>#VAPESTORE</span>
+        <span>#ОБЛАКО ПАРА | ВЕЙП ШОП</span>
       </div>
     </motion.div>
   );

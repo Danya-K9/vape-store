@@ -13,6 +13,8 @@ const PRODUCTS = [
   { name: 'Жидкость Zenith Salt Draco', price: 23.5, category: 'liquids', badge: 'Хит', image: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=400', showInBestsellers: true, manufacturer: 'Zenith' },
   { name: 'Паучи никотиновые Glitch EUCLPTS MNT MEDIUM', price: 21, category: 'pouches', badge: 'Советуем', image: 'https://media04.meinbezirk.at/article/2023/05/26/2/34446192_L.jpg?1685110858', manufacturer: 'Glitch' },
   { name: 'Жидкость', price: 25, category: 'liquids', badge: 'Новинка', image: 'https://static.wixstatic.com/media/669d4a_425250bd165449deaec057b3abe04037~mv2.jpg/v1/fill/w_280,h_260,al_c,q_80,enc_auto/ecigmx_004_portada.jpg', manufacturer: 'Tradewinds', strength: 6 },
+  { name: 'Смесь для кальяна BlackBurn Pear Lemon', price: 18, category: 'hookah-mix', image: 'https://images.unsplash.com/photo-1517638851339-a711cfcf3279?w=400', supplier: 'Cloud Supply', strength: 4, tobacco: 'С табаком', weight: '50 г' },
+  { name: 'Угли для кальяна Crown Coco 72', price: 14, category: 'hookah-coals', image: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400', coalType: 'Кокосовые', packCount: '72', manufacturer: 'Crown', supplier: 'Cloud Supply' },
 ];
 
 async function main() {
@@ -26,7 +28,7 @@ async function main() {
 
   const storeCount = await prisma.store.count();
   const storeData = {
-    address: 'г. Орша, ул. Ленина, 17',
+    address: 'г. Орша, ул. Владимира Ленина, 17',
     hours: 'Понедельник ~ пятница:\nС 10:00 до 20:00\nСуббота: с 10:00 до 19:00\nВоскресенье: Выходной',
     phone: '+375 (44) 599-84-94',
     image: 'https://images.pexels.com/photos/14279339/pexels-photo-14279339.jpeg?auto=compress&w=600',

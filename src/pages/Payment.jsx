@@ -21,6 +21,8 @@ export default function Payment() {
         <ul className="payment-methods">
           <li>наличными</li>
           <li>банковской пластиковой картой</li>
+          <li>оплата по QR-коду</li>
+          <li>Apple Pay (в разработке)</li>
         </ul>
       </div>
     </motion.div>

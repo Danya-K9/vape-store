@@ -10,10 +10,13 @@ import './Home.css';
 
 const categoryFilters = [
   { id: 'all', name: 'Все' },
-  { id: 'pod-systems', name: 'Электронные парогенераторы' },
   { id: 'liquids', name: 'Жидкости для электронных парогенераторов' },
-  { id: 'disposables', name: 'Одноразовые парогенераторы' },
+  { id: 'disposables', name: 'Одноразовые/многоразовые парогенераторы' },
+  { id: 'pod-systems', name: 'Электронные парогенераторы' },
   { id: 'pouches', name: 'Никотиновые паучи' },
+  { id: 'hookah-mix', name: 'Смесь для кальянов' },
+  { id: 'hookah-coals', name: 'Угли для кальянов' },
+  { id: 'accessories', name: 'Комплектующие' },
 ];
 
 export default function Home() {
@@ -61,7 +64,7 @@ export default function Home() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          Новинки и Акции
+          Ассортимент
         </motion.h2>
         <div className="filter-tabs filter-tabs-viking">
           {categoryFilters.map((f) => (
@@ -143,9 +146,6 @@ export default function Home() {
         >
           Блог
         </motion.h2>
-        <div className="blog-header">
-          <Link to="/blog" className="blog-view-all">Посмотреть все</Link>
-        </div>
         <div className="blog-layout">
           <motion.article
             className="blog-featured blog-card-viking"
@@ -153,42 +153,19 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
+            whileHover={{ y: -4 }}
           >
-            <Link to={`/blog/${blogPosts[0]?.id}`} className="blog-featured-link blog-card-link">
+            <Link to="/blog" className="blog-featured-link blog-card-link">
               <div className="blog-featured-text blog-card-text">
-                <span className="blog-date">{blogPosts[0]?.date}</span>
-                <h3>{blogPosts[0]?.title}</h3>
-                <span className="blog-link">Подробнее →</span>
+                <span className="blog-date">Актуальные подборки</span>
+                <h3>Одноразовые/многоразовые устройства, смеси, угли и комплектующие</h3>
+                <span className="blog-link">Смотреть подборку →</span>
               </div>
               <div className="blog-featured-image blog-card-image">
-                <img src={blogPosts[0]?.image || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=280'} alt={blogPosts[0]?.title} />
+                <img src={blogPosts[1]?.image || blogPosts[0]?.image} alt="Ассортимент магазина" />
               </div>
             </Link>
           </motion.article>
-          <div className="blog-grid-secondary">
-            {blogPosts.slice(1).map((post, i) => (
-              <motion.article
-                key={post.id}
-                className="blog-card blog-card-viking"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                whileHover={{ y: -4 }}
-              >
-                <Link to={`/blog/${post.id}`} className="blog-card-link">
-                  <div className="blog-card-text">
-                    <span className="blog-date">{post.date}</span>
-                    <h3>{post.title}</h3>
-                    <span className="blog-link">Подробнее →</span>
-                  </div>
-                  <div className="blog-card-image">
-                    <img src={post.image || 'https://images.unsplash.com/photo-1566150960911-7c5e8d60b247?w=400'} alt={post.title} />
-                  </div>
-                </Link>
-              </motion.article>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -204,14 +181,14 @@ export default function Home() {
         </motion.h2>
         <div className="reviews-two-columns">
           <div className="reviews-column reviews-google">
-            <h3>ОТЗЫВЫ НА VAPE Google</h3>
+            <h3>Отзывы Яндекс Карт</h3>
             <div className="reviews-column-header">
-              <span className="reviews-rating">★ 4.6 / 5</span>
-              <span className="reviews-count">243 Отзывов</span>
+              <span className="reviews-rating">4,7 ★</span>
+              <span className="reviews-count">Отзывы клиентов</span>
               <button type="button" className="btn-leave-review">ОСТАВИТЬ ОТЗЫВ</button>
             </div>
             <div className="reviews-list">
-              {reviews.filter((r) => r.source === 'google').map((review, i) => (
+              {reviews.filter((r) => r.source === 'yandex').slice(0, 2).map((review, i) => (
                 <motion.div
                   key={review.id}
                   className="review-card"
@@ -233,14 +210,14 @@ export default function Home() {
             </div>
           </div>
           <div className="reviews-column reviews-yandex">
-            <h3>Vape — Яндекс Карты</h3>
+            <h3>Облако пара — Яндекс Карты</h3>
             <div className="reviews-column-header">
               <span className="reviews-rating">4,7 ★</span>
               <span className="reviews-count">80 отзывов • 262 оценки</span>
               <button type="button" className="btn-leave-review">Оставить отзыв</button>
             </div>
             <div className="reviews-list">
-              {reviews.filter((r) => r.source === 'yandex').map((review, i) => (
+              {reviews.filter((r) => r.source === 'yandex').slice(2).map((review, i) => (
                 <motion.div
                   key={review.id}
                   className="review-card"

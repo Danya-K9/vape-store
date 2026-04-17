@@ -9,43 +9,46 @@ const mainSlides = [
     id: 1,
     image: 'https://images.pexels.com/photos/14195357/pexels-photo-14195357.jpeg?auto=compress&w=900',
     title: 'Скидка при покупке трех флаконов солевой жидкости',
-    badge: '-50%',
   },
   {
     id: 2,
     image: 'https://sun6-23.userapi.com/s/v1/ig2/P3iG3K4fKmcg_Zru-zmAWUfQtc9Ch3gNrCzaCAxSrirLMa90wQxZtHZOyG9PRDYSutl11lTb5TavcfpxV7HkY1jZ.jpg?size=1600x1600&quality=95&crop=0,0,1600,1600&ava=1',
     title: 'Жидкости для электронных парогенераторов',
-    badge: null,
   },
   {
     id: 3,
     image: 'https://cdn.pixabay.com/photo/2018/09/14/19/20/vape-3677946_1280.jpg',
     title: 'Электронные парогенераторы',
-    badge: '-30%',
   },
   {
     id: 4,
     image: 'https://th.bing.com/th/id/OIP.6B7YY7ehhpfnp8EinLOX7gHaEP?w=280&h=180&c=7&r=0&o=7&pid=1.7&rm=3',
-    title: 'Одноразовые парогенераторы',
-    badge: '-20%',
+    title: 'Одноразовые/многоразовые парогенераторы',
   },
 ];
 
 const sideBanners = [
   {
     id: 'side1',
-    image: 'https://images.pexels.com/photos/14279339/pexels-photo-14279339.jpeg?auto=compress&w=600',
-    badge: '-50%',
+    slides: [
+      'https://images.pexels.com/photos/14279339/pexels-photo-14279339.jpeg?auto=compress&w=600',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600',
+      'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=600',
+    ],
   },
   {
     id: 'side2',
-    image: 'https://cdn.pixabay.com/photo/2018/09/14/19/20/vape-3677946_1280.jpg',
-    badge: '-20%',
+    slides: [
+      'https://cdn.pixabay.com/photo/2018/09/14/19/20/vape-3677946_1280.jpg',
+      'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600',
+      'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600',
+    ],
   },
 ];
 
 export default function HeroCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [sideIndex, setSideIndex] = useState(0);
   const [progress, setProgress] = useState(0);
 
   const goToSlide = useCallback((index) => {
@@ -66,6 +69,7 @@ export default function HeroCarousel() {
       setProgress((p) => {
         if (p >= 100) {
           next();
+          setSideIndex((prev) => (prev + 1) % 3);
           return 0;
         }
         return p + (100 / (SLIDE_DURATION / 50));
@@ -101,9 +105,6 @@ export default function HeroCarousel() {
                   className={`hero-slide ${i === activeIndex ? 'active' : ''}`}
                   style={{ backgroundImage: `url(${slide.image})` }}
                 >
-                  {slide.badge && (
-                    <span className="hero-slide-badge">{slide.badge}</span>
-                  )}
                   <p className="hero-slide-title">{slide.title}</p>
                   <span className="hero-slide-cta">Подробнее</span>
                 </div>
@@ -143,13 +144,16 @@ export default function HeroCarousel() {
         <div className="hero-side-banners">
           {sideBanners.map((banner) => (
             <Link key={banner.id} to="/catalog" className="hero-side-banner">
-              <div
-                className="hero-side-banner-bg"
-                style={{ backgroundImage: `url(${banner.image})` }}
-              />
-              {banner.badge && (
-                <span className="hero-side-badge">{banner.badge}</span>
-              )}
+              {banner.slides.map((img, index) => (
+                <div
+                  key={img}
+                  className={`hero-side-banner-bg ${index === sideIndex ? 'active' : ''}`}
+                  style={{ backgroundImage: `url(${img})` }}
+                />
+              ))}
+              <span className="hero-side-progress">
+                <span className="hero-side-progress-fill" style={{ width: `${progress}%` }} />
+              </span>
             </Link>
           ))}
         </div>

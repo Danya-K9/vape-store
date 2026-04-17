@@ -173,19 +173,19 @@ export default function Profile() {
           </div>
 
           <div className="profile-card">
-            <h2>История бронирования</h2>
+            <h2>История бронирований</h2>
             {orders.length > 0 ? (
               <div className="profile-orders">
                 {orders.map((o) => (
                   <div key={o.id} className="profile-order">
                     <div>
-                      <span>Бронь от {new Date(o.createdAt).toLocaleDateString('ru')}</span>
+                      <span>Бронирование от {new Date(o.createdAt).toLocaleDateString('ru')}</span>
                       <span className={`order-status order-status-${o.status}`}>
                       {o.status === 'pending' ? 'Ожидает' : o.status === 'confirmed' ? 'Подтверждён' : o.status === 'cancelled' ? 'Отменён' : o.status}
                     </span>
                     </div>
                     <p>{o.store?.address}</p>
-                    <p>Оплата: {o.paymentMethod === 'cash' ? 'Наличные' : 'Карта'}</p>
+                    <p>Оплата: {o.paymentMethod === 'cash' ? 'Наличные' : o.paymentMethod === 'qr' ? 'QR-код' : 'Карта'}</p>
                     <p><strong>{o.total} руб.</strong></p>
                     <p>{new Date(o.createdAt).toLocaleDateString('ru')}</p>
                   </div>

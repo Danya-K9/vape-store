@@ -8,10 +8,12 @@ import { productsApi } from '../lib/api';
 import './Catalog.css';
 
 const categoryNames = {
-  disposables: 'Одноразовые парогенераторы',
   liquids: 'Жидкости для электронных парогенераторов',
+  disposables: 'Одноразовые/многоразовые парогенераторы',
   'pod-systems': 'Электронные парогенераторы',
   pouches: 'Никотиновые паучи',
+  'hookah-mix': 'Смесь для кальянов',
+  'hookah-coals': 'Угли для кальянов',
   accessories: 'Комплектующие',
 };
 
@@ -51,6 +53,13 @@ export default function Catalog() {
   const [chargingValues, setChargingValues] = useState([]);
   const [powerValues, setPowerValues] = useState([]);
   const [batteryValues, setBatteryValues] = useState([]);
+  const [wattsValues, setWattsValues] = useState([]);
+  const [resistanceValues, setResistanceValues] = useState([]);
+  const [supplierValues, setSupplierValues] = useState([]);
+  const [tobaccoValues, setTobaccoValues] = useState([]);
+  const [weightValues, setWeightValues] = useState([]);
+  const [coalTypeValues, setCoalTypeValues] = useState([]);
+  const [packCountValues, setPackCountValues] = useState([]);
   const [apiProducts, setApiProducts] = useState(null);
   const prevCategoryRef = useRef(category);
 
@@ -71,8 +80,15 @@ export default function Catalog() {
     if (chargingValues.length) params.charging = chargingValues.join(',');
     if (powerValues.length) params.powerAdj = powerValues.join(',');
     if (batteryValues.length) params.battery = batteryValues.join(',');
+    if (wattsValues.length) params.watts = wattsValues.join(',');
+    if (resistanceValues.length) params.resistance = resistanceValues.join(',');
+    if (supplierValues.length) params.supplier = supplierValues.join(',');
+    if (tobaccoValues.length) params.tobacco = tobaccoValues.join(',');
+    if (weightValues.length) params.weight = weightValues.join(',');
+    if (coalTypeValues.length) params.coalType = coalTypeValues.join(',');
+    if (packCountValues.length) params.packCount = packCountValues.join(',');
     productsApi.list(params).then(setApiProducts).catch(() => setApiProducts([]));
-  }, [category, search, priceMin, priceMax, manufacturers, puffCounts, nicotineTypes, flavors, strengths, volumes, vgpgValues, chargingValues, powerValues, batteryValues]);
+  }, [category, search, priceMin, priceMax, manufacturers, puffCounts, nicotineTypes, flavors, strengths, volumes, vgpgValues, chargingValues, powerValues, batteryValues, wattsValues, resistanceValues, supplierValues, tobaccoValues, weightValues, coalTypeValues, packCountValues]);
 
   const products = apiProducts ?? localProducts;
   const fromApi = apiProducts !== null;
@@ -144,6 +160,13 @@ export default function Catalog() {
     setChargingValues([]);
     setPowerValues([]);
     setBatteryValues([]);
+    setWattsValues([]);
+    setResistanceValues([]);
+    setSupplierValues([]);
+    setTobaccoValues([]);
+    setWeightValues([]);
+    setCoalTypeValues([]);
+    setPackCountValues([]);
   };
 
   return (
@@ -197,6 +220,20 @@ export default function Catalog() {
         onPowerToggle={toggleArray(setPowerValues)}
         batteryValues={batteryValues}
         onBatteryToggle={toggleArray(setBatteryValues)}
+        wattsValues={wattsValues}
+        onWattsToggle={toggleArray(setWattsValues)}
+        resistanceValues={resistanceValues}
+        onResistanceToggle={toggleArray(setResistanceValues)}
+        supplierValues={supplierValues}
+        onSupplierToggle={toggleArray(setSupplierValues)}
+        tobaccoValues={tobaccoValues}
+        onTobaccoToggle={toggleArray(setTobaccoValues)}
+        weightValues={weightValues}
+        onWeightToggle={toggleArray(setWeightValues)}
+        coalTypeValues={coalTypeValues}
+        onCoalTypeToggle={toggleArray(setCoalTypeValues)}
+        packCountValues={packCountValues}
+        onPackCountToggle={toggleArray(setPackCountValues)}
         onReset={handleReset}
       />
 

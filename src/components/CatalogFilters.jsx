@@ -42,6 +42,20 @@ export default function CatalogFilters({
   onPowerToggle,
   batteryValues = [],
   onBatteryToggle,
+  wattsValues = [],
+  onWattsToggle,
+  resistanceValues = [],
+  onResistanceToggle,
+  supplierValues = [],
+  onSupplierToggle,
+  tobaccoValues = [],
+  onTobaccoToggle,
+  weightValues = [],
+  onWeightToggle,
+  coalTypeValues = [],
+  onCoalTypeToggle,
+  packCountValues = [],
+  onPackCountToggle,
   onReset,
 }) {
   const [dynamicOptions, setDynamicOptions] = useState(null);
@@ -238,12 +252,34 @@ export default function CatalogFilters({
     </>
   );
 
+  const hookahMixFilters = () => (
+    <>
+      <PriceSection />
+      {hasOpt('strength') && <FilterSection title="Крепость" open={isOpen('strength')} onToggle={() => toggleSection('strength')}>{renderCheckbox(getOpt('strength'), strengths, onStrengthToggle)}</FilterSection>}
+      {hasOpt('tobacco') && <FilterSection title="Наличие табака" open={isOpen('tobacco')} onToggle={() => toggleSection('tobacco')}>{renderCheckbox(getOpt('tobacco'), tobaccoValues, onTobaccoToggle)}</FilterSection>}
+      {hasOpt('weight') && <FilterSection title="Вес" open={isOpen('weight')} onToggle={() => toggleSection('weight')}>{renderCheckbox(getOpt('weight'), weightValues, onWeightToggle)}</FilterSection>}
+      {hasOpt('supplier') && <FilterSection title="Поставщик" open={isOpen('supplier')} onToggle={() => toggleSection('supplier')}>{renderCheckbox(getOpt('supplier'), supplierValues, onSupplierToggle)}</FilterSection>}
+    </>
+  );
+
+  const hookahCoalsFilters = () => (
+    <>
+      <PriceSection />
+      {hasOpt('coalType') && <FilterSection title="Тип углей" open={isOpen('coalType')} onToggle={() => toggleSection('coalType')}>{renderCheckbox(getOpt('coalType'), coalTypeValues, onCoalTypeToggle)}</FilterSection>}
+      {hasOpt('packCount') && <FilterSection title="Кол-во в пачке" open={isOpen('packCount')} onToggle={() => toggleSection('packCount')}>{renderCheckbox(getOpt('packCount'), packCountValues, onPackCountToggle)}</FilterSection>}
+      {hasOpt('manufacturer') && <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>{renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}</FilterSection>}
+      {hasOpt('supplier') && <FilterSection title="Поставщик" open={isOpen('supplier')} onToggle={() => toggleSection('supplier')}>{renderCheckbox(getOpt('supplier'), supplierValues, onSupplierToggle)}</FilterSection>}
+    </>
+  );
+
   const getFilters = () => {
     if (category === 'disposables') return disposablesFilters();
     if (category === 'liquids') return liquidsFilters();
     if (category === 'accessories') return accessoriesFilters();
     if (category === 'pouches') return pouchesFilters();
     if (category === 'pod-systems') return podSystemsFilters();
+    if (category === 'hookah-mix') return hookahMixFilters();
+    if (category === 'hookah-coals') return hookahCoalsFilters();
     return disposablesFilters();
   };
 

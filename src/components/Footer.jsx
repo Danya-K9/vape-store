@@ -12,7 +12,7 @@ export default function Footer() {
         <div className="footer-inner">
           <div className="footer-brand">
             <div className="footer-brand-row">
-              <img src="/footer-logo.png" alt="Облако пара" className="footer-logo-img" />
+              <img src="/logo.jpg" alt="Облако пара" className="footer-logo-img" />
               <span className="footer-brand-name">Облако пара</span>
             </div>
             <p className="footer-tagline">Магазин вейпов</p>
@@ -21,25 +21,26 @@ export default function Footer() {
               <span className="footer-label">Напишите нам</span>
               <div className="footer-messengers">
                 <a href={VIBER_LINK} aria-label="Viber" className="msg-icon msg-viber"><img src={SOCIAL_ICONS_FOOTER.viber} alt="" /></a>
-                <a href="https://t.me/Manager_VapeStoree" target="_blank" rel="noreferrer" aria-label="Telegram" className="msg-icon msg-telegram"><img src={SOCIAL_ICONS_FOOTER.telegram} alt="" /></a>
+                <a href="https://t.me/Manager_OblakoPara" target="_blank" rel="noreferrer" aria-label="Telegram" className="msg-icon msg-telegram"><img src={SOCIAL_ICONS_FOOTER.telegram} alt="" /></a>
                 <a href={`https://wa.me/${PHONE.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="msg-icon msg-whatsapp"><img src={SOCIAL_ICONS_FOOTER.whatsapp} alt="" /></a>
               </div>
             </div>
             <div className="footer-socials-block">
               <span className="footer-label">Мы в соц. сетях</span>
               <div className="footer-socials">
-                <a href="https://t.me/Orsha_Smoke" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_FOOTER.telegram} alt="" /></a>
+                <a href="https://t.me/Manager_OblakoPara" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_FOOTER.telegram} alt="" /></a>
                 <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><img src={SOCIAL_ICONS_FOOTER.instagram} alt="" /></a>
-                <a href="https://tiktok.com" target="_blank" rel="noreferrer" aria-label="TikTok"><img src={SOCIAL_ICONS_FOOTER.tiktok} alt="" /></a>
               </div>
             </div>
           </div>
           <div className="footer-column">
             <h4>Каталог</h4>
-            <Link to="/catalog/pod-systems">Электронные парогенераторы</Link>
             <Link to="/catalog/liquids">Жидкости для электронных парогенераторов</Link>
-            <Link to="/catalog/disposables">Одноразовые парогенераторы</Link>
+            <Link to="/catalog/disposables">Одноразовые/многоразовые парогенераторы</Link>
+            <Link to="/catalog/pod-systems">Электронные парогенераторы</Link>
             <Link to="/catalog/pouches">Никотиновые паучи</Link>
+            <Link to="/catalog/hookah-mix">Смесь для кальянов</Link>
+            <Link to="/catalog/hookah-coals">Угли для кальянов</Link>
             <Link to="/catalog/accessories">Комплектующие</Link>
           </div>
           <div className="footer-column">

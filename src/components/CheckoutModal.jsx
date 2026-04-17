@@ -14,6 +14,9 @@ export default function CheckoutModal({ isOpen, onClose }) {
   const [customerPhone, setCustomerPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const today = new Date();
+  const minPickupDate = today.toISOString().slice(0, 10);
+  const maxPickupDate = new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -21,7 +24,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
   }, [isOpen]);
 
   // При каждом новом открытии сбрасываем форму и состояние "готово",
-  // чтобы можно было оформить бронь ещё раз без перезагрузки сайта.
+  // чтобы можно было оформить бронирование ещё раз без перезагрузки сайта.
   useEffect(() => {
     if (!isOpen) return;
     setDone(false);
@@ -38,7 +41,6 @@ export default function CheckoutModal({ isOpen, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!cart.length) return;
-    const today = new Date().toISOString().slice(0, 10);
     if (!storeId) return;
     if (!customerName.trim() || !customerPhone.trim()) {
       alert('Укажите имя и номер телефона');
@@ -48,8 +50,8 @@ export default function CheckoutModal({ isOpen, onClose }) {
       alert('Укажите дату получения товара');
       return;
     }
-    if (pickupDate < today) {
-      alert('Дата получения не может быть в прошлом');
+    if (pickupDate < minPickupDate || pickupDate > maxPickupDate) {
+      alert('Доступно бронирование только на сегодня или завтра');
       return;
     }
     setLoading(true);
@@ -91,7 +93,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
         >
           {done ? (
             <div className="checkout-done">
-              <h1>Бронь оформлена!</h1>
+              <h1>Бронирование оформлено!</h1>
               <button type="button" className="checkout-done-btn" onClick={onClose}>
                 Закрыть
               </button>
@@ -99,7 +101,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
           ) : (
             <>
               <div className="checkout-modal-top">
-                <h2 className="checkout-modal-title">Оформление брони</h2>
+                <h2 className="checkout-modal-title">Оформление бронирования</h2>
                 <button type="button" className="checkout-modal-close" onClick={onClose} aria-label="Закрыть">×</button>
               </div>
               <p className="checkout-note">
@@ -152,7 +154,8 @@ export default function CheckoutModal({ isOpen, onClose }) {
                       type="date"
                       value={pickupDate}
                       onChange={(e) => setPickupDate(e.target.value)}
-                      min={new Date().toISOString().slice(0, 10)}
+                      min={minPickupDate}
+                      max={maxPickupDate}
                       required
                       className="checkout-date-input"
                     />
@@ -180,6 +183,16 @@ export default function CheckoutModal({ isOpen, onClose }) {
                       />
                       Карта
                     </label>
+                    <label className="checkout-payment">
+                      <input
+                        type="radio"
+                        name="payment"
+                        value="qr"
+                        checked={paymentMethod === 'qr'}
+                        onChange={() => setPaymentMethod('qr')}
+                      />
+                      QR-код
+                    </label>
                   </div>
                 </div>
 
@@ -199,7 +212,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
                       <strong>{total.toFixed(0)} руб.</strong>
                     </div>
                     <button type="submit" className="btn-checkout" disabled={loading || !storeId || !pickupDate}>
-                      {loading ? 'Отправка...' : 'Оформить бронь'}
+                      {loading ? 'Отправка...' : 'Оформить бронирование'}
                     </button>
                   </div>
                 </aside>

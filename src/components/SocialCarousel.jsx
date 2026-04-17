@@ -4,7 +4,7 @@ const cards = [
   {
     id: 'telegram',
     title: 'МЫ В TELEGRAM',
-    link: 'https://t.me/OblakoPara_Orsha',
+    link: 'https://t.me/Manager_OblakoPara',
     image: '/telegram-card.png',
   },
   {

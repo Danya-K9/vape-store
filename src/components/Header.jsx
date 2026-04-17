@@ -90,7 +90,7 @@ export default function Header() {
             </nav>
             <div className="header-utility-right">
               <a href={VIBER_LINK} className="header-social-icon viber" aria-label="Viber"><img src={SOCIAL_ICONS_HEADER.viber} alt="" /></a>
-              <a href="https://t.me/Manager_VapeStoree" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
+              <a href="https://t.me/Manager_OblakoPara" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
               <a href={`https://wa.me/${PHONE.replace(/\D/g, '')}`} className="header-social-icon whatsapp" target="_blank" rel="noreferrer" aria-label="WhatsApp"><img src={SOCIAL_ICONS_HEADER.whatsapp} alt="" /></a>
               <a href={`tel:${PHONE.replace(/\D/g, '')}`} className="header-phone">{PHONE_DISPLAY}</a>
               <button type="button" className="header-director-btn" onClick={() => setDirectorModalOpen(true)}>НАПИСАТЬ ДИРЕКТОРУ</button>
@@ -112,7 +112,7 @@ export default function Header() {
             <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>
               {scrolled ? (
                 <span className="logo-compact">
-                  <img src="/logo-store.png" alt="Облако пара" className="logo-img" />
+                  <img src="/logo.jpg" alt="Облако пара" className="logo-img" />
                   <span className="logo-text">
                     <span className="logo-brand">Облако пара</span>
                     <span className="logo-tagline">Магазин вейпов</span>
@@ -120,7 +120,7 @@ export default function Header() {
                 </span>
               ) : (
                 <span className="logo-compact logo-expanded">
-                  <img src="/logo-store.png" alt="Облако пара" className="logo-img" />
+                  <img src="/logo.jpg" alt="Облако пара" className="logo-img" />
                   <span className="logo-text">
                     <span className="logo-brand">Облако пара</span>
                     <span className="logo-tagline">Магазин вейпов</span>
@@ -143,10 +143,12 @@ export default function Header() {
                   ☰ КАТАЛОГ
                 </button>
                 <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`}>
-                  <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразовые парогенераторы</Link>
                   <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости для электронных парогенераторов</Link>
+                  <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразовые/многоразовые парогенераторы</Link>
                   <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
                   <Link to="/catalog/pod-systems" onClick={() => setCatalogOpen(false)}>Электронные парогенераторы</Link>
+                  <Link to="/catalog/hookah-mix" onClick={() => setCatalogOpen(false)}>Смесь для кальянов</Link>
+                  <Link to="/catalog/hookah-coals" onClick={() => setCatalogOpen(false)}>Угли для кальянов</Link>
                   <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
                 </div>
               </div>
@@ -158,8 +160,7 @@ export default function Header() {
                 <span className="header-socials-label">Мы в соц. сетях</span>
                 <div className="header-socials-row">
                   <a href="https://instagram.com" target="_blank" rel="noreferrer" className="header-social-icon instagram" aria-label="Instagram"><img src={SOCIAL_ICONS_HEADER.instagram} alt="" /></a>
-                  <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="header-social-icon tiktok" aria-label="TikTok"><img src={SOCIAL_ICONS_HEADER.tiktok} alt="" /></a>
-                  <a href="https://t.me/OblakoPara_Orsha" target="_blank" rel="noreferrer" className="header-social-icon telegram" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
+                  <a href="https://t.me/Manager_OblakoPara" target="_blank" rel="noreferrer" className="header-social-icon telegram" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
                 </div>
               </>
             )}
@@ -176,7 +177,7 @@ export default function Header() {
             {scrolled && (
               <div className="header-compact-contacts">
                 <a href={VIBER_LINK} className="header-social-icon viber" aria-label="Viber"><img src={SOCIAL_ICONS_HEADER.viber} alt="" /></a>
-                <a href="https://t.me/Manager_VapeStoree" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
+                <a href="https://t.me/Manager_OblakoPara" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
                 <a href={`https://wa.me/${PHONE.replace(/\D/g, '')}`} className="header-social-icon whatsapp" target="_blank" rel="noreferrer" aria-label="WhatsApp"><img src={SOCIAL_ICONS_HEADER.whatsapp} alt="" /></a>
                 <a href={`tel:${PHONE.replace(/\D/g, '')}`} className="header-phone">{PHONE_DISPLAY}</a>
               </div>
@@ -208,18 +209,22 @@ export default function Header() {
               ☰ КАТАЛОГ
             </button>
             <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`}>
-              <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразовые парогенераторы</Link>
               <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости для электронных парогенераторов</Link>
+              <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразовые/многоразовые парогенераторы</Link>
               <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
               <Link to="/catalog/pod-systems" onClick={() => setCatalogOpen(false)}>Электронные парогенераторы</Link>
+              <Link to="/catalog/hookah-mix" onClick={() => setCatalogOpen(false)}>Смесь для кальянов</Link>
+              <Link to="/catalog/hookah-coals" onClick={() => setCatalogOpen(false)}>Угли для кальянов</Link>
               <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
             </div>
           </div>
           <nav className="nav-categories">
-            <Link to="/catalog/disposables" className={location.pathname.includes('/disposables') ? 'active' : ''}>Одноразовые парогенераторы</Link>
             <Link to="/catalog/liquids" className={location.pathname.includes('/liquids') ? 'active' : ''}>Жидкости для электронных парогенераторов</Link>
+            <Link to="/catalog/disposables" className={location.pathname.includes('/disposables') ? 'active' : ''}>Одноразовые/многоразовые парогенераторы</Link>
             <Link to="/catalog/pouches" className={location.pathname.includes('/pouches') ? 'active' : ''}>Никотиновые паучи</Link>
             <Link to="/catalog/pod-systems" className={location.pathname.includes('/pod-systems') ? 'active' : ''}>Электронные парогенераторы</Link>
+            <Link to="/catalog/hookah-mix" className={location.pathname.includes('/hookah-mix') ? 'active' : ''}>Смесь для кальянов</Link>
+            <Link to="/catalog/hookah-coals" className={location.pathname.includes('/hookah-coals') ? 'active' : ''}>Угли для кальянов</Link>
             <Link to="/catalog/accessories" className={location.pathname.includes('/accessories') ? 'active' : ''}>Комплектующие</Link>
           </nav>
         </div>
@@ -259,19 +264,24 @@ export default function Header() {
                 </button>
                 {mobileCatalogOpen && (
                   <div className="mobile-catalog-links">
-                    <Link to="/catalog/disposables" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Одноразовые парогенераторы</Link>
                     <Link to="/catalog/liquids" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Жидкости для электронных парогенераторов</Link>
+                    <Link to="/catalog/disposables" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Одноразовые/многоразовые парогенераторы</Link>
                     <Link to="/catalog/pod-systems" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Электронные парогенераторы</Link>
-                    <Link to="/catalog/accessories" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Комплектующие</Link>
                     <Link to="/catalog/pouches" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Никотиновые паучи</Link>
+                    <Link to="/catalog/hookah-mix" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Смесь для кальянов</Link>
+                    <Link to="/catalog/hookah-coals" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Угли для кальянов</Link>
+                    <Link to="/catalog/accessories" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Комплектующие</Link>
                   </div>
                 )}
               </div>
               <div className="mobile-menu-links">
                 <Link to="/" onClick={() => setMenuOpen(false)}>Главная</Link>
                 <Link to="/delivery" onClick={() => setMenuOpen(false)}>Доставка</Link>
+                <span className="mobile-links-dot">•</span>
                 <Link to="/payment" onClick={() => setMenuOpen(false)}>Оплата</Link>
+                <span className="mobile-links-dot">•</span>
                 <Link to="/about" onClick={() => setMenuOpen(false)}>О нас</Link>
+                <span className="mobile-links-dot">•</span>
                 <Link to="/contacts" onClick={() => setMenuOpen(false)}>Контакты и магазины</Link>
               </div>
               <div className="mobile-menu-footer">
@@ -280,8 +290,7 @@ export default function Header() {
                   <span className="mobile-menu-socials-label">Мы в соц. сетях</span>
                   <div className="mobile-menu-socials">
                     <a href="https://instagram.com" className="header-social-icon instagram" target="_blank" rel="noreferrer" aria-label="Instagram"><img src={SOCIAL_ICONS_HEADER.instagram} alt="" /></a>
-                    <a href="https://tiktok.com" className="header-social-icon tiktok" target="_blank" rel="noreferrer" aria-label="TikTok"><img src={SOCIAL_ICONS_HEADER.tiktok} alt="" /></a>
-                    <a href="https://t.me/OblakoPara_Orsha" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
+                    <a href="https://t.me/Manager_OblakoPara" className="header-social-icon telegram" target="_blank" rel="noreferrer" aria-label="Telegram"><img src={SOCIAL_ICONS_HEADER.telegram} alt="" /></a>
                   </div>
                 </div>
               </div>

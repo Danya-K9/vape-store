@@ -9,13 +9,11 @@ const BASE_ICONS = {
 // Header (white bar)
 export const SOCIAL_ICONS_HEADER = {
   ...BASE_ICONS,
-  tiktok: '/tiktok_header.png',
 };
 
 // Footer (black bar)
 export const SOCIAL_ICONS_FOOTER = {
   ...BASE_ICONS,
-  tiktok: '/tiktok_ikon.webp',
 };
 
 // Default (used on some pages like Contacts) — match header style

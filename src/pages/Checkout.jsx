@@ -16,6 +16,9 @@ export default function Checkout() {
   const [customerPhone, setCustomerPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const today = new Date();
+  const minPickupDate = today.toISOString().slice(0, 10);
+  const maxPickupDate = new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   useEffect(() => {
     storesApi.list().then(setStores).catch(() => setStores([]));
@@ -31,7 +34,6 @@ export default function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const today = new Date().toISOString().slice(0, 10);
     if (!storeId) return;
     if (!customerName.trim() || !customerPhone.trim()) {
       alert('Укажите имя и номер телефона');
@@ -41,8 +43,8 @@ export default function Checkout() {
       alert('Укажите дату получения товара');
       return;
     }
-    if (pickupDate < today) {
-      alert('Дата получения не может быть в прошлом');
+    if (pickupDate < minPickupDate || pickupDate > maxPickupDate) {
+      alert('Доступно бронирование только на сегодня или завтра');
       return;
     }
     setLoading(true);
@@ -68,7 +70,7 @@ export default function Checkout() {
     return (
       <motion.div className="checkout-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <div className="checkout-done">
-          <h1>Бронь оформлена!</h1>
+          <h1>Бронирование оформлено!</h1>
           <p>Мы уведомили вас о заказе. Ожидайте подтверждения.</p>
           <Link to="/catalog">В каталог</Link>
         </div>
@@ -86,9 +88,9 @@ export default function Checkout() {
       <nav className="breadcrumb">
         <Link to="/">Главная</Link>
         <span> / </span>
-        <span>Оформление брони</span>
+        <span>Оформление бронирования</span>
       </nav>
-      <h1>Оформление брони</h1>
+      <h1>Оформление бронирования</h1>
       <p className="checkout-note">
         Корзина на сайте служит для предварительного бронирования товара.
         Забрать товар вы можете в любом из наших магазинов, которые указаны ниже.
@@ -140,7 +142,8 @@ export default function Checkout() {
               type="date"
               value={pickupDate}
               onChange={(e) => setPickupDate(e.target.value)}
-              min={new Date().toISOString().slice(0, 10)}
+              min={minPickupDate}
+              max={maxPickupDate}
               required
               className="checkout-date-input"
             />
@@ -168,6 +171,16 @@ export default function Checkout() {
               />
               Карта
             </label>
+            <label className="checkout-payment">
+              <input
+                type="radio"
+                name="payment"
+                value="qr"
+                checked={paymentMethod === 'qr'}
+                onChange={() => setPaymentMethod('qr')}
+              />
+              QR-код
+            </label>
           </div>
         </div>
 
@@ -187,7 +200,7 @@ export default function Checkout() {
               <strong>{total.toFixed(0)} руб.</strong>
             </div>
             <button type="submit" className="btn-checkout" disabled={loading || !storeId || !pickupDate}>
-              {loading ? 'Отправка...' : 'Оформить бронь'}
+              {loading ? 'Отправка...' : 'Оформить бронирование'}
             </button>
           </div>
         </aside>

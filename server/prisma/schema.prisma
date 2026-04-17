@@ -48,7 +48,14 @@ model Product {
   vgpg            String?
   charging        String?
   powerAdj        String?
+  watts           String?
+  resistance      String?
   battery         Int?
+  supplier        String?
+  tobacco         String?
+  weight          String?
+  coalType        String?
+  packCount       String?
   color           String?
   display         String?
   createdAt       DateTime  @default(now())
@@ -80,7 +87,7 @@ model Order {
   id            String    @id @default(cuid())
   userId        String?
   storeId       String
-  paymentMethod String    // cash | card
+  paymentMethod String    // cash | card | qr
   status        String    @default("pending") // pending | confirmed | cancelled
   total         Float
   pickupDate    DateTime? // дата когда заберут товар

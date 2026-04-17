@@ -76,22 +76,6 @@
   z-index: 1;
 }
 
-.hero-slide-badge {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #000;
-  color: #e11;
-  font-size: 18px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .hero-slide-title {
   position: absolute;
   bottom: 60px;
@@ -167,18 +151,31 @@
   inset: 0;
   background-size: cover;
   background-position: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
-.hero-side-badge {
+.hero-side-banner-bg.active {
+  opacity: 1;
+}
+
+.hero-side-progress {
   position: absolute;
-  top: 12px;
+  left: 12px;
   right: 12px;
-  padding: 6px 12px;
-  background: #e11;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  border-radius: 6px;
+  bottom: 12px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.hero-side-progress-fill {
+  display: block;
+  height: 100%;
+  background: #000;
+  transition: width 0.05s linear;
 }
 
 @media (max-width: 900px) {

@@ -23,6 +23,13 @@ router.get('/', async (req, res) => {
       charging,
       powerAdj,
       battery,
+      watts,
+      resistance,
+      supplier,
+      tobacco,
+      weight,
+      coalType,
+      packCount,
     } = req.query;
     const where = {};
     if (category) where.category = category;
@@ -47,6 +54,13 @@ router.get('/', async (req, res) => {
     if (charging) where.charging = { in: charging.split(',') };
     if (powerAdj) where.powerAdj = { in: powerAdj.split(',') };
     if (battery) where.battery = { in: battery.split(',').map(Number) };
+    if (watts) where.watts = { in: watts.split(',') };
+    if (resistance) where.resistance = { in: resistance.split(',') };
+    if (supplier) where.supplier = { in: supplier.split(',') };
+    if (tobacco) where.tobacco = { in: tobacco.split(',') };
+    if (weight) where.weight = { in: weight.split(',') };
+    if (coalType) where.coalType = { in: coalType.split(',') };
+    if (packCount) where.packCount = { in: packCount.split(',') };
     const products = await prisma.product.findMany({
       where,
       orderBy: { createdAt: 'desc' },

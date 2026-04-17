@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { authApi } from '../lib/api';
 import './Auth.css';
 
-const BOT_LINK = 'https://t.me/VapeShopHelperAdminBot';
+const BOT_LINK = 'https://t.me/Manager_OblakoPara';
 
 export default function Register() {
   const [searchParams] = useSearchParams();
@@ -117,7 +117,7 @@ export default function Register() {
       <div className="auth-card">
         <h1>Регистрация</h1>
         <p className="auth-bot-text">
-          Продолжите регистрацию через Telegram-бота. Напишите в боте команду <strong>/start</strong> — бот отправит код подтверждения и ссылку для завершения регистрации.
+          Для быстрой связи по регистрации напишите менеджеру в Telegram.
         </p>
         <a
           href={BOT_LINK}
@@ -125,7 +125,7 @@ export default function Register() {
           rel="noopener noreferrer"
           className="btn-bot"
         >
-          Открыть бота @VapeShopHelperAdminBot
+          Открыть Telegram менеджера
         </a>
         <p className="auth-switch">
           Уже есть аккаунт? <Link to="/login">Войти</Link>

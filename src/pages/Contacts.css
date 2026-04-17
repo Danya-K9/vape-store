@@ -196,8 +196,10 @@
   display: block;
   object-fit: contain;
   margin-bottom: 12px;
-  background: transparent !important;
+  background: #fff !important;
   border: none !important;
+  border-radius: 10px;
+  padding: 4px;
 }
 
 .contacts-social-item {

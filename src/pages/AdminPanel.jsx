@@ -215,10 +215,12 @@ export default function AdminPanel() {
           <h2>Управление вариантами фильтров по категориям</h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
             <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
-              <option value="disposables">Одноразовые парогенераторы</option>
               <option value="liquids">Жидкости для электронных парогенераторов</option>
+              <option value="disposables">Одноразовые/многоразовые парогенераторы</option>
               <option value="pod-systems">Электронные парогенераторы</option>
               <option value="pouches">Никотиновые паучи</option>
+              <option value="hookah-mix">Смесь для кальянов</option>
+              <option value="hookah-coals">Угли для кальянов</option>
               <option value="accessories">Комплектующие</option>
             </select>
             <select value={filterForm.filterKey} onChange={(e) => setFilterForm({ ...filterForm, filterKey: e.target.value })}>
@@ -232,6 +234,13 @@ export default function AdminPanel() {
               <option value="charging">Зарядка</option>
               <option value="powerAdj">Регулировка мощности</option>
               <option value="battery">Ёмкость АКБ</option>
+              <option value="watts">Ватты</option>
+              <option value="resistance">Сопротивление</option>
+              <option value="supplier">Поставщик</option>
+              <option value="tobacco">Наличие табака</option>
+              <option value="weight">Вес</option>
+              <option value="coalType">Тип углей</option>
+              <option value="packCount">Кол-во в пачке</option>
               <option value="country">Страна</option>
               <option value="color">Цвет</option>
               <option value="display">Дисплей</option>
@@ -300,7 +309,7 @@ export default function AdminPanel() {
 
       {tab === 'products' && (
         <section className="admin-section">
-          <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'disposables', image: '', images: [], description: '', manufacturer: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', battery: '', color: '', display: '', badge: '' }); setImageFile(null); setImageFiles([]); }}>Добавить товар</button>
+          <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'liquids', image: '', images: [], description: '', manufacturer: '', supplier: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', watts: '', resistance: '', battery: '', tobacco: '', weight: '', coalType: '', packCount: '', color: '', display: '', badge: '' }); setImageFile(null); setImageFiles([]); }}>Добавить товар</button>
           <table>
             <thead>
               <tr><th>Название</th><th>Цена</th><th>Категория</th><th>Новинки</th><th>Лидеры</th><th></th></tr>
@@ -313,11 +322,13 @@ export default function AdminPanel() {
                       <div className="admin-form-row">
                         <input placeholder="Название" value={form.name ?? ''} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                         <input type="number" placeholder="Цена" value={form.price ?? ''} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-                        <select value={form.category ?? 'disposables'} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                          <option value="disposables">Одноразовые парогенераторы</option>
+                        <select value={form.category ?? 'liquids'} onChange={(e) => setForm({ ...form, category: e.target.value })}>
                           <option value="liquids">Жидкости для электронных парогенераторов</option>
+                          <option value="disposables">Одноразовые/многоразовые парогенераторы</option>
                           <option value="pod-systems">Электронные парогенераторы</option>
                           <option value="pouches">Никотиновые паучи</option>
+                          <option value="hookah-mix">Смесь для кальянов</option>
+                          <option value="hookah-coals">Угли для кальянов</option>
                           <option value="accessories">Комплектующие</option>
                         </select>
                         <label><input type="checkbox" checked={form.showInNew ?? false} onChange={(e) => setForm({ ...form, showInNew: e.target.checked })} /> Новинки</label>
@@ -325,7 +336,7 @@ export default function AdminPanel() {
                       </div>
                       <div className="admin-form-row admin-form-specs">
                         {(() => {
-                          const cat = form.category ?? 'disposables';
+                          const cat = form.category ?? 'liquids';
                           if (cat === 'liquids') {
                             return (
                               <>
@@ -431,6 +442,11 @@ export default function AdminPanel() {
                             return (
                               <>
                                 <input
+                                  placeholder="Поставщик"
+                                  value={form.supplier ?? ''}
+                                  onChange={(e) => setForm({ ...form, supplier: e.target.value })}
+                                />
+                                <input
                                   placeholder="Производитель"
                                   value={form.manufacturer ?? ''}
                                   onChange={(e) => setForm({ ...form, manufacturer: e.target.value })}
@@ -462,6 +478,11 @@ export default function AdminPanel() {
                             return (
                               <>
                                 <input
+                                  placeholder="Поставщик"
+                                  value={form.supplier ?? ''}
+                                  onChange={(e) => setForm({ ...form, supplier: e.target.value })}
+                                />
+                                <input
                                   placeholder="Производитель"
                                   value={form.manufacturer ?? ''}
                                   onChange={(e) => setForm({ ...form, manufacturer: e.target.value })}
@@ -472,11 +493,52 @@ export default function AdminPanel() {
                                   onChange={(e) => setForm({ ...form, powerAdj: e.target.value })}
                                 />
                                 <input
+                                  placeholder="Ватты"
+                                  value={form.watts ?? ''}
+                                  onChange={(e) => setForm({ ...form, watts: e.target.value })}
+                                />
+                                <input
+                                  placeholder="Сопротивление"
+                                  value={form.resistance ?? ''}
+                                  onChange={(e) => setForm({ ...form, resistance: e.target.value })}
+                                />
+                                <input
                                   placeholder="Ёмкость АКБ"
                                   type="number"
                                   value={form.battery ?? ''}
                                   onChange={(e) => setForm({ ...form, battery: e.target.value })}
                                 />
+                              </>
+                            );
+                          }
+                          if (cat === 'accessories') {
+                            return (
+                              <>
+                                <input placeholder="Поставщик" value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                <input placeholder="Производитель" value={form.manufacturer ?? ''} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />
+                                <input placeholder="Сопротивление" value={form.resistance ?? ''} onChange={(e) => setForm({ ...form, resistance: e.target.value })} />
+                                <input placeholder="Ватты" value={form.watts ?? ''} onChange={(e) => setForm({ ...form, watts: e.target.value })} />
+                                <input placeholder="Ёмкость АКБ" type="number" value={form.battery ?? ''} onChange={(e) => setForm({ ...form, battery: e.target.value })} />
+                              </>
+                            );
+                          }
+                          if (cat === 'hookah-mix') {
+                            return (
+                              <>
+                                <input placeholder="Поставщик" value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                <input placeholder="Крепость" type="number" value={form.strength ?? ''} onChange={(e) => setForm({ ...form, strength: e.target.value })} />
+                                <input placeholder="Наличие табака" value={form.tobacco ?? ''} onChange={(e) => setForm({ ...form, tobacco: e.target.value })} />
+                                <input placeholder="Вес" value={form.weight ?? ''} onChange={(e) => setForm({ ...form, weight: e.target.value })} />
+                              </>
+                            );
+                          }
+                          if (cat === 'hookah-coals') {
+                            return (
+                              <>
+                                <input placeholder="Поставщик" value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                <input placeholder="Тип углей" value={form.coalType ?? ''} onChange={(e) => setForm({ ...form, coalType: e.target.value })} />
+                                <input placeholder="Кол-во в пачке" value={form.packCount ?? ''} onChange={(e) => setForm({ ...form, packCount: e.target.value })} />
+                                <input placeholder="Производитель" value={form.manufacturer ?? ''} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />
                               </>
                             );
                           }
@@ -511,10 +573,12 @@ export default function AdminPanel() {
                           <input placeholder="Название" value={form.name ?? p.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                           <input type="number" placeholder="Цена" value={form.price ?? p.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
                           <select value={form.category ?? p.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                            <option value="disposables">Одноразовые парогенераторы</option>
                             <option value="liquids">Жидкости для электронных парогенераторов</option>
+                            <option value="disposables">Одноразовые/многоразовые парогенераторы</option>
                             <option value="pod-systems">Электронные парогенераторы</option>
                             <option value="pouches">Никотиновые паучи</option>
+                            <option value="hookah-mix">Смесь для кальянов</option>
+                            <option value="hookah-coals">Угли для кальянов</option>
                             <option value="accessories">Комплектующие</option>
                           </select>
                           <label><input type="checkbox" checked={form.showInNew ?? p.showInNew} onChange={(e) => setForm({ ...form, showInNew: e.target.checked })} /> Новинки</label>
@@ -627,6 +691,7 @@ export default function AdminPanel() {
                             if (cat === 'pouches') {
                               return (
                                 <>
+                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
                                   <input
                                     placeholder="Производитель"
                                     value={form.manufacturer ?? p.manufacturer ?? ''}
@@ -658,6 +723,7 @@ export default function AdminPanel() {
                             if (cat === 'pod-systems') {
                               return (
                                 <>
+                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
                                   <input
                                     placeholder="Производитель"
                                     value={form.manufacturer ?? p.manufacturer ?? ''}
@@ -668,12 +734,45 @@ export default function AdminPanel() {
                                     value={form.powerAdj ?? p.powerAdj ?? ''}
                                     onChange={(e) => setForm({ ...form, powerAdj: e.target.value })}
                                   />
+                                  <input placeholder="Ватты" value={form.watts ?? p.watts ?? ''} onChange={(e) => setForm({ ...form, watts: e.target.value })} />
+                                  <input placeholder="Сопротивление" value={form.resistance ?? p.resistance ?? ''} onChange={(e) => setForm({ ...form, resistance: e.target.value })} />
                                   <input
                                     placeholder="Ёмкость АКБ"
                                     type="number"
                                     value={form.battery ?? p.battery ?? ''}
                                     onChange={(e) => setForm({ ...form, battery: e.target.value })}
                                   />
+                                </>
+                              );
+                            }
+                            if (cat === 'accessories') {
+                              return (
+                                <>
+                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                  <input placeholder="Производитель" value={form.manufacturer ?? p.manufacturer ?? ''} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />
+                                  <input placeholder="Сопротивление" value={form.resistance ?? p.resistance ?? ''} onChange={(e) => setForm({ ...form, resistance: e.target.value })} />
+                                  <input placeholder="Ватты" value={form.watts ?? p.watts ?? ''} onChange={(e) => setForm({ ...form, watts: e.target.value })} />
+                                  <input placeholder="Ёмкость АКБ" type="number" value={form.battery ?? p.battery ?? ''} onChange={(e) => setForm({ ...form, battery: e.target.value })} />
+                                </>
+                              );
+                            }
+                            if (cat === 'hookah-mix') {
+                              return (
+                                <>
+                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                  <input placeholder="Крепость" type="number" value={form.strength ?? p.strength ?? ''} onChange={(e) => setForm({ ...form, strength: e.target.value })} />
+                                  <input placeholder="Наличие табака" value={form.tobacco ?? p.tobacco ?? ''} onChange={(e) => setForm({ ...form, tobacco: e.target.value })} />
+                                  <input placeholder="Вес" value={form.weight ?? p.weight ?? ''} onChange={(e) => setForm({ ...form, weight: e.target.value })} />
+                                </>
+                              );
+                            }
+                            if (cat === 'hookah-coals') {
+                              return (
+                                <>
+                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                  <input placeholder="Тип углей" value={form.coalType ?? p.coalType ?? ''} onChange={(e) => setForm({ ...form, coalType: e.target.value })} />
+                                  <input placeholder="Кол-во в пачке" value={form.packCount ?? p.packCount ?? ''} onChange={(e) => setForm({ ...form, packCount: e.target.value })} />
+                                  <input placeholder="Производитель" value={form.manufacturer ?? p.manufacturer ?? ''} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />
                                 </>
                               );
                             }
