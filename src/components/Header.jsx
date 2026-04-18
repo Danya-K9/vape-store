@@ -112,7 +112,9 @@ export default function Header() {
             <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>
               {scrolled ? (
                 <span className="logo-compact">
-                  <img src="/logo.jpg" alt="Облако пара" className="logo-img" />
+                  <span className="logo-img-ring">
+                    <img src="/logo.jpg?v=3" alt="Облако пара" className="logo-img" />
+                  </span>
                   <span className="logo-text">
                     <span className="logo-brand">Облако пара</span>
                     <span className="logo-tagline">Магазин вейпов</span>
@@ -120,7 +122,9 @@ export default function Header() {
                 </span>
               ) : (
                 <span className="logo-compact logo-expanded">
-                  <img src="/logo.jpg" alt="Облако пара" className="logo-img" />
+                  <span className="logo-img-ring">
+                    <img src="/logo.jpg?v=3" alt="Облако пара" className="logo-img" />
+                  </span>
                   <span className="logo-text">
                     <span className="logo-brand">Облако пара</span>
                     <span className="logo-tagline">Магазин вейпов</span>

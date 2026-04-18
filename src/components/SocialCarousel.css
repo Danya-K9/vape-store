@@ -29,18 +29,17 @@
   position: absolute;
   inset: 0;
   background-size: cover;
-  background-position: center;
+  background-position: center center;
   background-repeat: no-repeat;
   background-color: #000;
 }
 
-/* Логотипы на макетах выше центра — якорим к верхней трети, чтобы не срезать сверху */
 .social-card-bg--telegram {
-  background-position: center 22%;
+  background-position: center 58%;
 }
 
 .social-card-bg--instagram {
-  background-position: center 18%;
+  background-position: center 52%;
 }
 
 .social-card-bg::after {

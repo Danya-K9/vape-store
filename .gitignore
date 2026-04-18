@@ -15,6 +15,7 @@ dist-ssr
 # Env files (do not commit secrets)
 .env
 .env.*
+!.env.example
 server/.env
 
 # Editor directories and files

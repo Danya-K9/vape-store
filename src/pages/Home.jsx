@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import ProductCarousel from '../components/ProductCarousel';
 import HeroCarousel from '../components/HeroCarousel';
 import SocialCarousel from '../components/SocialCarousel';
-import BlogHomeCarousel from '../components/BlogHomeCarousel';
 import { blogPosts, reviews, products as localProducts } from '../data/products';
 import { productsApi } from '../lib/api';
 import './Home.css';
+
+const BLOG_CAROUSEL_INTERVAL_MS = 6000;
 
 const categoryFilters = [
   { id: 'all', name: 'Все' },
@@ -25,6 +26,7 @@ export default function Home() {
   const [bestsellerFilter, setBestsellerFilter] = useState('all');
   const [newProducts, setNewProducts] = useState([]);
   const [bestsellerProducts, setBestsellerProducts] = useState([]);
+  const [blogSlide, setBlogSlide] = useState(0);
 
   const newFallback = (localProducts || []).filter((p) => p.badge === 'Новинка');
   const bestsellerFallback = (localProducts || []).filter((p) => p.badge === 'Хит' || p.badge === 'Советуем');
@@ -46,12 +48,23 @@ export default function Home() {
       .catch(() => setBestsellerProducts(bestsellerFallback));
   }, []);
 
+  useEffect(() => {
+    const n = blogPosts.length;
+    if (n <= 1) return undefined;
+    const timer = window.setInterval(() => {
+      setBlogSlide((i) => (i + 1) % n);
+    }, BLOG_CAROUSEL_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, []);
+
   const filteredNew = newFilter === 'all'
     ? newProducts
     : newProducts.filter((p) => p.category === newFilter);
   const filteredBestseller = bestsellerFilter === 'all'
     ? bestsellerProducts
     : bestsellerProducts.filter((p) => p.category === bestsellerFilter);
+
+  const blogFeatured = blogPosts[blogSlide] || blogPosts[0];
 
   return (
     <div className="home">
@@ -148,14 +161,49 @@ export default function Home() {
           Блог
         </motion.h2>
         <div className="blog-layout">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-          >
-            <BlogHomeCarousel posts={blogPosts} />
-          </motion.div>
+          <div className="blog-featured-carousel">
+            <AnimatePresence mode="wait">
+              <motion.article
+                key={blogFeatured.id}
+                className="blog-featured blog-card-viking"
+                initial={{ opacity: 0, x: 28 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -28 }}
+                transition={{ duration: 0.35 }}
+                whileHover={{ y: -4 }}
+              >
+                <Link
+                  to={`/blog/${blogFeatured.slug || blogFeatured.id}`}
+                  className="blog-featured-link blog-card-link"
+                >
+                  <div className="blog-featured-text blog-card-text">
+                    <span className="blog-date">{blogFeatured.date}</span>
+                    <h3>{blogFeatured.title}</h3>
+                    {blogFeatured.teaser && (
+                      <p className="blog-teaser">{blogFeatured.teaser}</p>
+                    )}
+                    <span className="blog-link">Читать статью →</span>
+                  </div>
+                  <div className="blog-featured-image blog-card-image">
+                    <img src={blogFeatured.image} alt="" />
+                  </div>
+                </Link>
+              </motion.article>
+            </AnimatePresence>
+            <div className="blog-carousel-dots" role="tablist" aria-label="Выбор статьи блога">
+              {blogPosts.map((p, i) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === blogSlide}
+                  className={`blog-carousel-dot ${i === blogSlide ? 'active' : ''}`}
+                  onClick={() => setBlogSlide(i)}
+                  aria-label={`Статья ${i + 1}: ${p.title}`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

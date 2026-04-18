@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import YandexMap from '../components/YandexMap';
+import YandexShopMap from '../components/YandexShopMap';
 import { PHONE, SOCIAL_ICONS } from '../constants/socialIcons';
 import './Contacts.css';
 
@@ -34,7 +34,7 @@ export default function Contacts() {
       <h1>Контакты и магазины партнёров</h1>
 
       <div className="contacts-map-wrap">
-        <YandexMap />
+        <YandexShopMap className="contacts-map-api" />
         <a
           href="https://yandex.by/maps/?pt=30.426632,54.508801&z=17&l=map"
           target="_blank"
