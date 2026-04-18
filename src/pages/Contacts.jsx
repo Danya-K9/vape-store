@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import YandexMap from '../components/YandexMap';
 import { PHONE, SOCIAL_ICONS } from '../constants/socialIcons';
 import './Contacts.css';
 
@@ -33,14 +34,7 @@ export default function Contacts() {
       <h1>Контакты и магазины партнёров</h1>
 
       <div className="contacts-map-wrap">
-        <iframe
-          src="https://yandex.ru/map-widget/v1/?ll=30.426632%2C54.508801&z=17&pt=30.426632,54.508801,pm2rdm&l=map"
-          title="Яндекс Карта — г. Орша, ул. Владимира Ленина, 17"
-          className="contacts-yandex-map"
-          frameBorder="0"
-          allowFullScreen
-        />
-        <div className="contacts-map-pin-label">Облако пара | вейп-шоп</div>
+        <YandexMap />
         <a
           href="https://yandex.by/maps/?pt=30.426632,54.508801&z=17&l=map"
           target="_blank"

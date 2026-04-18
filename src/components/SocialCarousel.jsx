@@ -28,7 +28,10 @@ export default function SocialCarousel() {
               rel="noreferrer"
               className="social-carousel-card"
             >
-              <div className="social-card-bg" style={{ backgroundImage: `url(${card.image})` }} />
+              <div
+                className={`social-card-bg social-card-bg--${card.id}`}
+                style={{ backgroundImage: `url(${card.image})` }}
+              />
               <div className="social-card-content">
                 {card.id === 'telegram' && (
                   <span className="social-card-icon" style={{ color: '#29b6f6' }}>✈</span>

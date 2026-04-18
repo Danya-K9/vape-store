@@ -34,6 +34,15 @@
   background-color: #000;
 }
 
+/* Логотипы на макетах выше центра — якорим к верхней трети, чтобы не срезать сверху */
+.social-card-bg--telegram {
+  background-position: center 22%;
+}
+
+.social-card-bg--instagram {
+  background-position: center 18%;
+}
+
 .social-card-bg::after {
   content: '';
   position: absolute;

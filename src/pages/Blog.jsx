@@ -36,9 +36,10 @@ export default function Blog() {
               <span className="blog-item-date">{post.date}</span>
               <h2>{post.title}</h2>
               <p>
-                Информация о новинках в мире электронных парогенераторов и жидкостей.
+                {post.excerpt
+                  || 'Информация о новинках в мире электронных парогенераторов и жидкостей.'}
               </p>
-              <Link to={`/blog/${post.id}`} className="blog-item-link">
+              <Link to={`/blog/${post.slug || post.id}`} className="blog-item-link">
                 Подробнее
               </Link>
             </div>

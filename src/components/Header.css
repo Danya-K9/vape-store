@@ -318,6 +318,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
+  min-width: 0;
 }
 
 .btn-catalog {
@@ -347,9 +348,27 @@
 
 .nav-categories {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 20px;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0 20px;
   flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  padding-bottom: 18px;
+  margin-bottom: -6px;
+}
+
+.nav-categories::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-categories {
+  scrollbar-width: none;
 }
 
 .nav-categories a {
@@ -361,6 +380,8 @@
 .nav-categories a {
   position: relative;
   padding-bottom: 4px;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .nav-categories a:hover {
@@ -375,7 +396,7 @@
 .nav-categories a.active::after {
   content: '';
   position: absolute;
-  bottom: -12px;
+  bottom: 2px;
   left: 0;
   right: 0;
   height: 3px;
@@ -385,6 +406,7 @@
 .nav-catalog-trigger {
   position: relative;
   overflow: visible;
+  flex-shrink: 0;
 }
 
 .header-main-bar,
@@ -706,7 +728,8 @@
 .logo-img {
   width: 44px;
   height: 44px;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .logo-img-full {

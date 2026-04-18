@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import ProductCarousel from '../components/ProductCarousel';
 import HeroCarousel from '../components/HeroCarousel';
 import SocialCarousel from '../components/SocialCarousel';
+import BlogHomeCarousel from '../components/BlogHomeCarousel';
 import { blogPosts, reviews, products as localProducts } from '../data/products';
 import { productsApi } from '../lib/api';
 import './Home.css';
@@ -147,25 +148,14 @@ export default function Home() {
           Блог
         </motion.h2>
         <div className="blog-layout">
-          <motion.article
-            className="blog-featured blog-card-viking"
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
-            whileHover={{ y: -4 }}
           >
-            <Link to="/blog" className="blog-featured-link blog-card-link">
-              <div className="blog-featured-text blog-card-text">
-                <span className="blog-date">Актуальные подборки</span>
-                <h3>Одноразовые/многоразовые устройства, смеси, угли и комплектующие</h3>
-                <span className="blog-link">Смотреть подборку →</span>
-              </div>
-              <div className="blog-featured-image blog-card-image">
-                <img src={blogPosts[1]?.image || blogPosts[0]?.image} alt="Ассортимент магазина" />
-              </div>
-            </Link>
-          </motion.article>
+            <BlogHomeCarousel posts={blogPosts} />
+          </motion.div>
         </div>
       </section>
 

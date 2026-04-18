@@ -1,0 +1,45 @@
+.blog-home-carousel {
+  position: relative;
+}
+
+.blog-home-carousel-card {
+  margin: 0;
+}
+
+.blog-home-carousel-excerpt {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #555;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.blog-home-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.blog-home-carousel-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #ccc;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.blog-home-carousel-dot:hover {
+  background: #999;
+}
+
+.blog-home-carousel-dot.active {
+  background: #000;
+  transform: scale(1.15);
+}

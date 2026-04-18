@@ -59,7 +59,7 @@
 .director-login-link {
   display: inline-block;
   padding: 12px 24px;
-  background: #2563eb;
+  background: #111;
   color: #fff;
   font-weight: 600;
   border-radius: 8px;
@@ -67,7 +67,7 @@
 }
 
 .director-login-link:hover {
-  background: #1d4ed8;
+  background: #000;
 }
 
 .director-modal-form {
@@ -107,7 +107,7 @@
 
 .director-file-btn {
   padding: 10px 20px;
-  background: #2563eb;
+  background: #111;
   color: #fff;
   font-size: 14px;
   font-weight: 500;
@@ -117,7 +117,7 @@
 }
 
 .director-file-btn:hover {
-  background: #1d4ed8;
+  background: #000;
 }
 
 .director-file-name {
@@ -128,7 +128,7 @@
 .director-submit-btn {
   width: 100%;
   padding: 14px 20px;
-  background: #2563eb;
+  background: #111;
   color: #fff;
   font-size: 16px;
   font-weight: 600;
@@ -138,7 +138,7 @@
 }
 
 .director-submit-btn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: #000;
 }
 
 .director-submit-btn:disabled {
