@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductCarousel from '../components/ProductCarousel';
@@ -10,6 +9,7 @@ import { productsApi } from '../lib/api';
 import './Home.css';
 
 const BLOG_CAROUSEL_INTERVAL_MS = 6000;
+const YANDEX_REVIEWS_URL = 'https://yandex.ru/navi/org/oblako_para/221337875525?si=8ng7m7pyz6fuzp3j7j08u3f798';
 
 const categoryFilters = [
   { id: 'all', name: 'Все' },
@@ -29,6 +29,7 @@ export default function Home() {
   const [bestsellerProducts, setBestsellerProducts] = useState([]);
   const [blogSlide, setBlogSlide] = useState(0);
   const blogSwipeRef = useRef({ startX: 0, deltaX: 0, active: false });
+  const blogTimerRef = useRef(null);
 
   const newFallback = (localProducts || []).filter((p) => p.badge === 'Новинка');
   const bestsellerFallback = (localProducts || []).filter((p) => p.badge === 'Хит' || p.badge === 'Советуем');
@@ -50,13 +51,30 @@ export default function Home() {
       .catch(() => setBestsellerProducts(bestsellerFallback));
   }, []);
 
-  useEffect(() => {
-    const n = blogPosts.length;
-    if (n <= 1) return undefined;
-    const timer = window.setInterval(() => {
-      setBlogSlide((i) => (i + 1) % n);
+  const blogCount = blogPosts.length;
+
+  const restartBlogTimer = () => {
+    if (blogTimerRef.current) window.clearInterval(blogTimerRef.current);
+    if (blogCount <= 1) return;
+    blogTimerRef.current = window.setInterval(() => {
+      setBlogSlide((i) => (i + 1) % blogCount);
     }, BLOG_CAROUSEL_INTERVAL_MS);
-    return () => window.clearInterval(timer);
+  };
+
+  useEffect(() => {
+    restartBlogTimer();
+    return () => {
+      if (blogTimerRef.current) window.clearInterval(blogTimerRef.current);
+    };
+  }, [blogCount]);
+
+  useEffect(() => {
+    // Preload blog images to avoid first-frame jank.
+    (blogPosts || []).forEach((p) => {
+      if (!p?.image) return;
+      const img = new Image();
+      img.src = p.image;
+    });
   }, []);
 
   const filteredNew = newFilter === 'all'
@@ -67,7 +85,10 @@ export default function Home() {
     : bestsellerProducts.filter((p) => p.category === bestsellerFilter);
 
   const blogFeatured = blogPosts[blogSlide] || blogPosts[0];
-  const blogCount = blogPosts.length;
+  const safeSetBlogSlide = (updater) => {
+    setBlogSlide(updater);
+    restartBlogTimer();
+  };
 
   const onBlogSwipeStart = (event) => {
     blogSwipeRef.current = { startX: event.clientX, deltaX: 0, active: true };
@@ -83,15 +104,25 @@ export default function Home() {
     const threshold = 50;
     const { deltaX } = blogSwipeRef.current;
     if (deltaX <= -threshold) {
-      setBlogSlide((i) => (i + 1) % blogCount);
+      safeSetBlogSlide((i) => (i + 1) % blogCount);
     } else if (deltaX >= threshold) {
-      setBlogSlide((i) => (i - 1 + blogCount) % blogCount);
+      safeSetBlogSlide((i) => (i - 1 + blogCount) % blogCount);
     }
     blogSwipeRef.current.active = false;
   };
 
-  const blogPrev = () => setBlogSlide((i) => (i - 1 + blogCount) % blogCount);
-  const blogNext = () => setBlogSlide((i) => (i + 1) % blogCount);
+  const blogPrev = () => safeSetBlogSlide((i) => (i - 1 + blogCount) % blogCount);
+  const blogNext = () => safeSetBlogSlide((i) => (i + 1) % blogCount);
+
+  const yandexReviews = useMemo(() => (reviews || []).filter((r) => r.source === 'yandex'), []);
+  const randomYandexReviews = useMemo(() => {
+    const src = [...yandexReviews];
+    for (let i = src.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [src[i], src[j]] = [src[j], src[i]];
+    }
+    return src.slice(0, 3);
+  }, [yandexReviews]);
 
   return (
     <div className="home">
@@ -195,15 +226,16 @@ export default function Home() {
             onPointerUp={onBlogSwipeEnd}
             onPointerCancel={onBlogSwipeEnd}
           >
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               <motion.article
                 key={blogFeatured.id}
                 className="blog-featured blog-card-viking"
                 initial={{ opacity: 0, x: 28 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -28 }}
-                transition={{ duration: 0.35 }}
+                transition={{ duration: 0.24, ease: 'easeOut' }}
                 whileHover={{ y: -4 }}
+                style={{ willChange: 'transform, opacity' }}
               >
                 <Link
                   to={`/blog/${blogFeatured.slug || blogFeatured.id}`}
@@ -218,7 +250,7 @@ export default function Home() {
                     <span className="blog-link">Читать статью →</span>
                   </div>
                   <div className="blog-featured-image blog-card-image">
-                    <img src={blogFeatured.image} alt="" />
+                    <img src={blogFeatured.image} alt="" loading="eager" decoding="async" />
                   </div>
                 </Link>
               </motion.article>
@@ -233,7 +265,7 @@ export default function Home() {
                   role="tab"
                   aria-selected={i === blogSlide}
                   className={`blog-carousel-dot ${i === blogSlide ? 'active' : ''}`}
-                  onClick={() => setBlogSlide(i)}
+                  onClick={() => safeSetBlogSlide(i)}
                   aria-label={`Статья ${i + 1}: ${p.title}`}
                 />
               ))}
@@ -254,54 +286,23 @@ export default function Home() {
         >
           Отзывы
         </motion.h2>
-        <div className="reviews-two-columns">
-          <div className="reviews-column reviews-google">
-            <h3>ОТЗЫВЫ НА VAPE Google</h3>
-            <div className="reviews-column-header">
-              <span className="reviews-rating">★ 4.6 / 5</span>
-              <span className="reviews-count">243 Отзывов</span>
-              <button type="button" className="btn-leave-review">ОСТАВИТЬ ОТЗЫВ</button>
-            </div>
-            <div className="reviews-list">
-              {reviews.filter((r) => r.source === 'google').map((review, i) => (
-                <motion.div
-                  key={review.id}
-                  className="review-card"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                >
-                  <div className="review-stars">
-                    {Array.from({ length: 5 }).map((_, k) => (
-                      <span key={k} className={k < review.rating ? 'star active' : 'star'}>★</span>
-                    ))}
-                  </div>
-                  <p className="review-text">&quot;{review.text}&quot;</p>
-                  <p className="review-author">{review.name}</p>
-                  <p className="review-date">{review.date}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
+        <div className="reviews-one-column">
           <div className="reviews-column reviews-yandex">
             <h3>Облако пара — Яндекс Карты</h3>
             <div className="reviews-column-header">
-              <span className="reviews-rating">4,7 ★</span>
-              <span className="reviews-count">80 отзывов • 262 оценки</span>
-              <button type="button" className="btn-leave-review">Оставить отзыв</button>
+              <a className="btn-leave-review" href={YANDEX_REVIEWS_URL} target="_blank" rel="noreferrer">Оставить отзыв</a>
             </div>
             <div className="reviews-list">
-              {reviews.filter((r) => r.source === 'yandex').map((review, i) => (
+              {randomYandexReviews.map((review, i) => (
                 <motion.div
                   key={review.id}
                   className="review-card"
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  transition={{ duration: 0.35, delay: i * 0.06 }}
                 >
-                  <div className="review-stars">
+                  <div className="review-stars" aria-label={`Оценка: ${review.rating} из 5`}>
                     {Array.from({ length: 5 }).map((_, k) => (
                       <span key={k} className={k < review.rating ? 'star active' : 'star'}>★</span>
                     ))}
@@ -312,7 +313,7 @@ export default function Home() {
                 </motion.div>
               ))}
             </div>
-            <button type="button" className="btn-more-reviews">Больше отзывов на Яндекс Картах</button>
+            <a className="btn-more-reviews" href={YANDEX_REVIEWS_URL} target="_blank" rel="noreferrer">Больше отзывов на Яндекс Картах</a>
           </div>
         </div>
       </section>

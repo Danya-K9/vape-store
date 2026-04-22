@@ -210,6 +210,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  transform: translateZ(0);
 }
 
 .blog-carousel-dots {
@@ -334,6 +335,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transform: translateZ(0);
 }
 
 .blog-card-link {
@@ -417,12 +419,9 @@
   text-align: center;
 }
 
-.reviews-two-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  max-width: 1200px;
+.reviews-one-column {
   width: 100%;
+  max-width: 920px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -470,6 +469,10 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .reviews-list {
@@ -490,6 +493,8 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
+  text-align: center;
 }
 
 .reviews-grid {
