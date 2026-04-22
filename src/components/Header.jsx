@@ -121,7 +121,7 @@ export default function Header() {
               {scrolled ? (
                 <span className="logo-compact">
                   <span className="logo-img-ring">
-                    <img src="/logo.png?v=5" alt="Облако пара" className="logo-img" />
+                    <img src="/logo.png?v=6" alt="Облако пара" className="logo-img" />
                   </span>
                   <span className="logo-text">
                     <span className="logo-brand">Облако пара</span>
@@ -131,7 +131,7 @@ export default function Header() {
               ) : (
                 <span className="logo-compact logo-expanded">
                   <span className="logo-img-ring">
-                    <img src="/logo.png?v=5" alt="Облако пара" className="logo-img" />
+                    <img src="/logo.png?v=6" alt="Облако пара" className="logo-img" />
                   </span>
                   <span className="logo-text">
                     <span className="logo-brand">Облако пара</span>

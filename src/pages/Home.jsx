@@ -90,6 +90,9 @@ export default function Home() {
     blogSwipeRef.current.active = false;
   };
 
+  const blogPrev = () => setBlogSlide((i) => (i - 1 + blogCount) % blogCount);
+  const blogNext = () => setBlogSlide((i) => (i + 1) % blogCount);
+
   return (
     <div className="home">
       <HeroCarousel />
@@ -220,7 +223,9 @@ export default function Home() {
                 </Link>
               </motion.article>
             </AnimatePresence>
-            <div className="blog-carousel-dots" role="tablist" aria-label="Выбор статьи блога">
+            <div className="blog-carousel-controls" aria-label="Навигация по блогу">
+              <button type="button" className="blog-carousel-arrow" onClick={blogPrev} aria-label="Предыдущая статья">‹</button>
+              <div className="blog-carousel-dots" role="tablist" aria-label="Выбор статьи блога">
               {blogPosts.map((p, i) => (
                 <button
                   key={p.id}
@@ -232,6 +237,8 @@ export default function Home() {
                   aria-label={`Статья ${i + 1}: ${p.title}`}
                 />
               ))}
+              </div>
+              <button type="button" className="blog-carousel-arrow" onClick={blogNext} aria-label="Следующая статья">›</button>
             </div>
           </div>
         </div>

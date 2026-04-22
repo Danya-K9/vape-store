@@ -2,7 +2,10 @@ import { useEffect, useRef } from 'react';
 
 const LAT = 54.508801;
 const LNG = 30.426632;
-const LOGO_MARKER = '/logo.png?v=5';
+const LOGO_MARKER = '/logo.png?v=6';
+const STORE_HOURS = `Понедельник — пятница: 10:00–20:00
+Суббота: 10:00–19:00
+Воскресенье: выходной`;
 
 export default function YandexShopMap({ className = '' }) {
   const containerRef = useRef(null);
@@ -57,17 +60,37 @@ export default function YandexShopMap({ className = '' }) {
           map.behaviors.disable('scrollZoom');
           map.options.set('suppressMapOpenBlock', true);
 
+          const markerSize = 56;
+          const markerLayout = window.ymaps.templateLayoutFactory.createClass(
+            `<div style="
+              width:${markerSize}px;
+              height:${markerSize}px;
+              border-radius:50%;
+              overflow:hidden;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+              border: 2px solid #fff;
+              background:#fff;
+              display:flex;
+              align-items:center;
+              justify-content:center;">
+                <img src="${LOGO_MARKER}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" />
+             </div>`,
+          );
+
           const placemark = new window.ymaps.Placemark(
             [LAT, LNG],
             {
               hintContent: 'Облако пара | вейп-шоп',
-              balloonContent: 'г. Орша, ул. Владимира Ленина, 17',
+              balloonContent: `<strong>г. Орша, ул. Владимира Ленина, 17</strong><br/>${STORE_HOURS.replace(/\n/g, '<br/>')}`,
             },
             {
-              iconLayout: 'default#image',
-              iconImageHref: LOGO_MARKER,
-              iconImageSize: [40, 40],
-              iconImageOffset: [-20, -40],
+              iconLayout: markerLayout,
+              iconShape: {
+                type: 'Circle',
+                coordinates: [markerSize / 2, markerSize / 2],
+                radius: markerSize / 2,
+              },
+              iconOffset: [-(markerSize / 2), -markerSize],
             },
           );
           map.geoObjects.add(placemark);

@@ -35,11 +35,11 @@
 }
 
 .social-card-bg--telegram {
-  background-position: center center;
+  background-position: center 70%;
 }
 
 .social-card-bg--instagram {
-  background-position: center center;
+  background-position: center 70%;
 }
 
 .social-card-bg::after {

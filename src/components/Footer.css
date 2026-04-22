@@ -36,8 +36,8 @@
 }
 
 .footer-logo-ring {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
@@ -52,7 +52,7 @@
   height: 100%;
   max-width: none;
   object-fit: contain;
-  padding: 3px;
+  padding: 0;
 }
 
 .footer-brand-name {
