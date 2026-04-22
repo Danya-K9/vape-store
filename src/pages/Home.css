@@ -256,6 +256,7 @@
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #eee;
+  min-height: 260px;
 }
 
 .blog-featured-link {
@@ -284,6 +285,10 @@
   margin: 0 0 8px;
   font-size: 22px;
   color: #1a1a1a;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .blog-featured-text .blog-link {
@@ -332,6 +337,10 @@
   font-weight: 700;
   color: #1a1a1a;
   margin: 0 0 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .blog-card-text .blog-link {

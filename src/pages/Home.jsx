@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductCarousel from '../components/ProductCarousel';
@@ -27,6 +28,7 @@ export default function Home() {
   const [newProducts, setNewProducts] = useState([]);
   const [bestsellerProducts, setBestsellerProducts] = useState([]);
   const [blogSlide, setBlogSlide] = useState(0);
+  const blogSwipeRef = useRef({ startX: 0, deltaX: 0, active: false });
 
   const newFallback = (localProducts || []).filter((p) => p.badge === 'Новинка');
   const bestsellerFallback = (localProducts || []).filter((p) => p.badge === 'Хит' || p.badge === 'Советуем');
@@ -65,6 +67,28 @@ export default function Home() {
     : bestsellerProducts.filter((p) => p.category === bestsellerFilter);
 
   const blogFeatured = blogPosts[blogSlide] || blogPosts[0];
+  const blogCount = blogPosts.length;
+
+  const onBlogSwipeStart = (event) => {
+    blogSwipeRef.current = { startX: event.clientX, deltaX: 0, active: true };
+  };
+
+  const onBlogSwipeMove = (event) => {
+    if (!blogSwipeRef.current.active) return;
+    blogSwipeRef.current.deltaX = event.clientX - blogSwipeRef.current.startX;
+  };
+
+  const onBlogSwipeEnd = () => {
+    if (!blogSwipeRef.current.active || blogCount <= 1) return;
+    const threshold = 50;
+    const { deltaX } = blogSwipeRef.current;
+    if (deltaX <= -threshold) {
+      setBlogSlide((i) => (i + 1) % blogCount);
+    } else if (deltaX >= threshold) {
+      setBlogSlide((i) => (i - 1 + blogCount) % blogCount);
+    }
+    blogSwipeRef.current.active = false;
+  };
 
   return (
     <div className="home">
@@ -161,7 +185,13 @@ export default function Home() {
           Блог
         </motion.h2>
         <div className="blog-layout">
-          <div className="blog-featured-carousel">
+          <div
+            className="blog-featured-carousel"
+            onPointerDown={onBlogSwipeStart}
+            onPointerMove={onBlogSwipeMove}
+            onPointerUp={onBlogSwipeEnd}
+            onPointerCancel={onBlogSwipeEnd}
+          >
             <AnimatePresence mode="wait">
               <motion.article
                 key={blogFeatured.id}

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 const LAT = 54.508801;
 const LNG = 30.426632;
-const LOGO_MARKER = '/logo.jpg?v=3';
+const LOGO_MARKER = '/logo.png?v=4';
 
 export default function YandexShopMap({ className = '' }) {
   const containerRef = useRef(null);

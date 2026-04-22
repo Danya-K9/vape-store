@@ -25,6 +25,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const catalogRefCompact = useRef(null);
   const catalogRefNav = useRef(null);
+  const navCategoriesRef = useRef(null);
   const [canHover, setCanHover] = useState(true);
 
   useEffect(() => {
@@ -71,6 +72,13 @@ export default function Header() {
     };
   }, [catalogOpen]);
 
+  const scrollNavCategories = (direction) => {
+    const el = navCategoriesRef.current;
+    if (!el) return;
+    const amount = Math.max(220, Math.floor(el.clientWidth * 0.6));
+    el.scrollBy({ left: direction * amount, behavior: 'smooth' });
+  };
+
   return (
     <header className={`header header-light ${scrolled ? 'header-scrolled' : ''} ${catalogOpen ? 'catalog-open' : ''}`}>
       <div className="header-notice-wrap">
@@ -113,7 +121,7 @@ export default function Header() {
               {scrolled ? (
                 <span className="logo-compact">
                   <span className="logo-img-ring">
-                    <img src="/logo.jpg?v=3" alt="Облако пара" className="logo-img" />
+                    <img src="/logo.png?v=4" alt="Облако пара" className="logo-img" />
                   </span>
                   <span className="logo-text">
                     <span className="logo-brand">Облако пара</span>
@@ -123,7 +131,7 @@ export default function Header() {
               ) : (
                 <span className="logo-compact logo-expanded">
                   <span className="logo-img-ring">
-                    <img src="/logo.jpg?v=3" alt="Облако пара" className="logo-img" />
+                    <img src="/logo.png?v=4" alt="Облако пара" className="logo-img" />
                   </span>
                   <span className="logo-text">
                     <span className="logo-brand">Облако пара</span>
@@ -222,7 +230,15 @@ export default function Header() {
               <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
             </div>
           </div>
-          <nav className="nav-categories">
+          <button
+            type="button"
+            className="nav-scroll-btn nav-scroll-btn-left"
+            onClick={() => scrollNavCategories(-1)}
+            aria-label="Прокрутить категории влево"
+          >
+            ‹
+          </button>
+          <nav className="nav-categories" ref={navCategoriesRef}>
             <Link to="/catalog/liquids" className={location.pathname.includes('/liquids') ? 'active' : ''}>Жидкости для электронных парогенераторов</Link>
             <Link to="/catalog/disposables" className={location.pathname.includes('/disposables') ? 'active' : ''}>Одноразовые/многоразовые парогенераторы</Link>
             <Link to="/catalog/pouches" className={location.pathname.includes('/pouches') ? 'active' : ''}>Никотиновые паучи</Link>
@@ -231,6 +247,14 @@ export default function Header() {
             <Link to="/catalog/hookah-coals" className={location.pathname.includes('/hookah-coals') ? 'active' : ''}>Угли для кальянов</Link>
             <Link to="/catalog/accessories" className={location.pathname.includes('/accessories') ? 'active' : ''}>Комплектующие</Link>
           </nav>
+          <button
+            type="button"
+            className="nav-scroll-btn nav-scroll-btn-right"
+            onClick={() => scrollNavCategories(1)}
+            aria-label="Прокрутить категории вправо"
+          >
+            ›
+          </button>
         </div>
       </div>
 
@@ -281,11 +305,8 @@ export default function Header() {
               <div className="mobile-menu-links">
                 <Link to="/" onClick={() => setMenuOpen(false)}>Главная</Link>
                 <Link to="/delivery" onClick={() => setMenuOpen(false)}>Доставка</Link>
-                <span className="mobile-links-dot">•</span>
                 <Link to="/payment" onClick={() => setMenuOpen(false)}>Оплата</Link>
-                <span className="mobile-links-dot">•</span>
                 <Link to="/about" onClick={() => setMenuOpen(false)}>О нас</Link>
-                <span className="mobile-links-dot">•</span>
                 <Link to="/contacts" onClick={() => setMenuOpen(false)}>Контакты и магазины</Link>
               </div>
               <div className="mobile-menu-footer">

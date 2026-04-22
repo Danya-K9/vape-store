@@ -31,15 +31,15 @@
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  background-color: #000;
+  background-color: #1f2937;
 }
 
 .social-card-bg--telegram {
-  background-position: center 58%;
+  background-position: center center;
 }
 
 .social-card-bg--instagram {
-  background-position: center 52%;
+  background-position: center center;
 }
 
 .social-card-bg::after {

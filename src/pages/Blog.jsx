@@ -1,9 +1,38 @@
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { blogPosts } from '../data/products';
 import './Blog.css';
 
 export default function Blog() {
+  const listRef = useRef(null);
+  const dragRef = useRef({ active: false, startX: 0, startScroll: 0 });
+
+  const onPointerDown = (event) => {
+    const el = listRef.current;
+    if (!el) return;
+    dragRef.current = {
+      active: true,
+      startX: event.clientX,
+      startScroll: el.scrollLeft,
+    };
+    el.setPointerCapture?.(event.pointerId);
+  };
+
+  const onPointerMove = (event) => {
+    const el = listRef.current;
+    if (!el || !dragRef.current.active) return;
+    const delta = event.clientX - dragRef.current.startX;
+    el.scrollLeft = dragRef.current.startScroll - delta;
+  };
+
+  const onPointerUp = (event) => {
+    const el = listRef.current;
+    if (!el) return;
+    dragRef.current.active = false;
+    el.releasePointerCapture?.(event.pointerId);
+  };
+
   return (
     <motion.div
       className="blog-page"
@@ -16,7 +45,14 @@ export default function Blog() {
         <p>Новости и статьи о вейпинге</p>
       </div>
 
-      <div className="blog-list">
+      <div
+        className="blog-list"
+        ref={listRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+      >
         {blogPosts.map((post, i) => (
           <motion.article
             key={post.id}
