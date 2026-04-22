@@ -13,7 +13,7 @@ export default function Footer() {
           <div className="footer-brand">
             <div className="footer-brand-row">
               <span className="footer-logo-ring">
-                <img src="/logo.png?v=4" alt="Облако пара" className="footer-logo-img" />
+                <img src="/logo.png?v=5" alt="Облако пара" className="footer-logo-img" />
               </span>
               <span className="footer-brand-name">Облако пара</span>
             </div>

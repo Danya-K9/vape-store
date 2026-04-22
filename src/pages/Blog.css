@@ -8,6 +8,23 @@
   margin-bottom: 48px;
 }
 
+.blog-controls {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+.blog-scroll-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .blog-header h1 {
   font-size: 32px;
   color: #1a1a1a;
@@ -44,12 +61,12 @@
   overflow: hidden;
   text-decoration: none;
   color: inherit;
-  min-height: 460px;
+  height: 470px;
   scroll-snap-align: start;
 }
 
 .blog-item-image {
-  aspect-ratio: 16/10;
+  height: 220px;
   overflow: hidden;
 }
 
@@ -100,6 +117,10 @@
 }
 
 @media (max-width: 700px) {
+  .blog-controls {
+    justify-content: center;
+  }
+
   .blog-list {
     grid-auto-columns: 84vw;
   }

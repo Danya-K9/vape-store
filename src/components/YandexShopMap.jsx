@@ -2,13 +2,13 @@ import { useEffect, useRef } from 'react';
 
 const LAT = 54.508801;
 const LNG = 30.426632;
-const LOGO_MARKER = '/logo.png?v=4';
+const LOGO_MARKER = '/logo.png?v=5';
 
 export default function YandexShopMap({ className = '' }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
 
-  const apiKey = import.meta.env.VITE_YANDEX_MAPS_API_KEY;
+  const apiKey = import.meta.env.VITE_YANDEX_MAPS_API_KEY || 'f8c58dc8-6b2e-4cdd-8e8f-9651f318eba0';
 
   useEffect(() => {
     if (!apiKey || !containerRef.current) return undefined;

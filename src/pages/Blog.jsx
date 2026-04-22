@@ -7,6 +7,12 @@ import './Blog.css';
 export default function Blog() {
   const listRef = useRef(null);
   const dragRef = useRef({ active: false, startX: 0, startScroll: 0 });
+  const scrollByCards = (direction) => {
+    const el = listRef.current;
+    if (!el) return;
+    const amount = Math.max(280, Math.floor(el.clientWidth * 0.8));
+    el.scrollBy({ left: direction * amount, behavior: 'smooth' });
+  };
 
   const onPointerDown = (event) => {
     const el = listRef.current;
@@ -43,6 +49,10 @@ export default function Blog() {
       <div className="blog-header">
         <h1>Блог</h1>
         <p>Новости и статьи о вейпинге</p>
+        <div className="blog-controls">
+          <button type="button" className="blog-scroll-btn" onClick={() => scrollByCards(-1)} aria-label="Листать блог влево">‹</button>
+          <button type="button" className="blog-scroll-btn" onClick={() => scrollByCards(1)} aria-label="Листать блог вправо">›</button>
+        </div>
       </div>
 
       <div
