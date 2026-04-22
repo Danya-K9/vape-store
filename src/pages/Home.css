@@ -280,8 +280,8 @@
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #eee;
-  min-height: 260px;
-  height: 260px;
+  min-height: 220px;
+  height: 220px;
 }
 
 .blog-featured-link {
@@ -289,18 +289,18 @@
   grid-template-columns: 1fr 1fr;
   text-decoration: none;
   color: inherit;
-  min-height: 260px;
-  height: 260px;
+  min-height: 220px;
+  height: 220px;
   align-items: stretch;
 }
 
 .blog-featured .blog-card-link {
-  min-height: 260px;
-  height: 260px;
+  min-height: 220px;
+  height: 220px;
 }
 
 .blog-featured-text {
-  padding: 20px 24px;
+  padding: 16px 18px;
 }
 
 .blog-featured-text .blog-date {
@@ -310,7 +310,7 @@
 
 .blog-featured-text h3 {
   margin: 0 0 8px;
-  font-size: 22px;
+  font-size: 20px;
   color: #1a1a1a;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -429,7 +429,7 @@
 .reviews-column {
   background: #fff;
   border-radius: 12px;
-  padding: 28px;
+  padding: 20px;
   border: 1px solid #eee;
 }
 
@@ -507,7 +507,7 @@
 
 .review-card {
   background: #fff;
-  padding: 24px;
+  padding: 16px;
   border-radius: 12px;
   border: 1px solid #eee;
 }
@@ -527,7 +527,7 @@
 .review-text {
   color: #555;
   line-height: 1.6;
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   font-style: italic;
 }
 

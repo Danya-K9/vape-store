@@ -12,9 +12,7 @@ export default function Footer() {
         <div className="footer-inner">
           <div className="footer-brand">
             <div className="footer-brand-row">
-              <span className="footer-logo-ring">
-                <img src="/logo.png?v=6" alt="Облако пара" className="footer-logo-img" />
-              </span>
+              <img src="/logo.png?v=6" alt="Облако пара" className="footer-logo-full" />
               <span className="footer-brand-name">Облако пара</span>
             </div>
             <p className="footer-tagline">Магазин вейпов</p>

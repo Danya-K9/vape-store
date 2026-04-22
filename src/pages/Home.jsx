@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import ProductCarousel from '../components/ProductCarousel';
 import HeroCarousel from '../components/HeroCarousel';
 import SocialCarousel from '../components/SocialCarousel';
@@ -226,35 +226,32 @@ export default function Home() {
             onPointerUp={onBlogSwipeEnd}
             onPointerCancel={onBlogSwipeEnd}
           >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.article
-                key={blogFeatured.id}
-                className="blog-featured blog-card-viking"
-                initial={{ opacity: 0, x: 28 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -28 }}
-                transition={{ duration: 0.24, ease: 'easeOut' }}
-                whileHover={{ y: -4 }}
-                style={{ willChange: 'transform, opacity' }}
+            <motion.article
+              key={blogFeatured.id}
+              className="blog-featured blog-card-viking"
+              initial={false}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              whileHover={{ y: -4 }}
+              style={{ willChange: 'transform, opacity' }}
+            >
+              <Link
+                to={`/blog/${blogFeatured.slug || blogFeatured.id}`}
+                className="blog-featured-link blog-card-link"
               >
-                <Link
-                  to={`/blog/${blogFeatured.slug || blogFeatured.id}`}
-                  className="blog-featured-link blog-card-link"
-                >
-                  <div className="blog-featured-text blog-card-text">
-                    <span className="blog-date">{blogFeatured.date}</span>
-                    <h3>{blogFeatured.title}</h3>
-                    {blogFeatured.teaser && (
-                      <p className="blog-teaser">{blogFeatured.teaser}</p>
-                    )}
-                    <span className="blog-link">Читать статью →</span>
-                  </div>
-                  <div className="blog-featured-image blog-card-image">
-                    <img src={blogFeatured.image} alt="" loading="eager" decoding="async" />
-                  </div>
-                </Link>
-              </motion.article>
-            </AnimatePresence>
+                <div className="blog-featured-text blog-card-text">
+                  <span className="blog-date">{blogFeatured.date}</span>
+                  <h3>{blogFeatured.title}</h3>
+                  {blogFeatured.teaser && (
+                    <p className="blog-teaser">{blogFeatured.teaser}</p>
+                  )}
+                  <span className="blog-link">Читать статью →</span>
+                </div>
+                <div className="blog-featured-image blog-card-image">
+                  <img src={blogFeatured.image} alt="" loading="eager" decoding="async" />
+                </div>
+              </Link>
+            </motion.article>
             <div className="blog-carousel-controls" aria-label="Навигация по блогу">
               <button type="button" className="blog-carousel-arrow" onClick={blogPrev} aria-label="Предыдущая статья">‹</button>
               <div className="blog-carousel-dots" role="tablist" aria-label="Выбор статьи блога">
