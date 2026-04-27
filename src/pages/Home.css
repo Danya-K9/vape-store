@@ -150,7 +150,7 @@
 .about-image {
   border-radius: 12px;
   overflow: hidden;
-  background: #f5f5f5;
+  background: transparent;
 }
 
 .about-image img {
@@ -327,7 +327,8 @@
 
 .blog-featured-image {
   overflow: hidden;
-  min-height: 0;
+  min-height: 220px;
+  height: 220px;
   display: flex;
 }
 
@@ -587,6 +588,7 @@
   .blog-featured-image,
   .blog-card-image {
     min-height: 150px;
+    height: 150px;
   }
 
   .blog-featured-link,
@@ -620,14 +622,15 @@
   }
 
   .blog-featured-image {
-    min-height: 240px;
+    min-height: 220px;
+    height: 220px;
     background: #f3f4f6;
     align-items: center;
     justify-content: center;
   }
 
   .blog-featured-image img {
-    object-fit: contain;
+    object-fit: cover;
   }
 }
 

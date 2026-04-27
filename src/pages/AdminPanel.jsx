@@ -45,9 +45,6 @@ export default function AdminPanel() {
   const [faqItems, setFaqItems] = useState([]);
   const [faqForm, setFaqForm] = useState({ question: '', answer: '', sortOrder: 0 });
   const [editingFaq, setEditingFaq] = useState(null);
-  const [licenseDocs, setLicenseDocs] = useState([]);
-  const [licenseForm, setLicenseForm] = useState({ title: '', fileUrl: '', sortOrder: 0 });
-  const [editingLicense, setEditingLicense] = useState(null);
 
   const headers = () => ({ Authorization: `Bearer ${token}` });
 
@@ -66,7 +63,6 @@ export default function AdminPanel() {
     if (tab === 'hero') fetchHeroBanners();
     if (tab === 'partners') fetchPartners();
     if (tab === 'faq') fetchFaqItems();
-    if (tab === 'licenses') fetchLicenseDocs();
   }, [token, tab]);
 
   async function fetchUsers() {
@@ -257,30 +253,6 @@ export default function AdminPanel() {
     fetchFaqItems();
   };
 
-  async function fetchLicenseDocs() {
-    const r = await fetch(`${API_BASE}/admin/license-docs`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setLicenseDocs(await r.json());
-  }
-
-  const saveLicenseDoc = async () => {
-    const url = editingLicense ? `${API_BASE}/admin/license-docs/${editingLicense.id}` : `${API_BASE}/admin/license-docs`;
-    await fetch(url, {
-      method: editingLicense ? 'PATCH' : 'POST',
-      headers: { ...headers(), 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...licenseForm, sortOrder: Number(licenseForm.sortOrder || 0) }),
-    });
-    setEditingLicense(null);
-    setLicenseForm({ title: '', fileUrl: '', sortOrder: 0 });
-    fetchLicenseDocs();
-  };
-
-  const deleteLicenseDoc = async (id) => {
-    if (!confirm('Удалить PDF?')) return;
-    await fetch(`${API_BASE}/admin/license-docs/${id}`, { method: 'DELETE', headers: headers() });
-    fetchLicenseDocs();
-  };
-
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -432,7 +404,6 @@ export default function AdminPanel() {
         <button className={tab === 'hero' ? 'active' : ''} onClick={() => setTab('hero')}>Главный экран</button>
         <button className={tab === 'partners' ? 'active' : ''} onClick={() => setTab('partners')}>Партнеры</button>
         <button className={tab === 'faq' ? 'active' : ''} onClick={() => setTab('faq')}>FAQ</button>
-        <button className={tab === 'licenses' ? 'active' : ''} onClick={() => setTab('licenses')}>Лицензии PDF</button>
       </nav>
 
       {tab === 'categories' && (
@@ -599,35 +570,6 @@ export default function AdminPanel() {
                   <td>
                     <button onClick={() => { setEditingFaq(f); setFaqForm({ question: f.question || '', answer: f.answer || '', sortOrder: f.sortOrder || 0 }); }}>Ред.</button>
                     <button onClick={() => deleteFaq(f.id)}>Удалить</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      )}
-
-      {tab === 'licenses' && (
-        <section className="admin-section">
-          <h2>Лицензия и сертификаты (PDF)</h2>
-          <div className="admin-form-row" style={{ marginBottom: 10 }}>
-            <input placeholder="Название документа" value={licenseForm.title} onChange={(e) => setLicenseForm({ ...licenseForm, title: e.target.value })} />
-            <input placeholder="Ссылка на PDF" value={licenseForm.fileUrl} onChange={(e) => setLicenseForm({ ...licenseForm, fileUrl: e.target.value })} style={{ width: 420 }} />
-            <input type="number" placeholder="Порядок" value={licenseForm.sortOrder} onChange={(e) => setLicenseForm({ ...licenseForm, sortOrder: e.target.value })} />
-            <button onClick={saveLicenseDoc}>{editingLicense ? 'Сохранить' : 'Добавить PDF'}</button>
-            {editingLicense && <button onClick={() => { setEditingLicense(null); setLicenseForm({ title: '', fileUrl: '', sortOrder: 0 }); }}>Отмена</button>}
-          </div>
-          <table>
-            <thead><tr><th>Название</th><th>Ссылка</th><th>Порядок</th><th></th></tr></thead>
-            <tbody>
-              {licenseDocs.map((d) => (
-                <tr key={d.id}>
-                  <td>{d.title}</td>
-                  <td>{d.fileUrl}</td>
-                  <td>{d.sortOrder}</td>
-                  <td>
-                    <button onClick={() => { setEditingLicense(d); setLicenseForm({ title: d.title || '', fileUrl: d.fileUrl || '', sortOrder: d.sortOrder || 0 }); }}>Ред.</button>
-                    <button onClick={() => deleteLicenseDoc(d.id)}>Удалить</button>
                   </td>
                 </tr>
               ))}

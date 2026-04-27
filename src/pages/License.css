@@ -51,23 +51,3 @@
   font-size: 12px;
 }
 
-.license-hint {
-  margin: 0 0 18px;
-  color: #555;
-  line-height: 1.6;
-}
-
-.license-image-wrap {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid #eee;
-  background: #f7f7f7;
-}
-
-.license-image-wrap img {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: cover;
-}
-

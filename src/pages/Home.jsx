@@ -9,6 +9,7 @@ import { productsApi, contentApi } from '../lib/api';
 import './Home.css';
 
 const BLOG_CAROUSEL_INTERVAL_MS = 6000;
+const REVIEWS_ROTATE_INTERVAL_MS = 5 * 60 * 1000;
 const YANDEX_REVIEWS_URL = 'https://yandex.ru/navi/org/oblako_para/221337875525?si=8ng7m7pyz6fuzp3j7j08u3f798';
 
 const defaultCategoryFilters = [
@@ -30,6 +31,7 @@ export default function Home() {
   const [blogSlide, setBlogSlide] = useState(0);
   const [blogPostsData, setBlogPostsData] = useState(blogPosts);
   const [categoryFilters, setCategoryFilters] = useState(defaultCategoryFilters);
+  const [visibleYandexReviews, setVisibleYandexReviews] = useState([]);
   const blogSwipeRef = useRef({ startX: 0, deltaX: 0, active: false });
   const blogTimerRef = useRef(null);
 
@@ -129,13 +131,21 @@ export default function Home() {
   const blogNext = () => safeSetBlogSlide((i) => (i + 1) % blogCount);
 
   const yandexReviews = useMemo(() => (reviews || []).filter((r) => r.source === 'yandex'), []);
-  const randomYandexReviews = useMemo(() => {
+  const getRandomYandexReviews = () => {
     const src = [...yandexReviews];
     for (let i = src.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1));
       [src[i], src[j]] = [src[j], src[i]];
     }
     return src.slice(0, 3);
+  };
+
+  useEffect(() => {
+    setVisibleYandexReviews(getRandomYandexReviews());
+    const timer = window.setInterval(() => {
+      setVisibleYandexReviews(getRandomYandexReviews());
+    }, REVIEWS_ROTATE_INTERVAL_MS);
+    return () => window.clearInterval(timer);
   }, [yandexReviews]);
 
   return (
@@ -306,7 +316,7 @@ export default function Home() {
               <a className="btn-leave-review" href={YANDEX_REVIEWS_URL} target="_blank" rel="noreferrer">Оставить отзыв</a>
             </div>
             <div className="reviews-list">
-              {randomYandexReviews.map((review, i) => (
+              {visibleYandexReviews.map((review, i) => (
                 <motion.div
                   key={review.id}
                   className="review-card"

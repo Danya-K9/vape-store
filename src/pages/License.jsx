@@ -29,9 +29,6 @@ export default function License() {
       </nav>
 
       <h1>Лицензия и сертификаты</h1>
-      <p className="license-hint">
-        Здесь размещены документы магазина. Сейчас добавлены временные ссылки для проверки работы, позже можно заменить через админ-панель.
-      </p>
 
       <div className="license-docs-grid">
         {docs.map((doc) => (
@@ -43,10 +40,6 @@ export default function License() {
             </div>
           </a>
         ))}
-      </div>
-
-      <div className="license-image-wrap">
-        <img src="/logo.png?v=6" alt="Облако пара" />
       </div>
     </motion.div>
   );
