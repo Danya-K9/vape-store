@@ -437,7 +437,7 @@
 
 .review-card-square {
   width: 330px;
-  min-height: 160px;
+  min-height: 132px;
   flex: 0 0 330px;
 }
 
@@ -470,7 +470,7 @@
 
 .review-card {
   background: #fff;
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   border: 1px solid #eee;
   display: flex;
@@ -492,9 +492,13 @@
 
 .review-text {
   color: #555;
-  line-height: 1.6;
-  margin: 0 0 12px;
+  line-height: 1.4;
+  margin: 0 0 8px;
   font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .review-author {

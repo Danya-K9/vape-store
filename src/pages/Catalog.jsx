@@ -215,10 +215,12 @@ export default function Catalog() {
     setApplyCounter((x) => x + 1);
   };
 
-  const handleApplyFilters = () => {
+  const handleApplyFilters = (payload) => {
+    const nextMin = payload?.nextMin ?? priceMin;
+    const nextMax = payload?.nextMax ?? priceMax;
     setAppliedFilters({
-      priceMin,
-      priceMax,
+      priceMin: nextMin,
+      priceMax: nextMax,
       manufacturers,
       puffCounts,
       nicotineTypes,

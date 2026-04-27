@@ -352,7 +352,7 @@ export default function CatalogFilters({
             setPriceMaxInput(String(nextMax));
             setPriceSliderValue(nextMax);
             onPriceChange?.(nextMin, nextMax);
-            onApply?.();
+            onApply?.({ nextMin, nextMax });
           }}
         >
           Показать
