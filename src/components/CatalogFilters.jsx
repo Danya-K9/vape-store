@@ -56,6 +56,7 @@ export default function CatalogFilters({
   onCoalTypeToggle,
   packCountValues = [],
   onPackCountToggle,
+  onApply,
   onReset,
 }) {
   const [priceMinInput, setPriceMinInput] = useState(String(priceMin));
@@ -336,7 +337,7 @@ export default function CatalogFilters({
       </div>
       {getFilters()}
       <div className="filters-actions">
-        <button type="button" className="btn-show-filters" onClick={() => {}}>Показать</button>
+        <button type="button" className="btn-show-filters" onClick={onApply}>Показать</button>
         <button type="button" className="btn-reset-filters" onClick={onReset}>Сбросить</button>
       </div>
     </div>

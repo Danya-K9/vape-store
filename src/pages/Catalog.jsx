@@ -53,6 +53,28 @@ export default function Catalog() {
   const [packCountValues, setPackCountValues] = useState([]);
   const [apiProducts, setApiProducts] = useState(null);
   const [dynamicCategories, setDynamicCategories] = useState(categories);
+  const [applyCounter, setApplyCounter] = useState(0);
+  const [appliedFilters, setAppliedFilters] = useState({
+    priceMin: 0,
+    priceMax: 150,
+    manufacturers: [],
+    puffCounts: [],
+    nicotineTypes: [],
+    flavors: [],
+    strengths: [],
+    volumes: [],
+    vgpgValues: [],
+    chargingValues: [],
+    powerValues: [],
+    batteryValues: [],
+    wattsValues: [],
+    resistanceValues: [],
+    supplierValues: [],
+    tobaccoValues: [],
+    weightValues: [],
+    coalTypeValues: [],
+    packCountValues: [],
+  });
   const prevCategoryRef = useRef(category);
 
   useEffect(() => {
@@ -69,26 +91,26 @@ export default function Catalog() {
       prevCategoryRef.current = category;
       setApiProducts(null);
     }
-    const params = { category: category || undefined, search: search || undefined, priceMin, priceMax };
-    if (manufacturers.length) params.manufacturer = manufacturers.join(',');
-    if (puffCounts.length) params.puffCount = puffCounts.join(',');
-    if (nicotineTypes.length) params.nicotineType = nicotineTypes.join(',');
-    if (flavors.length) params.flavor = flavors.join(',');
-    if (strengths.length) params.strength = strengths.join(',');
-    if (volumes.length) params.volume = volumes.join(',');
-    if (vgpgValues.length) params.vgpg = vgpgValues.join(',');
-    if (chargingValues.length) params.charging = chargingValues.join(',');
-    if (powerValues.length) params.powerAdj = powerValues.join(',');
-    if (batteryValues.length) params.battery = batteryValues.join(',');
-    if (wattsValues.length) params.watts = wattsValues.join(',');
-    if (resistanceValues.length) params.resistance = resistanceValues.join(',');
-    if (supplierValues.length) params.supplier = supplierValues.join(',');
-    if (tobaccoValues.length) params.tobacco = tobaccoValues.join(',');
-    if (weightValues.length) params.weight = weightValues.join(',');
-    if (coalTypeValues.length) params.coalType = coalTypeValues.join(',');
-    if (packCountValues.length) params.packCount = packCountValues.join(',');
+    const params = { category: category || undefined, search: search || undefined, priceMin: appliedFilters.priceMin, priceMax: appliedFilters.priceMax };
+    if (appliedFilters.manufacturers.length) params.manufacturer = appliedFilters.manufacturers.join(',');
+    if (appliedFilters.puffCounts.length) params.puffCount = appliedFilters.puffCounts.join(',');
+    if (appliedFilters.nicotineTypes.length) params.nicotineType = appliedFilters.nicotineTypes.join(',');
+    if (appliedFilters.flavors.length) params.flavor = appliedFilters.flavors.join(',');
+    if (appliedFilters.strengths.length) params.strength = appliedFilters.strengths.join(',');
+    if (appliedFilters.volumes.length) params.volume = appliedFilters.volumes.join(',');
+    if (appliedFilters.vgpgValues.length) params.vgpg = appliedFilters.vgpgValues.join(',');
+    if (appliedFilters.chargingValues.length) params.charging = appliedFilters.chargingValues.join(',');
+    if (appliedFilters.powerValues.length) params.powerAdj = appliedFilters.powerValues.join(',');
+    if (appliedFilters.batteryValues.length) params.battery = appliedFilters.batteryValues.join(',');
+    if (appliedFilters.wattsValues.length) params.watts = appliedFilters.wattsValues.join(',');
+    if (appliedFilters.resistanceValues.length) params.resistance = appliedFilters.resistanceValues.join(',');
+    if (appliedFilters.supplierValues.length) params.supplier = appliedFilters.supplierValues.join(',');
+    if (appliedFilters.tobaccoValues.length) params.tobacco = appliedFilters.tobaccoValues.join(',');
+    if (appliedFilters.weightValues.length) params.weight = appliedFilters.weightValues.join(',');
+    if (appliedFilters.coalTypeValues.length) params.coalType = appliedFilters.coalTypeValues.join(',');
+    if (appliedFilters.packCountValues.length) params.packCount = appliedFilters.packCountValues.join(',');
     productsApi.list(params).then(setApiProducts).catch(() => setApiProducts([]));
-  }, [category, search, priceMin, priceMax, manufacturers, puffCounts, nicotineTypes, flavors, strengths, volumes, vgpgValues, chargingValues, powerValues, batteryValues, wattsValues, resistanceValues, supplierValues, tobaccoValues, weightValues, coalTypeValues, packCountValues]);
+  }, [category, search, applyCounter]);
 
   const products = apiProducts ?? localProducts;
   const fromApi = apiProducts !== null;
@@ -105,18 +127,18 @@ export default function Catalog() {
         p.name.toLowerCase().includes(search.toLowerCase())
       );
     }
-    result = result.filter((p) => p.price >= priceMin && p.price <= priceMax);
-    if (manufacturers.length > 0) {
-      result = result.filter((p) => manufacturers.includes(getManufacturer(p.name)));
+    result = result.filter((p) => p.price >= appliedFilters.priceMin && p.price <= appliedFilters.priceMax);
+    if (appliedFilters.manufacturers.length > 0) {
+      result = result.filter((p) => appliedFilters.manufacturers.includes(getManufacturer(p.name)));
     }
-    if (puffCounts.length > 0) {
+    if (appliedFilters.puffCounts.length > 0) {
       result = result.filter((p) => {
         const puff = getPuffCount(p.name);
-        return puff && puffCounts.includes(puff);
+        return puff && appliedFilters.puffCounts.includes(puff);
       });
     }
     return result;
-  }, [byCategory, search, priceMin, priceMax, manufacturers, puffCounts, fromApi]);
+  }, [byCategory, search, appliedFilters, fromApi]);
 
   const categoryNames = Object.fromEntries(dynamicCategories.map((c) => [c.slug, c.name]));
   const title = category ? categoryNames[category] || 'Каталог' : 'Каталог';
@@ -168,6 +190,54 @@ export default function Catalog() {
     setWeightValues([]);
     setCoalTypeValues([]);
     setPackCountValues([]);
+    const resetFilters = {
+      priceMin: 0,
+      priceMax: 150,
+      manufacturers: [],
+      puffCounts: [],
+      nicotineTypes: [],
+      flavors: [],
+      strengths: [],
+      volumes: [],
+      vgpgValues: [],
+      chargingValues: [],
+      powerValues: [],
+      batteryValues: [],
+      wattsValues: [],
+      resistanceValues: [],
+      supplierValues: [],
+      tobaccoValues: [],
+      weightValues: [],
+      coalTypeValues: [],
+      packCountValues: [],
+    };
+    setAppliedFilters(resetFilters);
+    setApplyCounter((x) => x + 1);
+  };
+
+  const handleApplyFilters = () => {
+    setAppliedFilters({
+      priceMin,
+      priceMax,
+      manufacturers,
+      puffCounts,
+      nicotineTypes,
+      flavors,
+      strengths,
+      volumes,
+      vgpgValues,
+      chargingValues,
+      powerValues,
+      batteryValues,
+      wattsValues,
+      resistanceValues,
+      supplierValues,
+      tobaccoValues,
+      weightValues,
+      coalTypeValues,
+      packCountValues,
+    });
+    setApplyCounter((x) => x + 1);
   };
 
   return (
@@ -235,6 +305,7 @@ export default function Catalog() {
         onCoalTypeToggle={toggleArray(setCoalTypeValues)}
         packCountValues={packCountValues}
         onPackCountToggle={toggleArray(setPackCountValues)}
+        onApply={handleApplyFilters}
         onReset={handleReset}
       />
 

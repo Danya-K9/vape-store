@@ -307,38 +307,25 @@ export default function Home() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          Отзывы
+          НАМ доверяют ⭐
         </motion.h2>
-        <div className="reviews-one-column">
-          <div className="reviews-column reviews-yandex">
-            <h3>Облако пара — Яндекс Карты</h3>
-            <div className="reviews-column-header">
-              <a className="btn-leave-review" href={YANDEX_REVIEWS_URL} target="_blank" rel="noreferrer">Оставить отзыв</a>
-            </div>
-            <div className="reviews-list">
-              {visibleYandexReviews.map((review, i) => (
-                <motion.div
-                  key={review.id}
-                  className="review-card"
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.35, delay: i * 0.06 }}
-                >
-                  <div className="review-stars" aria-label={`Оценка: ${review.rating} из 5`}>
-                    {Array.from({ length: 5 }).map((_, k) => (
-                      <span key={k} className={k < review.rating ? 'star active' : 'star'}>★</span>
-                    ))}
-                  </div>
-                  <p className="review-text">&quot;{review.text}&quot;</p>
-                  <p className="review-author">{review.name}</p>
-                  <p className="review-date">{review.date}</p>
-                </motion.div>
-              ))}
-            </div>
-            <a className="btn-more-reviews" href={YANDEX_REVIEWS_URL} target="_blank" rel="noreferrer">Больше отзывов на Яндекс Картах</a>
+        <div className="reviews-marquee">
+          <div className="reviews-track">
+            {[...visibleYandexReviews, ...visibleYandexReviews].map((review, i) => (
+              <article key={`${review.id}-${i}`} className="review-card review-card-square">
+                <div className="review-stars" aria-label={`Оценка: ${review.rating} из 5`}>
+                  {Array.from({ length: 5 }).map((_, k) => (
+                    <span key={k} className={k < review.rating ? 'star active' : 'star'}>★</span>
+                  ))}
+                </div>
+                <p className="review-text">&quot;{review.text}&quot;</p>
+                <p className="review-author">{review.name}</p>
+                <p className="review-date">{review.date}</p>
+              </article>
+            ))}
           </div>
         </div>
+        <a className="btn-more-reviews" href={YANDEX_REVIEWS_URL} target="_blank" rel="noreferrer">ОТЗЫВЫ В ЯНДЕКС</a>
       </section>
     </div>
   );

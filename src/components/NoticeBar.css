@@ -25,11 +25,10 @@
 
 .notice-track {
   display: flex;
-  width: 300%;
 }
 
 .notice-text {
-  flex: 0 0 33.333%;
+  flex: 0 0 auto;
   min-width: 0;
   text-align: center;
   white-space: nowrap;
