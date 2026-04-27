@@ -60,7 +60,6 @@ export default function CatalogFilters({
 }) {
   const [priceMinInput, setPriceMinInput] = useState(String(priceMin));
   const [priceMaxInput, setPriceMaxInput] = useState(String(priceMax));
-  const [priceMaxDraft, setPriceMaxDraft] = useState(priceMax);
   const [isMinFocused, setIsMinFocused] = useState(false);
   const [isMaxFocused, setIsMaxFocused] = useState(false);
   const [dynamicOptions, setDynamicOptions] = useState(null);
@@ -70,7 +69,6 @@ export default function CatalogFilters({
   }, [category]);
   useEffect(() => { if (!isMinFocused) setPriceMinInput(String(priceMin)); }, [priceMin, isMinFocused]);
   useEffect(() => { if (!isMaxFocused) setPriceMaxInput(String(priceMax)); }, [priceMax, isMaxFocused]);
-  useEffect(() => { setPriceMaxDraft(priceMax); }, [priceMax]);
 
   const [openSections, setOpenSections] = useState({
     price: true,
@@ -125,11 +123,9 @@ export default function CatalogFilters({
         type="range"
         min={0}
         max={150}
-        value={priceMaxDraft}
-        onInput={(e) => setPriceMaxDraft(parseInt(e.target.value, 10))}
-        onChange={(e) => setPriceMaxDraft(parseInt(e.target.value, 10))}
-        onMouseUp={(e) => commitSliderPrice(e.currentTarget.value)}
-        onTouchEnd={(e) => commitSliderPrice(e.currentTarget.value)}
+        value={priceMax}
+        onInput={(e) => commitSliderPrice(e.currentTarget.value)}
+        onChange={(e) => commitSliderPrice(e.currentTarget.value)}
         className="price-slider"
       />
       <p className="price-range-text">Цена: {priceMin} – {priceMax} BYN</p>

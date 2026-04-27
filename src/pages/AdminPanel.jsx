@@ -525,12 +525,20 @@ export default function AdminPanel() {
             <input type="number" placeholder="Порядок" value={partnerForm.sortOrder} onChange={(e) => setPartnerForm({ ...partnerForm, sortOrder: e.target.value })} />
           </div>
           <div className="admin-form-row" style={{ marginBottom: 10 }}>
-            <input placeholder="Описание" value={partnerForm.description} onChange={(e) => setPartnerForm({ ...partnerForm, description: e.target.value })} style={{ width: 420 }} />
+            <input
+              placeholder="Описание"
+              value={partnerForm.description}
+              onChange={(e) => setPartnerForm({ ...partnerForm, description: e.target.value.slice(0, 1000) })}
+              style={{ width: 420 }}
+            />
             <input type="file" accept="image/*" onChange={(e) => { setPartnerImageFile(e.target.files?.[0] || null); if (e.target.files?.[0]) setPartnerForm({ ...partnerForm, image: '' }); }} />
             <input placeholder="URL картинки" value={partnerForm.image} onChange={(e) => { setPartnerForm({ ...partnerForm, image: e.target.value }); if (e.target.value) setPartnerImageFile(null); }} disabled={!!partnerImageFile} />
             <button onClick={savePartner}>{editingPartner ? 'Сохранить' : 'Добавить партнера'}</button>
             {editingPartner && <button onClick={() => { setEditingPartner(null); setPartnerImageFile(null); setPartnerForm({ name: '', description: '', website: '', image: '', sortOrder: 0 }); }}>Отмена</button>}
           </div>
+          <p style={{ margin: '0 0 10px', color: '#666' }}>
+            Осталось символов для описания: {1000 - (partnerForm.description?.length || 0)}
+          </p>
           <table>
             <thead><tr><th>Название</th><th>Сайт</th><th>Порядок</th><th></th></tr></thead>
             <tbody>
