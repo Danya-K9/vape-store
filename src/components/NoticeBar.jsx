@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import './NoticeBar.css';
 
 const messages = [
@@ -22,7 +23,18 @@ export default function NoticeBar() {
     <div className="notice-bar">
       <span className="notice-chevron">‹</span>
       <div className="notice-content">
-        <span key={index} className="notice-text notice-text-animated">{messages[index]}</span>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={index}
+            className="notice-text"
+            initial={{ opacity: 0, x: 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -24 }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
+          >
+            {messages[index]}
+          </motion.span>
+        </AnimatePresence>
       </div>
       <span className="notice-chevron">›</span>
     </div>

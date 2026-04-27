@@ -10,7 +10,7 @@ const STORES = [
     address: 'г. Орша, ул. Владимира Ленина, 17',
     hours: 'Понедельник ~ пятница:\nС 10:00 до 20:00\nСуббота: с 10:00 до 19:00\nВоскресенье: Выходной',
     phone: PHONE,
-    image: '/magazin.png',
+    image: '/magazin.png?v=1',
   },
 ];
 

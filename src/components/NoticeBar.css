@@ -33,12 +33,3 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.notice-text-animated {
-  animation: notice-fade 0.35s ease;
-}
-
-@keyframes notice-fade {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}

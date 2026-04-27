@@ -85,8 +85,8 @@ export default function CatalogFilters({
   };
   const isOpen = (key) => openSections[key] !== false;
   const normalizePrice = (nextMinRaw, nextMaxRaw) => {
-    const nextMin = Math.max(0, parseInt(nextMinRaw, 10) || 0);
-    const nextMax = Math.max(nextMin, parseInt(nextMaxRaw, 10) || 0);
+    const nextMin = Math.max(0, parseInt(String(nextMinRaw).replace(/[^\d]/g, ''), 10) || 0);
+    const nextMax = Math.max(nextMin, parseInt(String(nextMaxRaw).replace(/[^\d]/g, ''), 10) || 0);
     return { nextMin, nextMax };
   };
 
@@ -96,21 +96,22 @@ export default function CatalogFilters({
         <div>
           <label>От</label>
           <input
-            type="number"
-            min={0}
+            type="text"
+            inputMode="numeric"
             value={priceMinInput}
-            onChange={(e) => setPriceMinInput(e.target.value)}
+            onChange={(e) => setPriceMinInput(e.target.value.replace(/[^\d]/g, ''))}
           />
         </div>
         <div>
           <label>До</label>
           <input
-            type="number"
-            min={0}
+            type="text"
+            inputMode="numeric"
             value={priceMaxInput}
             onChange={(e) => {
-              setPriceMaxInput(e.target.value);
-              const num = parseInt(e.target.value, 10);
+              const sanitized = e.target.value.replace(/[^\d]/g, '');
+              setPriceMaxInput(sanitized);
+              const num = parseInt(sanitized, 10);
               if (Number.isFinite(num)) setPriceSliderValue(Math.max(0, num));
             }}
           />
@@ -121,6 +122,7 @@ export default function CatalogFilters({
         min={0}
         max={150}
         value={priceSliderValue}
+        onMouseDown={(e) => e.stopPropagation()}
         onInput={(e) => {
           const next = parseInt(e.currentTarget.value, 10) || 0;
           setPriceSliderValue(next);
