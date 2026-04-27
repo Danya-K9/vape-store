@@ -49,9 +49,18 @@ const HERO_ZONE_LIMITS = {
 };
 
 function normalizeSlug(value = '') {
-  return String(value)
+  const source = String(value)
     .trim()
-    .toLowerCase()
+    .toLowerCase();
+  const translitMap = {
+    а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
+    к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
+    х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
+  };
+  return source
+    .split('')
+    .map((char) => translitMap[char] ?? char)
+    .join('')
     .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
@@ -546,6 +555,159 @@ router.patch('/hero-banners/:id', (req, res, next) => {
 router.delete('/hero-banners/:id', async (req, res) => {
   try {
     await prisma.heroBanner.delete({ where: { id: req.params.id } });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get('/partners', async (req, res) => {
+  try {
+    const partners = await prisma.partner.findMany({ orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] });
+    res.json(partners);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post('/partners', (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
+  try {
+    const name = String(req.body.name || '').trim();
+    if (!name) return res.status(400).json({ error: 'Название партнера обязательно' });
+    const partner = await prisma.partner.create({
+      data: {
+        name,
+        description: req.body.description ? String(req.body.description).trim() : null,
+        website: req.body.website ? String(req.body.website).trim() : null,
+        image: req.file ? `/uploads/${req.file.filename}` : (req.body.image || null),
+        sortOrder: parseSortOrder(req.body.sortOrder, 0),
+      },
+    });
+    res.json(partner);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.patch('/partners/:id', (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
+  try {
+    const data = {};
+    if (req.body.name !== undefined) data.name = String(req.body.name).trim();
+    if (req.body.description !== undefined) data.description = req.body.description ? String(req.body.description).trim() : null;
+    if (req.body.website !== undefined) data.website = req.body.website ? String(req.body.website).trim() : null;
+    if (req.file) data.image = `/uploads/${req.file.filename}`;
+    else if (req.body.image !== undefined) data.image = req.body.image || null;
+    if (req.body.sortOrder !== undefined) data.sortOrder = parseSortOrder(req.body.sortOrder, 0);
+    const partner = await prisma.partner.update({ where: { id: req.params.id }, data });
+    res.json(partner);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.delete('/partners/:id', async (req, res) => {
+  try {
+    await prisma.partner.delete({ where: { id: req.params.id } });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get('/faq', async (req, res) => {
+  try {
+    const items = await prisma.faqItem.findMany({ orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] });
+    res.json(items);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post('/faq', async (req, res) => {
+  try {
+    const question = String(req.body.question || '').trim();
+    const answer = String(req.body.answer || '').trim();
+    if (!question || !answer) return res.status(400).json({ error: 'Вопрос и ответ обязательны' });
+    const item = await prisma.faqItem.create({
+      data: { question, answer, sortOrder: parseSortOrder(req.body.sortOrder, 0) },
+    });
+    res.json(item);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.patch('/faq/:id', async (req, res) => {
+  try {
+    const data = {};
+    if (req.body.question !== undefined) data.question = String(req.body.question).trim();
+    if (req.body.answer !== undefined) data.answer = String(req.body.answer).trim();
+    if (req.body.sortOrder !== undefined) data.sortOrder = parseSortOrder(req.body.sortOrder, 0);
+    const item = await prisma.faqItem.update({ where: { id: req.params.id }, data });
+    res.json(item);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.delete('/faq/:id', async (req, res) => {
+  try {
+    await prisma.faqItem.delete({ where: { id: req.params.id } });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get('/license-docs', async (req, res) => {
+  try {
+    const docs = await prisma.licenseDocument.findMany({ orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] });
+    res.json(docs);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post('/license-docs', async (req, res) => {
+  try {
+    const title = String(req.body.title || '').trim();
+    const fileUrl = String(req.body.fileUrl || '').trim();
+    if (!title || !fileUrl) return res.status(400).json({ error: 'Название и ссылка на PDF обязательны' });
+    const doc = await prisma.licenseDocument.create({
+      data: { title, fileUrl, sortOrder: parseSortOrder(req.body.sortOrder, 0) },
+    });
+    res.json(doc);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.patch('/license-docs/:id', async (req, res) => {
+  try {
+    const data = {};
+    if (req.body.title !== undefined) data.title = String(req.body.title).trim();
+    if (req.body.fileUrl !== undefined) data.fileUrl = String(req.body.fileUrl).trim();
+    if (req.body.sortOrder !== undefined) data.sortOrder = parseSortOrder(req.body.sortOrder, 0);
+    const doc = await prisma.licenseDocument.update({ where: { id: req.params.id }, data });
+    res.json(doc);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.delete('/license-docs/:id', async (req, res) => {
+  try {
+    await prisma.licenseDocument.delete({ where: { id: req.params.id } });
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });

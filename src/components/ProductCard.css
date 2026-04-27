@@ -158,6 +158,16 @@
   color: #333;
 }
 
+.qty-value-input {
+  width: 52px;
+  height: 32px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .product-actions {
   display: flex;
   gap: 8px;

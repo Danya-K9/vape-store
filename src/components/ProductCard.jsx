@@ -84,7 +84,16 @@ export default function ProductCard({ product, index = 0, isFavorite = false, on
       </Link>
       <div className="product-quantity">
         <button type="button" className="qty-btn" onClick={(e) => { e.preventDefault(); setQty((x) => Math.max(1, x - 1)); }}>−</button>
-        <span className="qty-value">{qty}</span>
+        <input
+          className="qty-value-input"
+          value={qty}
+          inputMode="numeric"
+          onChange={(e) => {
+            const parsed = parseInt(e.target.value.replace(/[^\d]/g, ''), 10);
+            setQty(Number.isFinite(parsed) && parsed > 0 ? parsed : 1);
+          }}
+          onClick={(e) => e.preventDefault()}
+        />
         <button type="button" className="qty-btn" onClick={(e) => { e.preventDefault(); setQty((x) => x + 1); }}>+</button>
       </div>
       <div className="product-actions">

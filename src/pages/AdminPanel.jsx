@@ -29,6 +29,7 @@ export default function AdminPanel() {
   const [categories, setCategories] = useState([]);
   const [categoryForm, setCategoryForm] = useState({ slug: '', name: '', sortOrder: 0 });
   const [editingCategory, setEditingCategory] = useState(null);
+  const [categoryError, setCategoryError] = useState('');
   const [blogPosts, setBlogPosts] = useState([]);
   const [blogForm, setBlogForm] = useState({ title: '', slug: '', dateLabel: '', teaser: '', description: '', image: '', showOnHome: true, sortOrder: 0 });
   const [blogImageFile, setBlogImageFile] = useState(null);
@@ -37,6 +38,16 @@ export default function AdminPanel() {
   const [heroBanners, setHeroBanners] = useState([]);
   const [heroForm, setHeroForm] = useState({ zone: 'main', title: '', discountText: '', image: '', sortOrder: 0 });
   const [heroImageFile, setHeroImageFile] = useState(null);
+  const [partners, setPartners] = useState([]);
+  const [partnerForm, setPartnerForm] = useState({ name: '', description: '', website: '', image: '', sortOrder: 0 });
+  const [partnerImageFile, setPartnerImageFile] = useState(null);
+  const [editingPartner, setEditingPartner] = useState(null);
+  const [faqItems, setFaqItems] = useState([]);
+  const [faqForm, setFaqForm] = useState({ question: '', answer: '', sortOrder: 0 });
+  const [editingFaq, setEditingFaq] = useState(null);
+  const [licenseDocs, setLicenseDocs] = useState([]);
+  const [licenseForm, setLicenseForm] = useState({ title: '', fileUrl: '', sortOrder: 0 });
+  const [editingLicense, setEditingLicense] = useState(null);
 
   const headers = () => ({ Authorization: `Bearer ${token}` });
 
@@ -53,6 +64,9 @@ export default function AdminPanel() {
     if (tab === 'categories') fetchCategories();
     if (tab === 'blog') fetchBlogPosts();
     if (tab === 'hero') fetchHeroBanners();
+    if (tab === 'partners') fetchPartners();
+    if (tab === 'faq') fetchFaqItems();
+    if (tab === 'licenses') fetchLicenseDocs();
   }, [token, tab]);
 
   async function fetchUsers() {
@@ -86,19 +100,25 @@ export default function AdminPanel() {
   }
 
   const saveCategory = async () => {
+    setCategoryError('');
     const body = { ...categoryForm, sortOrder: Number(categoryForm.sortOrder || 0) };
-    if (editingCategory) {
-      await fetch(`${API_BASE}/admin/categories/${editingCategory.id}`, {
+    const request = editingCategory
+      ? fetch(`${API_BASE}/admin/categories/${editingCategory.id}`, {
         method: 'PATCH',
         headers: { ...headers(), 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
-      });
-    } else {
-      await fetch(`${API_BASE}/admin/categories`, {
+      })
+      : fetch(`${API_BASE}/admin/categories`, {
         method: 'POST',
         headers: { ...headers(), 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
+    const resp = await request;
+    const text = await resp.text();
+    const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
+    if (!resp.ok) {
+      setCategoryError(data?.error || 'Не удалось сохранить категорию');
+      return;
     }
     setEditingCategory(null);
     setCategoryForm({ slug: '', name: '', sortOrder: 0 });
@@ -185,6 +205,80 @@ export default function AdminPanel() {
     if (!confirm('Удалить баннер?')) return;
     await fetch(`${API_BASE}/admin/hero-banners/${id}`, { method: 'DELETE', headers: headers() });
     fetchHeroBanners();
+  };
+
+  async function fetchPartners() {
+    const r = await fetch(`${API_BASE}/admin/partners`, { headers: headers() });
+    if (r.status === 401) { logout(); return; }
+    setPartners(await r.json());
+  }
+
+  const savePartner = async () => {
+    const body = new FormData();
+    Object.entries(partnerForm).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) body.append(k, v);
+    });
+    if (partnerImageFile) body.set('image', partnerImageFile);
+    const url = editingPartner ? `${API_BASE}/admin/partners/${editingPartner.id}` : `${API_BASE}/admin/partners`;
+    await fetch(url, { method: editingPartner ? 'PATCH' : 'POST', headers: headers(), body });
+    setEditingPartner(null);
+    setPartnerImageFile(null);
+    setPartnerForm({ name: '', description: '', website: '', image: '', sortOrder: 0 });
+    fetchPartners();
+  };
+
+  const deletePartner = async (id) => {
+    if (!confirm('Удалить партнера?')) return;
+    await fetch(`${API_BASE}/admin/partners/${id}`, { method: 'DELETE', headers: headers() });
+    fetchPartners();
+  };
+
+  async function fetchFaqItems() {
+    const r = await fetch(`${API_BASE}/admin/faq`, { headers: headers() });
+    if (r.status === 401) { logout(); return; }
+    setFaqItems(await r.json());
+  }
+
+  const saveFaq = async () => {
+    const url = editingFaq ? `${API_BASE}/admin/faq/${editingFaq.id}` : `${API_BASE}/admin/faq`;
+    await fetch(url, {
+      method: editingFaq ? 'PATCH' : 'POST',
+      headers: { ...headers(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...faqForm, sortOrder: Number(faqForm.sortOrder || 0) }),
+    });
+    setEditingFaq(null);
+    setFaqForm({ question: '', answer: '', sortOrder: 0 });
+    fetchFaqItems();
+  };
+
+  const deleteFaq = async (id) => {
+    if (!confirm('Удалить вопрос?')) return;
+    await fetch(`${API_BASE}/admin/faq/${id}`, { method: 'DELETE', headers: headers() });
+    fetchFaqItems();
+  };
+
+  async function fetchLicenseDocs() {
+    const r = await fetch(`${API_BASE}/admin/license-docs`, { headers: headers() });
+    if (r.status === 401) { logout(); return; }
+    setLicenseDocs(await r.json());
+  }
+
+  const saveLicenseDoc = async () => {
+    const url = editingLicense ? `${API_BASE}/admin/license-docs/${editingLicense.id}` : `${API_BASE}/admin/license-docs`;
+    await fetch(url, {
+      method: editingLicense ? 'PATCH' : 'POST',
+      headers: { ...headers(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...licenseForm, sortOrder: Number(licenseForm.sortOrder || 0) }),
+    });
+    setEditingLicense(null);
+    setLicenseForm({ title: '', fileUrl: '', sortOrder: 0 });
+    fetchLicenseDocs();
+  };
+
+  const deleteLicenseDoc = async (id) => {
+    if (!confirm('Удалить PDF?')) return;
+    await fetch(`${API_BASE}/admin/license-docs/${id}`, { method: 'DELETE', headers: headers() });
+    fetchLicenseDocs();
   };
 
   const handleLogin = async (e) => {
@@ -336,6 +430,9 @@ export default function AdminPanel() {
         <button className={tab === 'categories' ? 'active' : ''} onClick={() => setTab('categories')}>Категории</button>
         <button className={tab === 'blog' ? 'active' : ''} onClick={() => setTab('blog')}>Блог</button>
         <button className={tab === 'hero' ? 'active' : ''} onClick={() => setTab('hero')}>Главный экран</button>
+        <button className={tab === 'partners' ? 'active' : ''} onClick={() => setTab('partners')}>Партнеры</button>
+        <button className={tab === 'faq' ? 'active' : ''} onClick={() => setTab('faq')}>FAQ</button>
+        <button className={tab === 'licenses' ? 'active' : ''} onClick={() => setTab('licenses')}>Лицензии PDF</button>
       </nav>
 
       {tab === 'categories' && (
@@ -348,6 +445,7 @@ export default function AdminPanel() {
             <button onClick={saveCategory}>{editingCategory ? 'Сохранить' : 'Добавить'}</button>
             {editingCategory && <button onClick={() => { setEditingCategory(null); setCategoryForm({ slug: '', name: '', sortOrder: 0 }); }}>Отмена</button>}
           </div>
+          {categoryError && <p className="admin-error" style={{ marginBottom: 8 }}>{categoryError}</p>}
           <table>
             <thead><tr><th>Slug</th><th>Название</th><th>Порядок</th><th></th></tr></thead>
             <tbody>
@@ -439,6 +537,97 @@ export default function AdminPanel() {
                   <td>
                     <button onClick={() => updateHeroBanner(b)}>Сохранить</button>
                     <button onClick={() => deleteHeroBanner(b.id)}>Удалить</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {tab === 'partners' && (
+        <section className="admin-section">
+          <h2>Магазин - партнеры</h2>
+          <div className="admin-form-row" style={{ marginBottom: 10 }}>
+            <input placeholder="Название партнера" value={partnerForm.name} onChange={(e) => setPartnerForm({ ...partnerForm, name: e.target.value })} />
+            <input placeholder="Сайт (https://...)" value={partnerForm.website} onChange={(e) => setPartnerForm({ ...partnerForm, website: e.target.value })} />
+            <input type="number" placeholder="Порядок" value={partnerForm.sortOrder} onChange={(e) => setPartnerForm({ ...partnerForm, sortOrder: e.target.value })} />
+          </div>
+          <div className="admin-form-row" style={{ marginBottom: 10 }}>
+            <input placeholder="Описание" value={partnerForm.description} onChange={(e) => setPartnerForm({ ...partnerForm, description: e.target.value })} style={{ width: 420 }} />
+            <input type="file" accept="image/*" onChange={(e) => { setPartnerImageFile(e.target.files?.[0] || null); if (e.target.files?.[0]) setPartnerForm({ ...partnerForm, image: '' }); }} />
+            <input placeholder="URL картинки" value={partnerForm.image} onChange={(e) => { setPartnerForm({ ...partnerForm, image: e.target.value }); if (e.target.value) setPartnerImageFile(null); }} disabled={!!partnerImageFile} />
+            <button onClick={savePartner}>{editingPartner ? 'Сохранить' : 'Добавить партнера'}</button>
+            {editingPartner && <button onClick={() => { setEditingPartner(null); setPartnerImageFile(null); setPartnerForm({ name: '', description: '', website: '', image: '', sortOrder: 0 }); }}>Отмена</button>}
+          </div>
+          <table>
+            <thead><tr><th>Название</th><th>Сайт</th><th>Порядок</th><th></th></tr></thead>
+            <tbody>
+              {partners.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.name}</td>
+                  <td>{p.website || '-'}</td>
+                  <td>{p.sortOrder}</td>
+                  <td>
+                    <button onClick={() => { setEditingPartner(p); setPartnerImageFile(null); setPartnerForm({ name: p.name || '', description: p.description || '', website: p.website || '', image: p.image || '', sortOrder: p.sortOrder || 0 }); }}>Ред.</button>
+                    <button onClick={() => deletePartner(p.id)}>Удалить</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {tab === 'faq' && (
+        <section className="admin-section">
+          <h2>FAQ</h2>
+          <div className="admin-form-row" style={{ marginBottom: 8 }}>
+            <input placeholder="Вопрос" value={faqForm.question} onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })} style={{ width: 420 }} />
+            <input type="number" placeholder="Порядок" value={faqForm.sortOrder} onChange={(e) => setFaqForm({ ...faqForm, sortOrder: e.target.value })} />
+          </div>
+          <textarea value={faqForm.answer} onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })} rows={5} style={{ width: '100%', marginBottom: 8 }} placeholder="Ответ" />
+          <button onClick={saveFaq}>{editingFaq ? 'Сохранить' : 'Добавить вопрос'}</button>
+          {editingFaq && <button onClick={() => { setEditingFaq(null); setFaqForm({ question: '', answer: '', sortOrder: 0 }); }}>Отмена</button>}
+          <table style={{ marginTop: 12 }}>
+            <thead><tr><th>Вопрос</th><th>Порядок</th><th></th></tr></thead>
+            <tbody>
+              {faqItems.map((f) => (
+                <tr key={f.id}>
+                  <td>{f.question}</td>
+                  <td>{f.sortOrder}</td>
+                  <td>
+                    <button onClick={() => { setEditingFaq(f); setFaqForm({ question: f.question || '', answer: f.answer || '', sortOrder: f.sortOrder || 0 }); }}>Ред.</button>
+                    <button onClick={() => deleteFaq(f.id)}>Удалить</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {tab === 'licenses' && (
+        <section className="admin-section">
+          <h2>Лицензия и сертификаты (PDF)</h2>
+          <div className="admin-form-row" style={{ marginBottom: 10 }}>
+            <input placeholder="Название документа" value={licenseForm.title} onChange={(e) => setLicenseForm({ ...licenseForm, title: e.target.value })} />
+            <input placeholder="Ссылка на PDF" value={licenseForm.fileUrl} onChange={(e) => setLicenseForm({ ...licenseForm, fileUrl: e.target.value })} style={{ width: 420 }} />
+            <input type="number" placeholder="Порядок" value={licenseForm.sortOrder} onChange={(e) => setLicenseForm({ ...licenseForm, sortOrder: e.target.value })} />
+            <button onClick={saveLicenseDoc}>{editingLicense ? 'Сохранить' : 'Добавить PDF'}</button>
+            {editingLicense && <button onClick={() => { setEditingLicense(null); setLicenseForm({ title: '', fileUrl: '', sortOrder: 0 }); }}>Отмена</button>}
+          </div>
+          <table>
+            <thead><tr><th>Название</th><th>Ссылка</th><th>Порядок</th><th></th></tr></thead>
+            <tbody>
+              {licenseDocs.map((d) => (
+                <tr key={d.id}>
+                  <td>{d.title}</td>
+                  <td>{d.fileUrl}</td>
+                  <td>{d.sortOrder}</td>
+                  <td>
+                    <button onClick={() => { setEditingLicense(d); setLicenseForm({ title: d.title || '', fileUrl: d.fileUrl || '', sortOrder: d.sortOrder || 0 }); }}>Ред.</button>
+                    <button onClick={() => deleteLicenseDoc(d.id)}>Удалить</button>
                   </td>
                 </tr>
               ))}

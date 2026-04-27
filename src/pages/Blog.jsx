@@ -90,7 +90,7 @@ export default function Blog() {
               <span className="blog-item-date">{post.dateLabel || post.date}</span>
               <h2>{post.title}</h2>
               <p>
-                Информация о новинках в мире электронных парогенераторов и жидкостей.
+                {post.teaser || 'Информация о новинках в мире электронных парогенераторов и жидкостей.'}
               </p>
               <Link to={`/blog/${post.slug || post.id}`} className="blog-item-link">
                 Подробнее

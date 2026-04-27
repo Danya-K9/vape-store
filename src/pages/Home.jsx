@@ -213,8 +213,8 @@ export default function Home() {
           </div>
           <div className="about-image">
             <img
-              src="https://images.pexels.com/photos/14279339/pexels-photo-14279339.jpeg?auto=compress&w=600"
-              alt="Вейп шоп"
+              src="/logo.png?v=6"
+              alt="Логотип Облако пара"
             />
           </div>
         </motion.div>

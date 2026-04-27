@@ -58,11 +58,15 @@ export default function CatalogFilters({
   onPackCountToggle,
   onReset,
 }) {
+  const [priceMinInput, setPriceMinInput] = useState(String(priceMin));
+  const [priceMaxInput, setPriceMaxInput] = useState(String(priceMax));
   const [dynamicOptions, setDynamicOptions] = useState(null);
   useEffect(() => {
     if (!category) { setDynamicOptions(null); return; }
     filtersApi.list(category).then(setDynamicOptions).catch(() => setDynamicOptions(null));
   }, [category]);
+  useEffect(() => { setPriceMinInput(String(priceMin)); }, [priceMin]);
+  useEffect(() => { setPriceMaxInput(String(priceMax)); }, [priceMax]);
 
   const [openSections, setOpenSections] = useState({
     price: true,
@@ -75,14 +79,47 @@ export default function CatalogFilters({
     setOpenSections((s) => ({ ...s, [key]: !s[key] }));
   };
   const isOpen = (key) => openSections[key] !== false;
+  const commitPrice = (nextMinRaw, nextMaxRaw) => {
+    const nextMin = Math.max(0, parseInt(nextMinRaw, 10) || 0);
+    const nextMax = Math.max(nextMin, parseInt(nextMaxRaw, 10) || 0);
+    onPriceChange?.(nextMin, nextMax);
+  };
 
   const PriceSection = () => (
     <FilterSection title="Цена" open={isOpen('price')} onToggle={() => toggleSection('price')}>
       <div className="price-inputs">
-        <div><label>От</label><input type="number" min={0} value={priceMin} onChange={(e) => onPriceChange?.(parseInt(e.target.value, 10) || 0, priceMax)} /></div>
-        <div><label>До</label><input type="number" min={0} value={priceMax} onChange={(e) => onPriceChange?.(priceMin, parseInt(e.target.value, 10) || 0)} /></div>
+        <div>
+          <label>От</label>
+          <input
+            type="number"
+            min={0}
+            value={priceMinInput}
+            onChange={(e) => setPriceMinInput(e.target.value)}
+            onBlur={() => commitPrice(priceMinInput, priceMaxInput)}
+            onKeyDown={(e) => e.key === 'Enter' && commitPrice(priceMinInput, priceMaxInput)}
+          />
+        </div>
+        <div>
+          <label>До</label>
+          <input
+            type="number"
+            min={0}
+            value={priceMaxInput}
+            onChange={(e) => setPriceMaxInput(e.target.value)}
+            onBlur={() => commitPrice(priceMinInput, priceMaxInput)}
+            onKeyDown={(e) => e.key === 'Enter' && commitPrice(priceMinInput, priceMaxInput)}
+          />
+        </div>
       </div>
-      <input type="range" min={0} max={150} value={priceMax} onChange={(e) => onPriceChange?.(priceMin, parseInt(e.target.value, 10))} className="price-slider" />
+      <input
+        type="range"
+        min={0}
+        max={150}
+        value={priceMax}
+        onInput={(e) => onPriceChange?.(priceMin, parseInt(e.target.value, 10))}
+        onChange={(e) => onPriceChange?.(priceMin, parseInt(e.target.value, 10))}
+        className="price-slider"
+      />
       <p className="price-range-text">Цена: {priceMin} – {priceMax} BYN</p>
     </FilterSection>
   );

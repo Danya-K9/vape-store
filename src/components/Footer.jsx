@@ -47,12 +47,13 @@ export default function Footer() {
             <h4>О нас</h4>
             <Link to="/about">История</Link>
             <Link to="/contacts">Магазины</Link>
+            <Link to="/partners">Магазин - партнеры</Link>
             <Link to="/privacy">Политика конфиденциальности</Link>
-            <Link to="/license">Лицензия</Link>
+            <Link to="/license">Лицензия и сертификаты</Link>
           </div>
           <div className="footer-column">
             <h4>Гостям</h4>
-            <Link to="/contacts">FAQ</Link>
+            <Link to="/faq">FAQ</Link>
             <Link to="/contacts">Контакты</Link>
             <Link to="/delivery">Доставка</Link>
             <Link to="/payment">Оплата</Link>

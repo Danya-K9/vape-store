@@ -154,6 +154,35 @@ model HeroBanner {
   updatedAt    DateTime @updatedAt
 }
 
+model Partner {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  website     String?
+  image       String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LicenseDocument {
+  id        String   @id @default(cuid())
+  title     String
+  fileUrl   String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model AuthCode {
   id        String   @id @default(cuid())
   code      String

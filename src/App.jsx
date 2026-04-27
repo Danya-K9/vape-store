@@ -9,6 +9,8 @@ import BlogDetail from './pages/BlogDetail';
 import About from './pages/About';
 import License from './pages/License';
 import Contacts from './pages/Contacts';
+import Faq from './pages/Faq';
+import Partners from './pages/Partners';
 import Payment from './pages/Payment';
 import Delivery from './pages/Delivery';
 import Favorites from './pages/Favorites';
@@ -33,6 +35,8 @@ function AppRoutes() {
           <Route path="payment" element={<Payment />} />
           <Route path="delivery" element={<Delivery />} />
           <Route path="contacts" element={<Contacts />} />
+          <Route path="faq" element={<Faq />} />
+          <Route path="partners" element={<Partners />} />
           <Route path="favorites" element={<Favorites />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="vapeAdminDanik" element={<AdminPanel />} />

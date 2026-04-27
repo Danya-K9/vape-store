@@ -100,4 +100,7 @@ export const contentApi = {
     return api(`/content/blog-posts${q ? `?${q}` : ''}`);
   },
   heroBanners: () => api('/content/hero-banners'),
+  partners: () => api('/content/partners'),
+  faq: () => api('/content/faq'),
+  licenseDocs: () => api('/content/license-docs'),
 };

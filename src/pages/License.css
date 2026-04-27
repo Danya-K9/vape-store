@@ -9,6 +9,48 @@
   font-size: 28px;
 }
 
+.license-docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.license-doc-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+}
+
+.license-doc-card h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.license-doc-card p {
+  margin: 0;
+  color: #4b5563;
+}
+
+.license-doc-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #111827;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+}
+
 .license-hint {
   margin: 0 0 18px;
   color: #555;
