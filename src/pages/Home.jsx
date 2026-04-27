@@ -307,7 +307,7 @@ export default function Home() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          НАМ доверяют ⭐
+          Нам доверяют ⭐
         </motion.h2>
         <div className="reviews-marquee">
           <div className="reviews-track">

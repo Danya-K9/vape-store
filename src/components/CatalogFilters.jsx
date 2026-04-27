@@ -61,15 +61,17 @@ export default function CatalogFilters({
 }) {
   const [priceMinInput, setPriceMinInput] = useState(String(priceMin));
   const [priceMaxInput, setPriceMaxInput] = useState(String(priceMax));
-  const [isMinFocused, setIsMinFocused] = useState(false);
-  const [isMaxFocused, setIsMaxFocused] = useState(false);
+  const [priceSliderValue, setPriceSliderValue] = useState(Number(priceMax) || 0);
   const [dynamicOptions, setDynamicOptions] = useState(null);
   useEffect(() => {
     if (!category) { setDynamicOptions(null); return; }
     filtersApi.list(category).then(setDynamicOptions).catch(() => setDynamicOptions(null));
   }, [category]);
-  useEffect(() => { if (!isMinFocused) setPriceMinInput(String(priceMin)); }, [priceMin, isMinFocused]);
-  useEffect(() => { if (!isMaxFocused) setPriceMaxInput(String(priceMax)); }, [priceMax, isMaxFocused]);
+  useEffect(() => {
+    setPriceMinInput(String(priceMin));
+    setPriceMaxInput(String(priceMax));
+    setPriceSliderValue(Number(priceMax) || 0);
+  }, [priceMin, priceMax]);
 
   const [openSections, setOpenSections] = useState({
     price: true,
@@ -82,14 +84,10 @@ export default function CatalogFilters({
     setOpenSections((s) => ({ ...s, [key]: !s[key] }));
   };
   const isOpen = (key) => openSections[key] !== false;
-  const commitPrice = (nextMinRaw, nextMaxRaw) => {
+  const normalizePrice = (nextMinRaw, nextMaxRaw) => {
     const nextMin = Math.max(0, parseInt(nextMinRaw, 10) || 0);
     const nextMax = Math.max(nextMin, parseInt(nextMaxRaw, 10) || 0);
-    onPriceChange?.(nextMin, nextMax);
-  };
-  const commitSliderPrice = (value) => {
-    const nextMax = Math.max(priceMin, parseInt(value, 10) || 0);
-    onPriceChange?.(priceMin, nextMax);
+    return { nextMin, nextMax };
   };
 
   const PriceSection = () => (
@@ -102,9 +100,6 @@ export default function CatalogFilters({
             min={0}
             value={priceMinInput}
             onChange={(e) => setPriceMinInput(e.target.value)}
-            onFocus={() => setIsMinFocused(true)}
-            onBlur={() => { setIsMinFocused(false); commitPrice(priceMinInput, priceMaxInput); }}
-            onKeyDown={(e) => e.key === 'Enter' && commitPrice(priceMinInput, priceMaxInput)}
           />
         </div>
         <div>
@@ -113,10 +108,11 @@ export default function CatalogFilters({
             type="number"
             min={0}
             value={priceMaxInput}
-            onChange={(e) => setPriceMaxInput(e.target.value)}
-            onFocus={() => setIsMaxFocused(true)}
-            onBlur={() => { setIsMaxFocused(false); commitPrice(priceMinInput, priceMaxInput); }}
-            onKeyDown={(e) => e.key === 'Enter' && commitPrice(priceMinInput, priceMaxInput)}
+            onChange={(e) => {
+              setPriceMaxInput(e.target.value);
+              const num = parseInt(e.target.value, 10);
+              if (Number.isFinite(num)) setPriceSliderValue(Math.max(0, num));
+            }}
           />
         </div>
       </div>
@@ -124,12 +120,20 @@ export default function CatalogFilters({
         type="range"
         min={0}
         max={150}
-        value={priceMax}
-        onInput={(e) => commitSliderPrice(e.currentTarget.value)}
-        onChange={(e) => commitSliderPrice(e.currentTarget.value)}
+        value={priceSliderValue}
+        onInput={(e) => {
+          const next = parseInt(e.currentTarget.value, 10) || 0;
+          setPriceSliderValue(next);
+          setPriceMaxInput(String(next));
+        }}
+        onChange={(e) => {
+          const next = parseInt(e.currentTarget.value, 10) || 0;
+          setPriceSliderValue(next);
+          setPriceMaxInput(String(next));
+        }}
         className="price-slider"
       />
-      <p className="price-range-text">Цена: {priceMin} – {priceMax} BYN</p>
+      <p className="price-range-text">Цена: {priceMinInput || 0} – {priceMaxInput || 0} BYN</p>
     </FilterSection>
   );
 
@@ -337,7 +341,20 @@ export default function CatalogFilters({
       </div>
       {getFilters()}
       <div className="filters-actions">
-        <button type="button" className="btn-show-filters" onClick={onApply}>Показать</button>
+        <button
+          type="button"
+          className="btn-show-filters"
+          onClick={() => {
+            const { nextMin, nextMax } = normalizePrice(priceMinInput, priceMaxInput);
+            setPriceMinInput(String(nextMin));
+            setPriceMaxInput(String(nextMax));
+            setPriceSliderValue(nextMax);
+            onPriceChange?.(nextMin, nextMax);
+            onApply?.();
+          }}
+        >
+          Показать
+        </button>
         <button type="button" className="btn-reset-filters" onClick={onReset}>Сбросить</button>
       </div>
     </div>

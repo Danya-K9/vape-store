@@ -436,15 +436,18 @@
 }
 
 .review-card-square {
-  width: 260px;
-  min-height: 260px;
-  flex: 0 0 260px;
+  width: 330px;
+  min-height: 190px;
+  flex: 0 0 330px;
 }
 
 .btn-more-reviews {
   display: block;
-  width: 100%;
+  width: fit-content;
+  min-width: 210px;
   margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
   padding: 12px;
   background: #000;
   color: #fff;

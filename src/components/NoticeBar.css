@@ -21,24 +21,24 @@
   flex: 1;
   overflow: hidden;
   max-width: 800px;
-}
-
-.notice-track {
   display: flex;
+  justify-content: center;
 }
 
 .notice-text {
-  flex: 0 0 auto;
-  min-width: 0;
+  display: block;
+  width: 100%;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-@media (max-width: 600px) {
-  .notice-text {
-    white-space: normal;
-    text-align: center;
-  }
+.notice-text-animated {
+  animation: notice-fade 0.35s ease;
+}
+
+@keyframes notice-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
