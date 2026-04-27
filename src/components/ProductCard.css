@@ -47,6 +47,10 @@
   object-fit: cover;
 }
 
+.product-image-blur {
+  filter: blur(3px);
+}
+
 .product-card-viking:hover .product-image {
   transform: scale(1.05);
 }

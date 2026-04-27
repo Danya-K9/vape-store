@@ -35,6 +35,7 @@ model Product {
   price           Float
   category        String
   badge           String?   // Новинка, Хит, Советуем
+  blurImage       Boolean   @default(false)
   showInNew       Boolean   @default(false) // Новинки и акции
   showInBestsellers Boolean @default(false) // Лидеры продаж
   // Опциональные поля фильтрации

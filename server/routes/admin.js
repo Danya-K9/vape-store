@@ -185,6 +185,7 @@ router.post('/products', (req, res, next) => {
       price: parseFloat(req.body.price),
       category: req.body.category || 'disposables',
       badge: req.body.badge || null,
+      blurImage: req.body.blurImage === 'true' || req.body.blurImage === true,
       showInNew: req.body.showInNew === 'true' || req.body.showInNew === true,
       showInBestsellers: req.body.showInBestsellers === 'true' || req.body.showInBestsellers === true,
       manufacturer: req.body.manufacturer || null,
@@ -250,6 +251,7 @@ router.patch('/products/:id', (req, res, next) => {
     });
     if (body.showInNew !== undefined) body.showInNew = body.showInNew === 'true' || body.showInNew === true;
     if (body.showInBestsellers !== undefined) body.showInBestsellers = body.showInBestsellers === 'true' || body.showInBestsellers === true;
+    if (body.blurImage !== undefined) body.blurImage = body.blurImage === 'true' || body.blurImage === true;
     const product = await prisma.product.update({
       where: { id: req.params.id },
       data: body,

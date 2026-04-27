@@ -56,7 +56,11 @@ export default function ProductCard({ product, index = 0, isFavorite = false, on
               className="product-card-carousel"
             />
           ) : (
-            <img src={product.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=400'} alt={product.name} className="product-image" />
+            <img
+              src={product.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=400'}
+              alt={product.name}
+              className={`product-image ${product.blurImage ? 'product-image-blur' : ''}`}
+            />
           )}
           {product.badge && (
             <span className={`product-badge product-badge--${product.badge === 'Новинка' ? 'new' : product.badge === 'Советуем' ? 'rec' : 'hit'}`}>

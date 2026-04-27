@@ -685,7 +685,7 @@ export default function AdminPanel() {
 
       {tab === 'products' && (
         <section className="admin-section">
-          <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'liquids', image: '', images: [], description: '', manufacturer: '', supplier: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', watts: '', resistance: '', battery: '', tobacco: '', weight: '', coalType: '', packCount: '', color: '', display: '', badge: '' }); setImageFile(null); setImageFiles([]); }}>Добавить товар</button>
+          <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'liquids', image: '', images: [], description: '', manufacturer: '', supplier: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', watts: '', resistance: '', battery: '', tobacco: '', weight: '', coalType: '', packCount: '', color: '', display: '', badge: '', blurImage: false }); setImageFile(null); setImageFiles([]); }}>Добавить товар</button>
           <table>
             <thead>
               <tr><th>Название</th><th>Цена</th><th>Категория</th><th>Новинки</th><th>Лидеры</th><th></th></tr>
@@ -707,6 +707,7 @@ export default function AdminPanel() {
                           <option value="hookah-coals">Угли для кальянов</option>
                           <option value="accessories">Комплектующие</option>
                         </select>
+                        <label><input type="checkbox" checked={form.blurImage ?? false} onChange={(e) => setForm({ ...form, blurImage: e.target.checked })} /> Блюр</label>
                         <label><input type="checkbox" checked={form.showInNew ?? false} onChange={(e) => setForm({ ...form, showInNew: e.target.checked })} /> Новинки</label>
                         <label><input type="checkbox" checked={form.showInBestsellers ?? false} onChange={(e) => setForm({ ...form, showInBestsellers: e.target.checked })} /> Лидеры</label>
                       </div>
@@ -967,6 +968,7 @@ export default function AdminPanel() {
                             <option value="hookah-coals">Угли для кальянов</option>
                             <option value="accessories">Комплектующие</option>
                           </select>
+                          <label><input type="checkbox" checked={form.blurImage ?? p.blurImage ?? false} onChange={(e) => setForm({ ...form, blurImage: e.target.checked })} /> Блюр</label>
                           <label><input type="checkbox" checked={form.showInNew ?? p.showInNew} onChange={(e) => setForm({ ...form, showInNew: e.target.checked })} /> Новинки</label>
                           <label><input type="checkbox" checked={form.showInBestsellers ?? p.showInBestsellers} onChange={(e) => setForm({ ...form, showInBestsellers: e.target.checked })} /> Лидеры</label>
                         </div>
