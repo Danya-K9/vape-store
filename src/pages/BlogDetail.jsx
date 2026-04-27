@@ -1,11 +1,21 @@
 import { useParams, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { blogPosts } from '../data/products';
+import { contentApi } from '../lib/api';
 import './BlogDetail.css';
 
 export default function BlogDetail() {
   const { id } = useParams();
-  const post = blogPosts.find((p) => String(p.id) === id || p.slug === id);
+  const [posts, setPosts] = useState(blogPosts);
+
+  useEffect(() => {
+    contentApi.blogPosts()
+      .then((data) => setPosts(Array.isArray(data) && data.length > 0 ? data : blogPosts))
+      .catch(() => setPosts(blogPosts));
+  }, []);
+
+  const post = posts.find((p) => String(p.id) === id || p.slug === id);
 
   if (!post) {
     return (
@@ -33,7 +43,7 @@ export default function BlogDetail() {
       <div className="blog-detail-image">
         <img src={post.image} alt={post.title} />
       </div>
-      <span className="blog-detail-date">{post.date}</span>
+      <span className="blog-detail-date">{post.dateLabel || post.date}</span>
       <h1>{post.title}</h1>
       <div className="blog-detail-body">
         {post.description.split(/\n\n+/).map((block, i) => {

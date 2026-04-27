@@ -32,6 +32,44 @@ const uploadProductFiles = multer({
 
 router.use(authAdmin);
 
+const CATEGORY_FALLBACK = [
+  { slug: 'liquids', name: 'Жидкости для электронных парогенераторов', sortOrder: 0 },
+  { slug: 'disposables', name: 'Одноразовые/многоразовые парогенераторы', sortOrder: 1 },
+  { slug: 'pod-systems', name: 'Электронные парогенераторы', sortOrder: 2 },
+  { slug: 'pouches', name: 'Никотиновые паучи', sortOrder: 3 },
+  { slug: 'hookah-mix', name: 'Смесь для кальянов', sortOrder: 4 },
+  { slug: 'hookah-coals', name: 'Угли для кальянов', sortOrder: 5 },
+  { slug: 'accessories', name: 'Комплектующие', sortOrder: 6 },
+];
+
+const HERO_ZONE_LIMITS = {
+  main: 4,
+  'side-top': 3,
+  'side-bottom': 3,
+};
+
+function normalizeSlug(value = '') {
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function parseBool(value, fallback = false) {
+  if (value === undefined || value === null || value === '') return fallback;
+  if (typeof value === 'boolean') return value;
+  return String(value).toLowerCase() === 'true';
+}
+
+function parseSortOrder(value, fallback = 0) {
+  if (value === undefined || value === null || value === '') return fallback;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : fallback;
+}
+
 router.get('/users', async (req, res) => {
   try {
     const users = await prisma.user.findMany({
@@ -291,6 +329,201 @@ router.patch('/orders/:id', async (req, res) => {
       await sendTelegramOrderStatusToUser(prev.user.telegram, order.id, status);
     }
     res.json(order);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get('/categories', async (req, res) => {
+  try {
+    const categories = await prisma.category.findMany({ orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] });
+    if (categories.length > 0) return res.json(categories);
+    const created = await Promise.all(CATEGORY_FALLBACK.map((item) => prisma.category.create({ data: item })));
+    res.json(created);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post('/categories', async (req, res) => {
+  try {
+    const slug = normalizeSlug(req.body.slug || req.body.name);
+    const name = String(req.body.name || '').trim();
+    if (!slug || !name) return res.status(400).json({ error: 'slug/name обязательны' });
+    const category = await prisma.category.create({
+      data: { slug, name, sortOrder: parseSortOrder(req.body.sortOrder, 0) },
+    });
+    res.json(category);
+  } catch (e) {
+    if (e.code === 'P2002') return res.status(400).json({ error: 'Категория с таким slug уже есть' });
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.patch('/categories/:id', async (req, res) => {
+  try {
+    const data = {};
+    if (req.body.slug !== undefined) data.slug = normalizeSlug(req.body.slug);
+    if (req.body.name !== undefined) data.name = String(req.body.name).trim();
+    if (req.body.sortOrder !== undefined) data.sortOrder = parseSortOrder(req.body.sortOrder, 0);
+    const category = await prisma.category.update({ where: { id: req.params.id }, data });
+    res.json(category);
+  } catch (e) {
+    if (e.code === 'P2002') return res.status(400).json({ error: 'Категория с таким slug уже есть' });
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.delete('/categories/:id', async (req, res) => {
+  try {
+    await prisma.category.delete({ where: { id: req.params.id } });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get('/blog-posts', async (req, res) => {
+  try {
+    const posts = await prisma.blogPost.findMany({ orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }] });
+    res.json(posts);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post('/blog-posts', (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
+  try {
+    const image = req.file ? `/uploads/${req.file.filename}` : (req.body.image || null);
+    const slug = normalizeSlug(req.body.slug || req.body.title);
+    const description = String(req.body.description || '').trim();
+    if (!slug || !req.body.title || !description) return res.status(400).json({ error: 'title/slug/description обязательны' });
+    if (description.length > 2500) return res.status(400).json({ error: 'Описание не должно быть длиннее 2500 символов' });
+    const post = await prisma.blogPost.create({
+      data: {
+        slug,
+        title: String(req.body.title).trim(),
+        dateLabel: String(req.body.dateLabel || new Date().toLocaleDateString('ru-RU')),
+        teaser: req.body.teaser ? String(req.body.teaser).trim() : null,
+        description,
+        image,
+        showOnHome: parseBool(req.body.showOnHome, true),
+        sortOrder: parseSortOrder(req.body.sortOrder, 0),
+      },
+    });
+    res.json(post);
+  } catch (e) {
+    if (e.code === 'P2002') return res.status(400).json({ error: 'Пост с таким slug уже есть' });
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.patch('/blog-posts/:id', (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
+  try {
+    const data = {};
+    if (req.file) data.image = `/uploads/${req.file.filename}`;
+    else if (req.body.image !== undefined) data.image = req.body.image || null;
+    if (req.body.slug !== undefined) data.slug = normalizeSlug(req.body.slug);
+    if (req.body.title !== undefined) data.title = String(req.body.title).trim();
+    if (req.body.dateLabel !== undefined) data.dateLabel = String(req.body.dateLabel).trim();
+    if (req.body.teaser !== undefined) data.teaser = req.body.teaser ? String(req.body.teaser).trim() : null;
+    if (req.body.description !== undefined) {
+      const description = String(req.body.description).trim();
+      if (description.length > 2500) return res.status(400).json({ error: 'Описание не должно быть длиннее 2500 символов' });
+      data.description = description;
+    }
+    if (req.body.showOnHome !== undefined) data.showOnHome = parseBool(req.body.showOnHome, true);
+    if (req.body.sortOrder !== undefined) data.sortOrder = parseSortOrder(req.body.sortOrder, 0);
+    const post = await prisma.blogPost.update({ where: { id: req.params.id }, data });
+    res.json(post);
+  } catch (e) {
+    if (e.code === 'P2002') return res.status(400).json({ error: 'Пост с таким slug уже есть' });
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.delete('/blog-posts/:id', async (req, res) => {
+  try {
+    await prisma.blogPost.delete({ where: { id: req.params.id } });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get('/hero-banners', async (req, res) => {
+  try {
+    const banners = await prisma.heroBanner.findMany({ orderBy: [{ zone: 'asc' }, { sortOrder: 'asc' }, { createdAt: 'asc' }] });
+    res.json(banners);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post('/hero-banners', (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
+  try {
+    const zone = String(req.body.zone || '');
+    if (!HERO_ZONE_LIMITS[zone]) return res.status(400).json({ error: 'Некорректная зона' });
+    const count = await prisma.heroBanner.count({ where: { zone } });
+    if (count >= HERO_ZONE_LIMITS[zone]) return res.status(400).json({ error: `Лимит для зоны ${zone}: ${HERO_ZONE_LIMITS[zone]}` });
+    const image = req.file ? `/uploads/${req.file.filename}` : (req.body.image || '');
+    if (!image) return res.status(400).json({ error: 'image обязателен' });
+    const banner = await prisma.heroBanner.create({
+      data: {
+        zone,
+        image,
+        title: req.body.title ? String(req.body.title).trim() : null,
+        discountText: zone === 'main' && req.body.discountText ? String(req.body.discountText).trim() : null,
+        sortOrder: parseSortOrder(req.body.sortOrder, count),
+      },
+    });
+    res.json(banner);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.patch('/hero-banners/:id', (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
+  try {
+    const current = await prisma.heroBanner.findUnique({ where: { id: req.params.id } });
+    if (!current) return res.status(404).json({ error: 'Баннер не найден' });
+    const data = {};
+    if (req.file) data.image = `/uploads/${req.file.filename}`;
+    else if (req.body.image !== undefined) data.image = req.body.image || null;
+    if (req.body.title !== undefined) data.title = req.body.title ? String(req.body.title).trim() : null;
+    if (req.body.discountText !== undefined) data.discountText = current.zone === 'main' && req.body.discountText ? String(req.body.discountText).trim() : null;
+    if (req.body.sortOrder !== undefined) data.sortOrder = parseSortOrder(req.body.sortOrder, current.sortOrder);
+    const banner = await prisma.heroBanner.update({ where: { id: req.params.id }, data });
+    res.json(banner);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.delete('/hero-banners/:id', async (req, res) => {
+  try {
+    await prisma.heroBanner.delete({ where: { id: req.params.id } });
+    res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

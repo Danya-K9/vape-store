@@ -13,6 +13,7 @@ import adminRoutes from './routes/admin.js';
 import storeRoutes from './routes/stores.js';
 import directorRoutes from './routes/director.js';
 import filterRoutes from './routes/filters.js';
+import contentRoutes from './routes/content.js';
 import { startTelegramBot } from './telegram/bot.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -41,6 +42,7 @@ app.use('/api/favorites', favoriteRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/director', directorRoutes);
 app.use('/api/filters', filterRoutes);
+app.use('/api/content', contentRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));

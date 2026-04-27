@@ -5,17 +5,8 @@ import ProductCard from '../components/ProductCard';
 import CatalogFilters from '../components/CatalogFilters';
 import { products as localProducts, categories } from '../data/products';
 import { productsApi } from '../lib/api';
+import { contentApi } from '../lib/api';
 import './Catalog.css';
-
-const categoryNames = {
-  liquids: 'Жидкости для электронных парогенераторов',
-  disposables: 'Одноразовые/многоразовые парогенераторы',
-  'pod-systems': 'Электронные парогенераторы',
-  pouches: 'Никотиновые паучи',
-  'hookah-mix': 'Смесь для кальянов',
-  'hookah-coals': 'Угли для кальянов',
-  accessories: 'Комплектующие',
-};
 
 function getManufacturer(name) {
   if (name.includes('KLIK KLAK')) return 'KLIK KLAK';
@@ -61,7 +52,16 @@ export default function Catalog() {
   const [coalTypeValues, setCoalTypeValues] = useState([]);
   const [packCountValues, setPackCountValues] = useState([]);
   const [apiProducts, setApiProducts] = useState(null);
+  const [dynamicCategories, setDynamicCategories] = useState(categories);
   const prevCategoryRef = useRef(category);
+
+  useEffect(() => {
+    contentApi.categories().then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        setDynamicCategories(data.map((c) => ({ id: c.slug, slug: c.slug, name: c.name })));
+      }
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => { setSearch(searchParams.get('search') || ''); }, [searchParams]);
   useEffect(() => {
@@ -118,6 +118,7 @@ export default function Catalog() {
     return result;
   }, [byCategory, search, priceMin, priceMax, manufacturers, puffCounts, fromApi]);
 
+  const categoryNames = Object.fromEntries(dynamicCategories.map((c) => [c.slug, c.name]));
   const title = category ? categoryNames[category] || 'Каталог' : 'Каталог';
 
   const handlePriceChange = (min, max) => {

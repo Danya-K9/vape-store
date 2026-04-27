@@ -6,6 +6,7 @@ import DirectorModal from './DirectorModal';
 import CheckoutModal from './CheckoutModal';
 import { useCart } from '../context/CartContext';
 import { PHONE, SOCIAL_ICONS_HEADER } from '../constants/socialIcons';
+import { contentApi } from '../lib/api';
 import './Header.css';
 
 const PHONE_DISPLAY = '+375 (29) 539-75-10';
@@ -27,6 +28,21 @@ export default function Header() {
   const catalogRefNav = useRef(null);
   const navCategoriesRef = useRef(null);
   const [canHover, setCanHover] = useState(true);
+  const [categories, setCategories] = useState([
+    { slug: 'liquids', name: 'Жидкости для электронных парогенераторов' },
+    { slug: 'disposables', name: 'Одноразовые/многоразовые парогенераторы' },
+    { slug: 'pod-systems', name: 'Электронные парогенераторы' },
+    { slug: 'pouches', name: 'Никотиновые паучи' },
+    { slug: 'hookah-mix', name: 'Смесь для кальянов' },
+    { slug: 'hookah-coals', name: 'Угли для кальянов' },
+    { slug: 'accessories', name: 'Комплектующие' },
+  ]);
+
+  useEffect(() => {
+    contentApi.categories().then((data) => {
+      if (Array.isArray(data) && data.length > 0) setCategories(data);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -151,13 +167,9 @@ export default function Header() {
                   ☰ КАТАЛОГ
                 </button>
                 <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`}>
-                  <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости для электронных парогенераторов</Link>
-                  <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразовые/многоразовые парогенераторы</Link>
-                  <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
-                  <Link to="/catalog/pod-systems" onClick={() => setCatalogOpen(false)}>Электронные парогенераторы</Link>
-                  <Link to="/catalog/hookah-mix" onClick={() => setCatalogOpen(false)}>Смесь для кальянов</Link>
-                  <Link to="/catalog/hookah-coals" onClick={() => setCatalogOpen(false)}>Угли для кальянов</Link>
-                  <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
+                  {categories.map((c) => (
+                    <Link key={c.slug} to={`/catalog/${c.slug}`} onClick={() => setCatalogOpen(false)}>{c.name}</Link>
+                  ))}
                 </div>
               </div>
             )}
@@ -217,13 +229,9 @@ export default function Header() {
               ☰ КАТАЛОГ
             </button>
             <div className={`catalog-dropdown ${catalogOpen ? 'open' : ''}`}>
-              <Link to="/catalog/liquids" onClick={() => setCatalogOpen(false)}>Жидкости для электронных парогенераторов</Link>
-              <Link to="/catalog/disposables" onClick={() => setCatalogOpen(false)}>Одноразовые/многоразовые парогенераторы</Link>
-              <Link to="/catalog/pouches" onClick={() => setCatalogOpen(false)}>Никотиновые паучи</Link>
-              <Link to="/catalog/pod-systems" onClick={() => setCatalogOpen(false)}>Электронные парогенераторы</Link>
-              <Link to="/catalog/hookah-mix" onClick={() => setCatalogOpen(false)}>Смесь для кальянов</Link>
-              <Link to="/catalog/hookah-coals" onClick={() => setCatalogOpen(false)}>Угли для кальянов</Link>
-              <Link to="/catalog/accessories" onClick={() => setCatalogOpen(false)}>Комплектующие</Link>
+              {categories.map((c) => (
+                <Link key={c.slug} to={`/catalog/${c.slug}`} onClick={() => setCatalogOpen(false)}>{c.name}</Link>
+              ))}
             </div>
           </div>
           <button
@@ -235,13 +243,9 @@ export default function Header() {
             ‹
           </button>
           <nav className="nav-categories" ref={navCategoriesRef}>
-            <Link to="/catalog/liquids" className={location.pathname.includes('/liquids') ? 'active' : ''}>Жидкости для электронных парогенераторов</Link>
-            <Link to="/catalog/disposables" className={location.pathname.includes('/disposables') ? 'active' : ''}>Одноразовые/многоразовые парогенераторы</Link>
-            <Link to="/catalog/pouches" className={location.pathname.includes('/pouches') ? 'active' : ''}>Никотиновые паучи</Link>
-            <Link to="/catalog/pod-systems" className={location.pathname.includes('/pod-systems') ? 'active' : ''}>Электронные парогенераторы</Link>
-            <Link to="/catalog/hookah-mix" className={location.pathname.includes('/hookah-mix') ? 'active' : ''}>Смесь для кальянов</Link>
-            <Link to="/catalog/hookah-coals" className={location.pathname.includes('/hookah-coals') ? 'active' : ''}>Угли для кальянов</Link>
-            <Link to="/catalog/accessories" className={location.pathname.includes('/accessories') ? 'active' : ''}>Комплектующие</Link>
+            {categories.map((c) => (
+              <Link key={c.slug} to={`/catalog/${c.slug}`} className={location.pathname.includes(`/${c.slug}`) ? 'active' : ''}>{c.name}</Link>
+            ))}
           </nav>
           <button
             type="button"
@@ -288,13 +292,9 @@ export default function Header() {
                 </button>
                 {mobileCatalogOpen && (
                   <div className="mobile-catalog-links">
-                    <Link to="/catalog/liquids" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Жидкости для электронных парогенераторов</Link>
-                    <Link to="/catalog/disposables" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Одноразовые/многоразовые парогенераторы</Link>
-                    <Link to="/catalog/pod-systems" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Электронные парогенераторы</Link>
-                    <Link to="/catalog/pouches" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Никотиновые паучи</Link>
-                    <Link to="/catalog/hookah-mix" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Смесь для кальянов</Link>
-                    <Link to="/catalog/hookah-coals" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Угли для кальянов</Link>
-                    <Link to="/catalog/accessories" onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>Комплектующие</Link>
+                    {categories.map((c) => (
+                      <Link key={c.slug} to={`/catalog/${c.slug}`} onClick={() => { setMobileCatalogOpen(false); setMenuOpen(false); }}>{c.name}</Link>
+                    ))}
                   </div>
                 )}
               </div>

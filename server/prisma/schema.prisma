@@ -120,6 +120,40 @@ model FilterOption {
   @@unique([category, filterKey, value])
 }
 
+model Category {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  dateLabel   String
+  teaser      String?
+  description String   @db.VarChar(2500)
+  image       String?
+  showOnHome  Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model HeroBanner {
+  id           String   @id @default(cuid())
+  zone         String   // main | side-top | side-bottom
+  image        String
+  title        String?
+  discountText String?
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model AuthCode {
   id        String   @id @default(cuid())
   code      String

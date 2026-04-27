@@ -1,11 +1,19 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { blogPosts } from '../data/products';
+import { contentApi } from '../lib/api';
 import './Blog.css';
 
 export default function Blog() {
+  const [posts, setPosts] = useState(blogPosts);
   const listRef = useRef(null);
+  useEffect(() => {
+    contentApi.blogPosts()
+      .then((data) => setPosts(Array.isArray(data) && data.length > 0 ? data : blogPosts))
+      .catch(() => setPosts(blogPosts));
+  }, []);
+
   const dragRef = useRef({ active: false, startX: 0, startScroll: 0 });
   const scrollByCards = (direction) => {
     const el = listRef.current;
@@ -63,7 +71,7 @@ export default function Blog() {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-        {blogPosts.map((post, i) => (
+        {posts.map((post, i) => (
           <motion.article
             key={post.id}
             className="blog-item"
@@ -79,12 +87,12 @@ export default function Blog() {
               />
             </div>
             <div className="blog-item-content">
-              <span className="blog-item-date">{post.date}</span>
+              <span className="blog-item-date">{post.dateLabel || post.date}</span>
               <h2>{post.title}</h2>
               <p>
                 Информация о новинках в мире электронных парогенераторов и жидкостей.
               </p>
-              <Link to={`/blog/${post.id}`} className="blog-item-link">
+              <Link to={`/blog/${post.slug || post.id}`} className="blog-item-link">
                 Подробнее
               </Link>
             </div>

@@ -90,3 +90,14 @@ export const storesApi = {
 export const filtersApi = {
   list: (category) => api(`/filters?category=${encodeURIComponent(category)}`),
 };
+
+export const contentApi = {
+  categories: () => api('/content/categories'),
+  blogPosts: (params = {}) => {
+    const q = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== ''))
+    ).toString();
+    return api(`/content/blog-posts${q ? `?${q}` : ''}`);
+  },
+  heroBanners: () => api('/content/hero-banners'),
+};

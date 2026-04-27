@@ -26,6 +26,16 @@ export default function AdminPanel() {
   const [form, setForm] = useState({});
   const [imageFile, setImageFile] = useState(null);
   const [imageFiles, setImageFiles] = useState([]); // Extra images for pod-systems
+  const [categories, setCategories] = useState([]);
+  const [categoryForm, setCategoryForm] = useState({ slug: '', name: '', sortOrder: 0 });
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [blogForm, setBlogForm] = useState({ title: '', slug: '', dateLabel: '', teaser: '', description: '', image: '', showOnHome: true, sortOrder: 0 });
+  const [blogImageFile, setBlogImageFile] = useState(null);
+  const [editingBlog, setEditingBlog] = useState(null);
+  const [heroBanners, setHeroBanners] = useState([]);
+  const [heroForm, setHeroForm] = useState({ zone: 'main', title: '', discountText: '', image: '', sortOrder: 0 });
+  const [heroImageFile, setHeroImageFile] = useState(null);
 
   const headers = () => ({ Authorization: `Bearer ${token}` });
 
@@ -37,29 +47,128 @@ export default function AdminPanel() {
   useEffect(() => {
     if (token && tab === 'filters') fetchFilterOptions();
   }, [token, tab, filterCategory]);
+  useEffect(() => {
+    if (!token) return;
+    if (tab === 'categories') fetchCategories();
+    if (tab === 'blog') fetchBlogPosts();
+    if (tab === 'hero') fetchHeroBanners();
+  }, [token, tab]);
 
-  const fetchUsers = async () => {
+  async function fetchUsers() {
     const r = await fetch(`${API_BASE}/admin/users`, { headers: headers() });
     if (r.status === 401) { logout(); return; }
     setUsers(await r.json());
-  };
+  }
 
-  const fetchProducts = async () => {
+  async function fetchProducts() {
     const r = await fetch(`${API_BASE}/admin/products`, { headers: headers() });
     if (r.status === 401) { logout(); return; }
     setProducts(await r.json());
-  };
+  }
 
-  const fetchFilterOptions = async () => {
+  async function fetchFilterOptions() {
     const r = await fetch(`${API_BASE}/admin/filters?category=${encodeURIComponent(filterCategory)}`, { headers: headers() });
     if (r.status === 401) { logout(); return; }
     setFilterOptions(await r.json());
-  };
+  }
 
-  const fetchOrders = async () => {
+  async function fetchOrders() {
     const r = await fetch(`${API_BASE}/admin/orders`, { headers: headers() });
     if (r.status === 401) { logout(); return; }
     setOrders(await r.json());
+  }
+
+  async function fetchCategories() {
+    const r = await fetch(`${API_BASE}/admin/categories`, { headers: headers() });
+    if (r.status === 401) { logout(); return; }
+    setCategories(await r.json());
+  }
+
+  const saveCategory = async () => {
+    const body = { ...categoryForm, sortOrder: Number(categoryForm.sortOrder || 0) };
+    if (editingCategory) {
+      await fetch(`${API_BASE}/admin/categories/${editingCategory.id}`, {
+        method: 'PATCH',
+        headers: { ...headers(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    } else {
+      await fetch(`${API_BASE}/admin/categories`, {
+        method: 'POST',
+        headers: { ...headers(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    }
+    setEditingCategory(null);
+    setCategoryForm({ slug: '', name: '', sortOrder: 0 });
+    fetchCategories();
+  };
+
+  const deleteCategory = async (id) => {
+    if (!confirm('Удалить категорию?')) return;
+    await fetch(`${API_BASE}/admin/categories/${id}`, { method: 'DELETE', headers: headers() });
+    fetchCategories();
+  };
+
+  async function fetchBlogPosts() {
+    const r = await fetch(`${API_BASE}/admin/blog-posts`, { headers: headers() });
+    if (r.status === 401) { logout(); return; }
+    setBlogPosts(await r.json());
+  }
+
+  const saveBlogPost = async () => {
+    const body = new FormData();
+    Object.entries(blogForm).forEach(([k, v]) => {
+      if (k === 'id') return;
+      if (v !== undefined && v !== null) body.append(k, v);
+    });
+    body.set('showOnHome', String(!!blogForm.showOnHome));
+    if (blogImageFile) body.set('image', blogImageFile);
+    const url = editingBlog ? `${API_BASE}/admin/blog-posts/${editingBlog.id}` : `${API_BASE}/admin/blog-posts`;
+    await fetch(url, { method: editingBlog ? 'PATCH' : 'POST', headers: headers(), body });
+    setEditingBlog(null);
+    setBlogImageFile(null);
+    setBlogForm({ title: '', slug: '', dateLabel: '', teaser: '', description: '', image: '', showOnHome: true, sortOrder: 0 });
+    fetchBlogPosts();
+  };
+
+  const deleteBlogPost = async (id) => {
+    if (!confirm('Удалить пост блога?')) return;
+    await fetch(`${API_BASE}/admin/blog-posts/${id}`, { method: 'DELETE', headers: headers() });
+    fetchBlogPosts();
+  };
+
+  async function fetchHeroBanners() {
+    const r = await fetch(`${API_BASE}/admin/hero-banners`, { headers: headers() });
+    if (r.status === 401) { logout(); return; }
+    setHeroBanners(await r.json());
+  }
+
+  const saveHeroBanner = async () => {
+    const body = new FormData();
+    Object.entries(heroForm).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) body.append(k, v);
+    });
+    if (heroImageFile) body.set('image', heroImageFile);
+    await fetch(`${API_BASE}/admin/hero-banners`, { method: 'POST', headers: headers(), body });
+    setHeroForm({ zone: 'main', title: '', discountText: '', image: '', sortOrder: 0 });
+    setHeroImageFile(null);
+    fetchHeroBanners();
+  };
+
+  const updateHeroBanner = async (banner) => {
+    const body = new FormData();
+    body.append('title', banner.title || '');
+    body.append('discountText', banner.discountText || '');
+    body.append('sortOrder', String(banner.sortOrder || 0));
+    await fetch(`${API_BASE}/admin/hero-banners/${banner.id}`, { method: 'PATCH', headers: headers(), body });
+    fetchHeroBanners();
+  };
+
+  const deleteHeroBanner = async (id) => {
+    if (!confirm('Удалить баннер?')) return;
+    await fetch(`${API_BASE}/admin/hero-banners/${id}`, { method: 'DELETE', headers: headers() });
+    fetchHeroBanners();
   };
 
   const handleLogin = async (e) => {
@@ -208,7 +317,115 @@ export default function AdminPanel() {
       <nav className="admin-tabs">
         <button className={tab === 'products' ? 'active' : ''} onClick={() => setTab('products')}>Товары</button>
         <button className={tab === 'filters' ? 'active' : ''} onClick={() => setTab('filters')}>Фильтры</button>
+        <button className={tab === 'categories' ? 'active' : ''} onClick={() => setTab('categories')}>Категории</button>
+        <button className={tab === 'blog' ? 'active' : ''} onClick={() => setTab('blog')}>Блог</button>
+        <button className={tab === 'hero' ? 'active' : ''} onClick={() => setTab('hero')}>Главный экран</button>
       </nav>
+
+      {tab === 'categories' && (
+        <section className="admin-section">
+          <h2>Категории каталога</h2>
+          <div className="admin-form-row" style={{ marginBottom: 12 }}>
+            <input placeholder="Slug" value={categoryForm.slug} onChange={(e) => setCategoryForm({ ...categoryForm, slug: e.target.value })} />
+            <input placeholder="Название" value={categoryForm.name} onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })} />
+            <input type="number" placeholder="Порядок" value={categoryForm.sortOrder} onChange={(e) => setCategoryForm({ ...categoryForm, sortOrder: e.target.value })} />
+            <button onClick={saveCategory}>{editingCategory ? 'Сохранить' : 'Добавить'}</button>
+            {editingCategory && <button onClick={() => { setEditingCategory(null); setCategoryForm({ slug: '', name: '', sortOrder: 0 }); }}>Отмена</button>}
+          </div>
+          <table>
+            <thead><tr><th>Slug</th><th>Название</th><th>Порядок</th><th></th></tr></thead>
+            <tbody>
+              {categories.map((c) => (
+                <tr key={c.id}>
+                  <td>{c.slug}</td>
+                  <td>{c.name}</td>
+                  <td>{c.sortOrder}</td>
+                  <td>
+                    <button onClick={() => { setEditingCategory(c); setCategoryForm({ slug: c.slug, name: c.name, sortOrder: c.sortOrder }); }}>Ред.</button>
+                    <button onClick={() => deleteCategory(c.id)}>Удалить</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {tab === 'blog' && (
+        <section className="admin-section">
+          <h2>Блог (текст до 2500 символов)</h2>
+          <div className="admin-form-row" style={{ marginBottom: 8 }}>
+            <input placeholder="Название" value={blogForm.title} onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })} />
+            <input placeholder="Slug" value={blogForm.slug} onChange={(e) => setBlogForm({ ...blogForm, slug: e.target.value })} />
+            <input placeholder="Дата (например 27 апреля 2026)" value={blogForm.dateLabel} onChange={(e) => setBlogForm({ ...blogForm, dateLabel: e.target.value })} />
+            <input type="number" placeholder="Порядок" value={blogForm.sortOrder} onChange={(e) => setBlogForm({ ...blogForm, sortOrder: e.target.value })} />
+          </div>
+          <div className="admin-form-row" style={{ marginBottom: 8 }}>
+            <input placeholder="Короткий анонс" value={blogForm.teaser} onChange={(e) => setBlogForm({ ...blogForm, teaser: e.target.value })} style={{ width: 420 }} />
+            <input type="file" accept="image/*" onChange={(e) => { setBlogImageFile(e.target.files?.[0] || null); if (e.target.files?.[0]) setBlogForm({ ...blogForm, image: '' }); }} />
+            <input placeholder="URL картинки" value={blogForm.image} onChange={(e) => { setBlogForm({ ...blogForm, image: e.target.value }); if (e.target.value) setBlogImageFile(null); }} disabled={!!blogImageFile} style={{ width: 280 }} />
+            <label><input type="checkbox" checked={!!blogForm.showOnHome} onChange={(e) => setBlogForm({ ...blogForm, showOnHome: e.target.checked })} /> Показывать на главной</label>
+          </div>
+          <textarea value={blogForm.description} onChange={(e) => setBlogForm({ ...blogForm, description: e.target.value.slice(0, 2500) })} rows={6} style={{ width: '100%', marginBottom: 8 }} placeholder="Текст статьи" />
+          <p style={{ margin: '0 0 10px', color: '#666' }}>{blogForm.description.length}/2500</p>
+          <button onClick={saveBlogPost}>{editingBlog ? 'Сохранить пост' : 'Добавить пост'}</button>
+          {editingBlog && <button onClick={() => { setEditingBlog(null); setBlogImageFile(null); setBlogForm({ title: '', slug: '', dateLabel: '', teaser: '', description: '', image: '', showOnHome: true, sortOrder: 0 }); }}>Отмена</button>}
+          <table style={{ marginTop: 16 }}>
+            <thead><tr><th>Заголовок</th><th>Slug</th><th>На главной</th><th></th></tr></thead>
+            <tbody>
+              {blogPosts.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.title}</td>
+                  <td>{p.slug}</td>
+                  <td>{p.showOnHome ? 'Да' : 'Нет'}</td>
+                  <td>
+                    <button onClick={() => { setEditingBlog(p); setBlogImageFile(null); setBlogForm({ title: p.title || '', slug: p.slug || '', dateLabel: p.dateLabel || '', teaser: p.teaser || '', description: p.description || '', image: p.image || '', showOnHome: p.showOnHome, sortOrder: p.sortOrder || 0 }); }}>Ред.</button>
+                    <button onClick={() => deleteBlogPost(p.id)}>Удалить</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {tab === 'hero' && (
+        <section className="admin-section">
+          <h2>Баннеры главного экрана</h2>
+          <div className="admin-form-row" style={{ marginBottom: 12 }}>
+            <select value={heroForm.zone} onChange={(e) => setHeroForm({ ...heroForm, zone: e.target.value })}>
+              <option value="main">Большая картинка (макс. 4)</option>
+              <option value="side-top">Верхняя мал. картинка (макс. 3)</option>
+              <option value="side-bottom">Нижняя мал. картинка (макс. 3)</option>
+            </select>
+            <input placeholder="Краткий текст" value={heroForm.title} onChange={(e) => setHeroForm({ ...heroForm, title: e.target.value })} />
+            {heroForm.zone === 'main' && (
+              <input placeholder="Кружок скидки (например -15%)" value={heroForm.discountText} onChange={(e) => setHeroForm({ ...heroForm, discountText: e.target.value })} />
+            )}
+            <input type="number" placeholder="Порядок" value={heroForm.sortOrder} onChange={(e) => setHeroForm({ ...heroForm, sortOrder: e.target.value })} />
+            <input type="file" accept="image/*" onChange={(e) => { setHeroImageFile(e.target.files?.[0] || null); if (e.target.files?.[0]) setHeroForm({ ...heroForm, image: '' }); }} />
+            <input placeholder="URL картинки" value={heroForm.image} onChange={(e) => { setHeroForm({ ...heroForm, image: e.target.value }); if (e.target.value) setHeroImageFile(null); }} disabled={!!heroImageFile} />
+            <button onClick={saveHeroBanner}>Добавить баннер</button>
+          </div>
+          <table>
+            <thead><tr><th>Зона</th><th>Текст</th><th>Скидка</th><th>Порядок</th><th></th></tr></thead>
+            <tbody>
+              {heroBanners.map((b) => (
+                <tr key={b.id}>
+                  <td>{b.zone === 'main' ? 'Большая' : b.zone === 'side-top' ? 'Верхняя мал.' : 'Нижняя мал.'}</td>
+                  <td><input value={b.title || ''} onChange={(e) => setHeroBanners((prev) => prev.map((x) => x.id === b.id ? { ...x, title: e.target.value } : x))} /></td>
+                  <td><input value={b.discountText || ''} disabled={b.zone !== 'main'} onChange={(e) => setHeroBanners((prev) => prev.map((x) => x.id === b.id ? { ...x, discountText: e.target.value } : x))} /></td>
+                  <td><input type="number" value={b.sortOrder || 0} onChange={(e) => setHeroBanners((prev) => prev.map((x) => x.id === b.id ? { ...x, sortOrder: Number(e.target.value || 0) } : x))} /></td>
+                  <td>
+                    <button onClick={() => updateHeroBanner(b)}>Сохранить</button>
+                    <button onClick={() => deleteHeroBanner(b.id)}>Удалить</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
 
       {tab === 'filters' && (
         <section className="admin-section">

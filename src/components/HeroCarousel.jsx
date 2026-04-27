@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { contentApi } from '../lib/api';
 import './HeroCarousel.css';
 
 const MAIN_SLIDE_DURATION = 5000;
@@ -50,6 +51,8 @@ const sideBanners = [
 ];
 
 export default function HeroCarousel() {
+  const [mainSlidesData, setMainSlidesData] = useState(mainSlides);
+  const [sideBannersData, setSideBannersData] = useState(sideBanners);
   const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [sideState, setSideState] = useState(() => ({
@@ -57,18 +60,48 @@ export default function HeroCarousel() {
     side2: { index: 0, progress: 0 },
   }));
 
+  useEffect(() => {
+    contentApi.heroBanners().then((data) => {
+      if (!Array.isArray(data) || data.length === 0) return;
+      const main = data
+        .filter((b) => b.zone === 'main' && b.image)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((b) => ({
+          id: b.id,
+          image: b.image,
+          title: b.title || '',
+          discountText: b.discountText || '',
+        }));
+      const top = data
+        .filter((b) => b.zone === 'side-top' && b.image)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((b) => b.image);
+      const bottom = data
+        .filter((b) => b.zone === 'side-bottom' && b.image)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((b) => b.image);
+      if (main.length > 0) setMainSlidesData(main);
+      if (top.length > 0 || bottom.length > 0) {
+        setSideBannersData([
+          { id: 'side1', slides: top.length > 0 ? top : sideBanners[0].slides },
+          { id: 'side2', slides: bottom.length > 0 ? bottom : sideBanners[1].slides },
+        ]);
+      }
+    }).catch(() => {});
+  }, []);
+
   const goToSlide = useCallback((index) => {
     setActiveIndex(index);
     setProgress(0);
   }, []);
 
   const next = useCallback(() => {
-    goToSlide((activeIndex + 1) % mainSlides.length);
-  }, [activeIndex, goToSlide]);
+    goToSlide((activeIndex + 1) % mainSlidesData.length);
+  }, [activeIndex, goToSlide, mainSlidesData.length]);
 
   const prev = useCallback(() => {
-    goToSlide((activeIndex - 1 + mainSlides.length) % mainSlides.length);
-  }, [activeIndex, goToSlide]);
+    goToSlide((activeIndex - 1 + mainSlidesData.length) % mainSlidesData.length);
+  }, [activeIndex, goToSlide, mainSlidesData.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -80,8 +113,8 @@ export default function HeroCarousel() {
         return p + (100 / (MAIN_SLIDE_DURATION / TICK_MS));
       });
       setSideState((prev) => {
-        const slides1Len = sideBanners[0]?.slides?.length || 1;
-        const slides2Len = sideBanners[1]?.slides?.length || 1;
+        const slides1Len = sideBannersData[0]?.slides?.length || 1;
+        const slides2Len = sideBannersData[1]?.slides?.length || 1;
 
         const step1 = 100 / (SIDE1_DURATION / TICK_MS);
         const step2 = 100 / (SIDE2_DURATION / TICK_MS);
@@ -101,7 +134,7 @@ export default function HeroCarousel() {
       });
     }, TICK_MS);
     return () => clearInterval(interval);
-  }, [activeIndex, next]);
+  }, [activeIndex, next, sideBannersData]);
 
   const handleProgressClick = (index) => {
     goToSlide(index);
@@ -124,13 +157,14 @@ export default function HeroCarousel() {
               ‹
             </button>
             <div className="hero-slides">
-              {mainSlides.map((slide, i) => (
+              {mainSlidesData.map((slide, i) => (
                 <div
                   key={slide.id}
                   className={`hero-slide ${i === activeIndex ? 'active' : ''}`}
                   style={{ backgroundImage: `url(${slide.image})` }}
                 >
                   <p className="hero-slide-title">{slide.title}</p>
+                  {slide.discountText && <span className="hero-discount-badge">{slide.discountText}</span>}
                   <span className="hero-slide-cta">Подробнее</span>
                 </div>
               ))}
@@ -148,7 +182,7 @@ export default function HeroCarousel() {
             </button>
           </Link>
           <div className="hero-indicators">
-            {mainSlides.map((_, i) => (
+            {mainSlidesData.map((_, i) => (
               <button
                 key={i}
                 type="button"
@@ -167,7 +201,7 @@ export default function HeroCarousel() {
           </div>
         </div>
         <div className="hero-side-banners">
-          {sideBanners.map((banner) => (
+          {sideBannersData.map((banner) => (
             <Link key={banner.id} to="/catalog" className="hero-side-banner">
               {banner.slides.map((img, index) => (
                 <div

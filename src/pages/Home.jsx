@@ -5,13 +5,13 @@ import ProductCarousel from '../components/ProductCarousel';
 import HeroCarousel from '../components/HeroCarousel';
 import SocialCarousel from '../components/SocialCarousel';
 import { blogPosts, reviews, products as localProducts } from '../data/products';
-import { productsApi } from '../lib/api';
+import { productsApi, contentApi } from '../lib/api';
 import './Home.css';
 
 const BLOG_CAROUSEL_INTERVAL_MS = 6000;
 const YANDEX_REVIEWS_URL = 'https://yandex.ru/navi/org/oblako_para/221337875525?si=8ng7m7pyz6fuzp3j7j08u3f798';
 
-const categoryFilters = [
+const defaultCategoryFilters = [
   { id: 'all', name: 'Все' },
   { id: 'liquids', name: 'Жидкости для электронных парогенераторов' },
   { id: 'disposables', name: 'Одноразовые/многоразовые парогенераторы' },
@@ -28,6 +28,8 @@ export default function Home() {
   const [newProducts, setNewProducts] = useState([]);
   const [bestsellerProducts, setBestsellerProducts] = useState([]);
   const [blogSlide, setBlogSlide] = useState(0);
+  const [blogPostsData, setBlogPostsData] = useState(blogPosts);
+  const [categoryFilters, setCategoryFilters] = useState(defaultCategoryFilters);
   const blogSwipeRef = useRef({ startX: 0, deltaX: 0, active: false });
   const blogTimerRef = useRef(null);
 
@@ -50,8 +52,20 @@ export default function Home() {
       })
       .catch(() => setBestsellerProducts(bestsellerFallback));
   }, []);
+  useEffect(() => {
+    contentApi.blogPosts({ homeOnly: 'true' })
+      .then((data) => setBlogPostsData(Array.isArray(data) && data.length > 0 ? data : blogPosts))
+      .catch(() => setBlogPostsData(blogPosts));
+    contentApi.categories()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCategoryFilters([{ id: 'all', name: 'Все' }, ...data.map((c) => ({ id: c.slug, name: c.name }))]);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
-  const blogCount = blogPosts.length;
+  const blogCount = blogPostsData.length;
 
   const restartBlogTimer = () => {
     if (blogTimerRef.current) window.clearInterval(blogTimerRef.current);
@@ -70,12 +84,12 @@ export default function Home() {
 
   useEffect(() => {
     // Preload blog images to avoid first-frame jank.
-    (blogPosts || []).forEach((p) => {
+    (blogPostsData || []).forEach((p) => {
       if (!p?.image) return;
       const img = new Image();
       img.src = p.image;
     });
-  }, []);
+  }, [blogPostsData]);
 
   const filteredNew = newFilter === 'all'
     ? newProducts
@@ -84,7 +98,7 @@ export default function Home() {
     ? bestsellerProducts
     : bestsellerProducts.filter((p) => p.category === bestsellerFilter);
 
-  const blogFeatured = blogPosts[blogSlide] || blogPosts[0];
+  const blogFeatured = blogPostsData[blogSlide] || blogPostsData[0];
   const safeSetBlogSlide = (updater) => {
     setBlogSlide(updater);
     restartBlogTimer();
@@ -219,6 +233,7 @@ export default function Home() {
           Блог
         </motion.h2>
         <div className="blog-layout">
+          {blogFeatured ? (
           <div
             className="blog-featured-carousel"
             onPointerDown={onBlogSwipeStart}
@@ -240,7 +255,7 @@ export default function Home() {
                 className="blog-featured-link blog-card-link"
               >
                 <div className="blog-featured-text blog-card-text">
-                  <span className="blog-date">{blogFeatured.date}</span>
+                  <span className="blog-date">{blogFeatured.dateLabel || blogFeatured.date}</span>
                   <h3>{blogFeatured.title}</h3>
                   {blogFeatured.teaser && (
                     <p className="blog-teaser">{blogFeatured.teaser}</p>
@@ -255,7 +270,7 @@ export default function Home() {
             <div className="blog-carousel-controls" aria-label="Навигация по блогу">
               <button type="button" className="blog-carousel-arrow" onClick={blogPrev} aria-label="Предыдущая статья">‹</button>
               <div className="blog-carousel-dots" role="tablist" aria-label="Выбор статьи блога">
-              {blogPosts.map((p, i) => (
+              {blogPostsData.map((p, i) => (
                 <button
                   key={p.id}
                   type="button"
@@ -270,6 +285,7 @@ export default function Home() {
               <button type="button" className="blog-carousel-arrow" onClick={blogNext} aria-label="Следующая статья">›</button>
             </div>
           </div>
+          ) : <p>Посты блога пока не добавлены.</p>}
         </div>
       </section>
 
