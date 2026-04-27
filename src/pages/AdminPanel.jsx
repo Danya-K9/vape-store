@@ -33,6 +33,7 @@ export default function AdminPanel() {
   const [blogForm, setBlogForm] = useState({ title: '', slug: '', dateLabel: '', teaser: '', description: '', image: '', showOnHome: true, sortOrder: 0 });
   const [blogImageFile, setBlogImageFile] = useState(null);
   const [editingBlog, setEditingBlog] = useState(null);
+  const [blogError, setBlogError] = useState('');
   const [heroBanners, setHeroBanners] = useState([]);
   const [heroForm, setHeroForm] = useState({ zone: 'main', title: '', discountText: '', image: '', sortOrder: 0 });
   const [heroImageFile, setHeroImageFile] = useState(null);
@@ -117,6 +118,15 @@ export default function AdminPanel() {
   }
 
   const saveBlogPost = async () => {
+    setBlogError('');
+    if (!blogForm.title?.trim()) {
+      setBlogError('Введите заголовок статьи');
+      return;
+    }
+    if (!blogForm.description?.trim()) {
+      setBlogError('Введите текст статьи');
+      return;
+    }
     const body = new FormData();
     Object.entries(blogForm).forEach(([k, v]) => {
       if (k === 'id') return;
@@ -125,7 +135,13 @@ export default function AdminPanel() {
     body.set('showOnHome', String(!!blogForm.showOnHome));
     if (blogImageFile) body.set('image', blogImageFile);
     const url = editingBlog ? `${API_BASE}/admin/blog-posts/${editingBlog.id}` : `${API_BASE}/admin/blog-posts`;
-    await fetch(url, { method: editingBlog ? 'PATCH' : 'POST', headers: headers(), body });
+    const resp = await fetch(url, { method: editingBlog ? 'PATCH' : 'POST', headers: headers(), body });
+    const text = await resp.text();
+    const data = text ? (() => { try { return JSON.parse(text); } catch { return null; } })() : null;
+    if (!resp.ok) {
+      setBlogError(data?.error || 'Не удалось сохранить пост');
+      return;
+    }
     setEditingBlog(null);
     setBlogImageFile(null);
     setBlogForm({ title: '', slug: '', dateLabel: '', teaser: '', description: '', image: '', showOnHome: true, sortOrder: 0 });
@@ -356,10 +372,13 @@ export default function AdminPanel() {
           <h2>Блог (текст до 2500 символов)</h2>
           <div className="admin-form-row" style={{ marginBottom: 8 }}>
             <input placeholder="Название" value={blogForm.title} onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })} />
-            <input placeholder="Slug" value={blogForm.slug} onChange={(e) => setBlogForm({ ...blogForm, slug: e.target.value })} />
+            <input placeholder="Slug (необязательно)" value={blogForm.slug} onChange={(e) => setBlogForm({ ...blogForm, slug: e.target.value })} />
             <input placeholder="Дата (например 27 апреля 2026)" value={blogForm.dateLabel} onChange={(e) => setBlogForm({ ...blogForm, dateLabel: e.target.value })} />
             <input type="number" placeholder="Порядок" value={blogForm.sortOrder} onChange={(e) => setBlogForm({ ...blogForm, sortOrder: e.target.value })} />
           </div>
+          <p style={{ margin: '0 0 8px', color: '#555', fontSize: 13 }}>
+            Slug — это часть ссылки статьи (например `/blog/novosti-vejpa`). Можно не заполнять: система создаст его автоматически.
+          </p>
           <div className="admin-form-row" style={{ marginBottom: 8 }}>
             <input placeholder="Короткий анонс" value={blogForm.teaser} onChange={(e) => setBlogForm({ ...blogForm, teaser: e.target.value })} style={{ width: 420 }} />
             <input type="file" accept="image/*" onChange={(e) => { setBlogImageFile(e.target.files?.[0] || null); if (e.target.files?.[0]) setBlogForm({ ...blogForm, image: '' }); }} />
@@ -368,6 +387,7 @@ export default function AdminPanel() {
           </div>
           <textarea value={blogForm.description} onChange={(e) => setBlogForm({ ...blogForm, description: e.target.value.slice(0, 2500) })} rows={6} style={{ width: '100%', marginBottom: 8 }} placeholder="Текст статьи" />
           <p style={{ margin: '0 0 10px', color: '#666' }}>{blogForm.description.length}/2500</p>
+          {blogError && <p className="admin-error" style={{ marginBottom: 10 }}>{blogError}</p>}
           <button onClick={saveBlogPost}>{editingBlog ? 'Сохранить пост' : 'Добавить пост'}</button>
           {editingBlog && <button onClick={() => { setEditingBlog(null); setBlogImageFile(null); setBlogForm({ title: '', slug: '', dateLabel: '', teaser: '', description: '', image: '', showOnHome: true, sortOrder: 0 }); }}>Отмена</button>}
           <table style={{ marginTop: 16 }}>

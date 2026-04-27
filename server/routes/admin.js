@@ -70,6 +70,23 @@ function parseSortOrder(value, fallback = 0) {
   return Number.isFinite(num) ? num : fallback;
 }
 
+async function buildUniqueBlogSlug(rawValue, excludeId = null) {
+  const base = normalizeSlug(rawValue || 'post');
+  let candidate = base || 'post';
+  let index = 1;
+  while (true) {
+    const existing = await prisma.blogPost.findFirst({
+      where: excludeId
+        ? { slug: candidate, NOT: { id: excludeId } }
+        : { slug: candidate },
+      select: { id: true },
+    });
+    if (!existing) return candidate;
+    candidate = `${base || 'post'}-${index}`;
+    index += 1;
+  }
+}
+
 router.get('/users', async (req, res) => {
   try {
     const users = await prisma.user.findMany({
@@ -400,14 +417,15 @@ router.post('/blog-posts', (req, res, next) => {
 }, async (req, res) => {
   try {
     const image = req.file ? `/uploads/${req.file.filename}` : (req.body.image || null);
-    const slug = normalizeSlug(req.body.slug || req.body.title);
+    const title = String(req.body.title || '').trim();
+    const slug = await buildUniqueBlogSlug(req.body.slug || title);
     const description = String(req.body.description || '').trim();
-    if (!slug || !req.body.title || !description) return res.status(400).json({ error: 'title/slug/description обязательны' });
+    if (!title || !description) return res.status(400).json({ error: 'Нужны: заголовок и текст статьи' });
     if (description.length > 2500) return res.status(400).json({ error: 'Описание не должно быть длиннее 2500 символов' });
     const post = await prisma.blogPost.create({
       data: {
         slug,
-        title: String(req.body.title).trim(),
+        title,
         dateLabel: String(req.body.dateLabel || new Date().toLocaleDateString('ru-RU')),
         teaser: req.body.teaser ? String(req.body.teaser).trim() : null,
         description,
@@ -430,10 +448,16 @@ router.patch('/blog-posts/:id', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
+    const current = await prisma.blogPost.findUnique({ where: { id: req.params.id } });
+    if (!current) return res.status(404).json({ error: 'Пост не найден' });
     const data = {};
     if (req.file) data.image = `/uploads/${req.file.filename}`;
     else if (req.body.image !== undefined) data.image = req.body.image || null;
-    if (req.body.slug !== undefined) data.slug = normalizeSlug(req.body.slug);
+    if (req.body.slug !== undefined) {
+      data.slug = await buildUniqueBlogSlug(req.body.slug || req.body.title || current.title, req.params.id);
+    } else if (req.body.title !== undefined) {
+      data.slug = await buildUniqueBlogSlug(current.slug || req.body.title, req.params.id);
+    }
     if (req.body.title !== undefined) data.title = String(req.body.title).trim();
     if (req.body.dateLabel !== undefined) data.dateLabel = String(req.body.dateLabel).trim();
     if (req.body.teaser !== undefined) data.teaser = req.body.teaser ? String(req.body.teaser).trim() : null;
@@ -447,7 +471,6 @@ router.patch('/blog-posts/:id', (req, res, next) => {
     const post = await prisma.blogPost.update({ where: { id: req.params.id }, data });
     res.json(post);
   } catch (e) {
-    if (e.code === 'P2002') return res.status(400).json({ error: 'Пост с таким slug уже есть' });
     res.status(500).json({ error: e.message });
   }
 });
