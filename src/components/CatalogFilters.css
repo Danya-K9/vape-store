@@ -109,6 +109,9 @@
   background: #d1d5db;
   border-radius: 999px;
   cursor: grab;
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
 }
 
 .price-slider:active {

@@ -62,6 +62,12 @@ export default function CatalogFilters({
   const [priceMinInput, setPriceMinInput] = useState(String(priceMin));
   const [priceMaxInput, setPriceMaxInput] = useState(String(priceMax));
   const [priceSliderValue, setPriceSliderValue] = useState(Number(priceMax) || 0);
+  const sliderUpperBound = Math.max(
+    150,
+    Number(priceMax) || 0,
+    parseInt(priceMaxInput || '0', 10) || 0,
+    parseInt(priceMinInput || '0', 10) || 0
+  );
   const [dynamicOptions, setDynamicOptions] = useState(null);
   useEffect(() => {
     if (!category) { setDynamicOptions(null); return; }
@@ -90,7 +96,7 @@ export default function CatalogFilters({
     return { nextMin, nextMax };
   };
 
-  const PriceSection = () => (
+  const renderPriceSection = () => (
     <FilterSection title="Цена" open={isOpen('price')} onToggle={() => toggleSection('price')}>
       <div className="price-inputs">
         <div>
@@ -120,9 +126,9 @@ export default function CatalogFilters({
       <input
         type="range"
         min={0}
-        max={150}
+        max={sliderUpperBound}
+        step={1}
         value={priceSliderValue}
-        onMouseDown={(e) => e.stopPropagation()}
         onInput={(e) => {
           const next = parseInt(e.currentTarget.value, 10) || 0;
           setPriceSliderValue(next);
@@ -156,7 +162,7 @@ export default function CatalogFilters({
 
   const disposablesFilters = () => (
     <>
-      <PriceSection />
+      {renderPriceSection()}
       {hasOpt('manufacturer') && (
         <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
           {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}
@@ -212,7 +218,7 @@ export default function CatalogFilters({
 
   const liquidsFilters = () => (
     <>
-      <PriceSection />
+      {renderPriceSection()}
       {hasOpt('manufacturer') && (
         <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
           {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}
@@ -248,7 +254,7 @@ export default function CatalogFilters({
 
   const accessoriesFilters = () => (
     <>
-      <PriceSection />
+      {renderPriceSection()}
       {hasOpt('manufacturer') ? (
         <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
           {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}
@@ -259,7 +265,7 @@ export default function CatalogFilters({
 
   const pouchesFilters = () => (
     <>
-      <PriceSection />
+      {renderPriceSection()}
       {hasOpt('manufacturer') && (
         <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
           {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}
@@ -285,7 +291,7 @@ export default function CatalogFilters({
 
   const podSystemsFilters = () => (
     <>
-      <PriceSection />
+      {renderPriceSection()}
       {hasOpt('manufacturer') && (
         <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>
           {renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}
@@ -306,7 +312,7 @@ export default function CatalogFilters({
 
   const hookahMixFilters = () => (
     <>
-      <PriceSection />
+      {renderPriceSection()}
       {hasOpt('strength') && <FilterSection title="Крепость" open={isOpen('strength')} onToggle={() => toggleSection('strength')}>{renderCheckbox(getOpt('strength'), strengths, onStrengthToggle)}</FilterSection>}
       {hasOpt('tobacco') && <FilterSection title="Наличие табака" open={isOpen('tobacco')} onToggle={() => toggleSection('tobacco')}>{renderCheckbox(getOpt('tobacco'), tobaccoValues, onTobaccoToggle)}</FilterSection>}
       {hasOpt('weight') && <FilterSection title="Вес" open={isOpen('weight')} onToggle={() => toggleSection('weight')}>{renderCheckbox(getOpt('weight'), weightValues, onWeightToggle)}</FilterSection>}
@@ -316,7 +322,7 @@ export default function CatalogFilters({
 
   const hookahCoalsFilters = () => (
     <>
-      <PriceSection />
+      {renderPriceSection()}
       {hasOpt('coalType') && <FilterSection title="Тип углей" open={isOpen('coalType')} onToggle={() => toggleSection('coalType')}>{renderCheckbox(getOpt('coalType'), coalTypeValues, onCoalTypeToggle)}</FilterSection>}
       {hasOpt('packCount') && <FilterSection title="Кол-во в пачке" open={isOpen('packCount')} onToggle={() => toggleSection('packCount')}>{renderCheckbox(getOpt('packCount'), packCountValues, onPackCountToggle)}</FilterSection>}
       {hasOpt('manufacturer') && <FilterSection title="Производитель" open={isOpen('manufacturer')} onToggle={() => toggleSection('manufacturer')}>{renderCheckbox(getOpt('manufacturer'), manufacturers, onManufacturerToggle)}</FilterSection>}

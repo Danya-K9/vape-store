@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 12px;
   padding: 12px 20px;
   background: #2a2a2a;
   color: #fff;
@@ -20,7 +20,8 @@
 .notice-content {
   flex: 1;
   overflow: hidden;
-  max-width: 800px;
+  max-width: 1200px;
+  width: min(1200px, calc(100vw - 96px));
   display: flex;
   justify-content: center;
 }
@@ -29,7 +30,7 @@
   display: block;
   width: 100%;
   text-align: center;
-  white-space: normal;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }

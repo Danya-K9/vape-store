@@ -10,7 +10,7 @@ const STORES = [
     address: 'г. Орша, ул. Владимира Ленина, 17',
     hours: 'Понедельник ~ пятница:\nС 10:00 до 20:00\nСуббота: с 10:00 до 19:00\nВоскресенье: Выходной',
     phone: PHONE,
-    image: `${import.meta.env.BASE_URL}magazin.png`,
+    image: '/magazin.png',
   },
 ];
 
@@ -49,7 +49,13 @@ export default function Contacts() {
         {STORES.map((store) => (
           <div key={store.id} className="contact-store-card">
             <div className="contact-store-image">
-              <img src={store.image} alt="Магазин" />
+              <img
+                src={store.image}
+                alt="Магазин"
+                onError={(e) => {
+                  e.currentTarget.src = '/magazin.png';
+                }}
+              />
             </div>
             <div className="contact-store-info">
               <p className="contact-store-address">{store.address}</p>
