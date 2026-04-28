@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-const MAX_PARTICLES = 220;
-const SPAWN_PER_MOVE = 4;
+const MAX_PARTICLES = 320;
+const SPAWN_PER_MOVE = 6;
 
 export default function SmokeTrailCanvas() {
   const canvasRef = useRef(null);
@@ -18,80 +18,83 @@ export default function SmokeTrailCanvas() {
 
     let rafId = 0;
     const particles = [];
-    let pointerX = 0;
-    let pointerY = 0;
+    let pointerX = window.innerWidth * 0.5;
+    let pointerY = window.innerHeight * 0.4;
     let hasPointer = false;
-    let activeArea = null;
+    let mainArea = null;
+    let footerArea = null;
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = Math.floor(rect.width * dpr);
-      canvas.height = Math.floor(rect.height * dpr);
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
-    const updateArea = () => {
-      activeArea = canvas.getBoundingClientRect();
+    const updateZones = () => {
+      const mainContent = document.querySelector('.main-content');
+      const footer = document.querySelector('.footer-dark');
+      mainArea = mainContent ? mainContent.getBoundingClientRect() : null;
+      footerArea = footer ? footer.getBoundingClientRect() : null;
+    };
+
+    const isAllowedPoint = (clientX, clientY) => {
+      const inMain = !mainArea
+        || (clientX >= mainArea.left
+          && clientX <= mainArea.right
+          && clientY >= mainArea.top
+          && clientY <= mainArea.bottom);
+      const inFooter = footerArea
+        && clientX >= footerArea.left
+        && clientX <= footerArea.right
+        && clientY >= footerArea.top
+        && clientY <= footerArea.bottom;
+      return inMain && !inFooter;
     };
 
     const spawn = (x, y, strength = 1) => {
       for (let i = 0; i < SPAWN_PER_MOVE; i += 1) {
         if (particles.length >= MAX_PARTICLES) particles.shift();
         const angle = Math.random() * Math.PI * 2;
-        const speed = (0.08 + Math.random() * 0.38) * strength;
-        const baseRadius = 14 + Math.random() * 32;
+        const speed = (0.12 + Math.random() * 0.55) * strength;
+        const baseRadius = 12 + Math.random() * 34;
+        const spread = 12 + Math.random() * 16;
+        const ttl = 140 + Math.random() * 120;
         particles.push({
-          x: x + (Math.random() - 0.5) * 16,
-          y: y + (Math.random() - 0.5) * 16,
-          vx: Math.cos(angle) * speed * 0.65,
-          vy: Math.sin(angle) * speed - (0.1 + Math.random() * 0.24),
-          radius: baseRadius,
-          radiusX: baseRadius * (1.05 + Math.random() * 0.25),
-          radiusY: baseRadius * (0.75 + Math.random() * 0.22),
-          alpha: 0.095 + Math.random() * 0.1,
-          swirl: (Math.random() - 0.5) * 0.035,
-          jitter: 0.25 + Math.random() * 0.45,
-          hueShift: Math.random() * 10,
+          x: x + (Math.random() - 0.5) * spread,
+          y: y + (Math.random() - 0.5) * spread,
+          vx: Math.cos(angle) * speed * 0.48,
+          vy: Math.sin(angle) * speed * 0.34 - (0.12 + Math.random() * 0.28),
+          radius: baseRadius * (0.85 + Math.random() * 0.45),
+          alpha: 0.06 + Math.random() * 0.11,
+          spin: (Math.random() - 0.5) * 0.07,
+          noiseSeed: Math.random() * 1000,
+          growth: 1.006 + Math.random() * 0.0035,
           life: 0,
-          maxLife: 110 + Math.random() * 90,
+          maxLife: ttl,
         });
       }
     };
 
     const onPointerMove = (event) => {
-      if (!activeArea) updateArea();
-      if (!activeArea) return;
-      const inArea = event.clientX >= activeArea.left
-        && event.clientX <= activeArea.right
-        && event.clientY >= activeArea.top
-        && event.clientY <= activeArea.bottom;
-      if (!inArea) {
+      if (!mainArea) updateZones();
+      if (!isAllowedPoint(event.clientX, event.clientY)) {
         hasPointer = false;
         return;
       }
-      const localX = event.clientX - activeArea.left;
-      const localY = event.clientY - activeArea.top;
-      const dx = localX - pointerX;
-      const dy = localY - pointerY;
+      const dx = event.clientX - pointerX;
+      const dy = event.clientY - pointerY;
       const dist = Math.hypot(dx, dy);
-      pointerX = localX;
-      pointerY = localY;
+      pointerX = event.clientX;
+      pointerY = event.clientY;
       hasPointer = true;
-      spawn(pointerX, pointerY, Math.min(2.1, 0.85 + dist * 0.05));
+      spawn(pointerX, pointerY, Math.min(2.8, 0.9 + dist * 0.06));
     };
 
     const render = () => {
-      if (!activeArea) updateArea();
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-      if (width <= 0 || height <= 0) {
-        rafId = window.requestAnimationFrame(render);
-        return;
-      }
-      ctx.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       for (let i = particles.length - 1; i >= 0; i -= 1) {
         const p = particles[i];
@@ -101,68 +104,83 @@ export default function SmokeTrailCanvas() {
           continue;
         }
 
-        const swirlForce = p.swirl * Math.sin(p.life * 0.08 + p.hueShift);
-        const jitterX = Math.sin((p.life + p.hueShift) * 0.22) * p.jitter;
-        const jitterY = Math.cos((p.life + p.hueShift) * 0.18) * p.jitter;
-        p.x += p.vx + jitterX * 0.08;
-        p.y += p.vy + jitterY * 0.08;
-        p.vx = (p.vx + swirlForce) * 0.992;
-        p.vy = (p.vy - 0.003) * 0.992;
-        p.radius *= 1.0035;
-        p.radiusX *= 1.004;
-        p.radiusY *= 1.003;
+        const swirl = Math.sin((p.life + p.noiseSeed) * 0.035) * p.spin;
+        const turbulenceX = Math.sin((p.life + p.noiseSeed) * 0.14) * 0.4;
+        const turbulenceY = Math.cos((p.life + p.noiseSeed) * 0.11) * 0.28;
+        p.x += p.vx + turbulenceX;
+        p.y += p.vy + turbulenceY;
+        p.vx = (p.vx + swirl) * 0.989;
+        p.vy = (p.vy - 0.0026) * 0.99;
+        p.radius *= p.growth;
         const t = p.life / p.maxLife;
-        const fade = Math.max(0, 1 - t);
-        const dense = Math.sin((1 - t) * Math.PI);
+        const fade = Math.max(0, 1 - t * 0.96);
+        const density = Math.sin((1 - t) * Math.PI);
+        const blurRadius = p.radius * (1.12 + density * 0.28);
 
-        const core = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-        core.addColorStop(0, `rgba(18, 18, 18, ${p.alpha * fade * 0.9})`);
-        core.addColorStop(0.4, `rgba(35, 35, 35, ${p.alpha * dense * 0.55})`);
-        core.addColorStop(1, 'rgba(70, 70, 70, 0)');
-        ctx.fillStyle = core;
+        const darkLayer = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, blurRadius);
+        darkLayer.addColorStop(0, `rgba(10, 10, 10, ${p.alpha * fade * 1.05})`);
+        darkLayer.addColorStop(0.42, `rgba(34, 34, 34, ${p.alpha * fade * 0.8})`);
+        darkLayer.addColorStop(1, 'rgba(70, 70, 70, 0)');
+        ctx.fillStyle = darkLayer;
         ctx.beginPath();
-        ctx.ellipse(p.x, p.y, p.radiusX, p.radiusY, p.swirl * 12, 0, Math.PI * 2);
+        ctx.ellipse(p.x, p.y, blurRadius * 1.08, blurRadius * 0.86, swirl * 10, 0, Math.PI * 2);
         ctx.fill();
 
-        const soft = ctx.createRadialGradient(
-          p.x + p.radius * 0.1,
-          p.y - p.radius * 0.05,
+        const grayLayer = ctx.createRadialGradient(
+          p.x + p.radius * 0.16,
+          p.y - p.radius * 0.1,
           0,
           p.x,
           p.y,
-          p.radius * 1.28,
+          blurRadius * 1.3,
         );
-        soft.addColorStop(0, `rgba(52, 52, 52, ${p.alpha * fade * 0.22})`);
-        soft.addColorStop(1, 'rgba(80, 80, 80, 0)');
-        ctx.fillStyle = soft;
+        grayLayer.addColorStop(0, `rgba(88, 88, 88, ${p.alpha * fade * 0.33})`);
+        grayLayer.addColorStop(0.7, `rgba(130, 130, 130, ${p.alpha * fade * 0.08})`);
+        grayLayer.addColorStop(1, 'rgba(160, 160, 160, 0)');
+        ctx.fillStyle = grayLayer;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius * 1.25, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, blurRadius * 1.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        const highlight = ctx.createRadialGradient(
+          p.x - p.radius * 0.22,
+          p.y - p.radius * 0.22,
+          0,
+          p.x,
+          p.y,
+          blurRadius * 0.88
+        );
+        highlight.addColorStop(0, `rgba(240, 240, 240, ${p.alpha * fade * 0.12})`);
+        highlight.addColorStop(1, 'rgba(230, 230, 230, 0)');
+        ctx.fillStyle = highlight;
+        ctx.beginPath();
+        ctx.arc(p.x - p.radius * 0.05, p.y - p.radius * 0.05, blurRadius * 0.84, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      if (hasPointer && particles.length < 34) {
-        spawn(pointerX, pointerY, 0.38);
+      if (hasPointer && particles.length < 68) {
+        spawn(pointerX, pointerY, 0.5);
       }
 
       rafId = window.requestAnimationFrame(render);
     };
 
     const onResize = () => {
-      updateArea();
+      updateZones();
       resize();
     };
 
-    updateArea();
+    updateZones();
     resize();
     window.addEventListener('resize', onResize);
-    window.addEventListener('scroll', updateArea, { passive: true });
+    window.addEventListener('scroll', updateZones, { passive: true });
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     rafId = window.requestAnimationFrame(render);
 
     return () => {
       window.cancelAnimationFrame(rafId);
       window.removeEventListener('resize', onResize);
-      window.removeEventListener('scroll', updateArea);
+      window.removeEventListener('scroll', updateZones);
       window.removeEventListener('pointermove', onPointerMove);
     };
   }, []);

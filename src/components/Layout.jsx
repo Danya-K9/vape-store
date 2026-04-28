@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from './Header';
@@ -12,22 +12,62 @@ const SIDE_TEXT = 'ОБЛАКО ПАРА ВЕЙП ШОП';
 export default function Layout() {
   const location = useLocation();
   const sideChars = SIDE_TEXT.split('');
+  const mainRef = useRef(null);
+  const [sideTop, setSideTop] = useState(24);
+  const isHome = location.pathname === '/';
+  const sideCharLoop = useMemo(
+    () => [...sideChars, ...sideChars, ...sideChars],
+    [sideChars]
+  );
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const updateSideTop = () => {
+      if (!isHome) {
+        setSideTop(24);
+        return;
+      }
+      const main = mainRef.current;
+      const hero = document.querySelector('.hero-carousel');
+      if (!main || !hero) {
+        setSideTop(24);
+        return;
+      }
+      const mainRect = main.getBoundingClientRect();
+      const heroRect = hero.getBoundingClientRect();
+      const start = Math.max(24, heroRect.bottom - mainRect.top + 10);
+      setSideTop(Math.round(start));
+    };
+
+    updateSideTop();
+    window.addEventListener('resize', updateSideTop);
+    window.addEventListener('scroll', updateSideTop, { passive: true });
+    return () => {
+      window.removeEventListener('resize', updateSideTop);
+      window.removeEventListener('scroll', updateSideTop);
+    };
+  }, [isHome, location.pathname]);
+
   return (
     <AgeGate>
       <div className="layout">
         <Header />
         <div className="layout-body">
-          <main className="main-content">
+          <main
+            className="main-content"
+            ref={mainRef}
+            style={{ '--side-strip-top': `${sideTop}px` }}
+          >
             <SmokeTrailCanvas />
             <aside className="side-marquee side-marquee-left" aria-hidden="true">
               <div className="side-marquee-track">
-                {[...sideChars, ...sideChars].map((char, idx) => (
+                {sideCharLoop.map((char, idx) => (
                   <span key={`left-${idx}`} className="side-marquee-char">
                     {char === ' ' ? '\u00A0' : char}
                   </span>
@@ -36,7 +76,7 @@ export default function Layout() {
             </aside>
             <aside className="side-marquee side-marquee-right" aria-hidden="true">
               <div className="side-marquee-track">
-                {[...sideChars, ...sideChars].map((char, idx) => (
+                {sideCharLoop.map((char, idx) => (
                   <span key={`right-${idx}`} className="side-marquee-char">
                     {char === ' ' ? '\u00A0' : char}
                   </span>
