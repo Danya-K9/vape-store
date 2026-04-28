@@ -11,6 +11,14 @@
   box-sizing: border-box;
 }
 
+.section.section-promo {
+  padding-bottom: 28px;
+}
+
+.section.section-bestsellers {
+  padding-top: 28px;
+}
+
 .section-title-viking {
   font-size: 26px;
   font-weight: 700;

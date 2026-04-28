@@ -30,6 +30,15 @@ const uploadProductFiles = multer({
   { name: 'images', maxCount: 50 },
 ]);
 
+const uploadPdfFile = multer({
+  dest: path.join(__dirname, '../uploads'),
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (_, file, cb) => {
+    if (file.mimetype === 'application/pdf' || file.originalname.toLowerCase().endsWith('.pdf')) cb(null, true);
+    else cb(new Error('Только PDF файлы'));
+  },
+}).single('file');
+
 router.use(authAdmin);
 
 const CATEGORY_FALLBACK = [
@@ -713,10 +722,16 @@ router.get('/license-docs', async (req, res) => {
   }
 });
 
-router.post('/license-docs', async (req, res) => {
+router.post('/license-docs', (req, res, next) => {
+  uploadPdfFile(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
   try {
     const title = String(req.body.title || '').trim();
-    const fileUrl = String(req.body.fileUrl || '').trim();
+    const uploadedFileUrl = req.file ? `/uploads/${req.file.filename}` : '';
+    const fileUrl = String(req.body.fileUrl || uploadedFileUrl).trim();
     if (!title || !fileUrl) return res.status(400).json({ error: 'Название и ссылка на PDF обязательны' });
     const doc = await prisma.licenseDocument.create({
       data: { title, fileUrl, sortOrder: parseSortOrder(req.body.sortOrder, 0) },
@@ -727,11 +742,17 @@ router.post('/license-docs', async (req, res) => {
   }
 });
 
-router.patch('/license-docs/:id', async (req, res) => {
+router.patch('/license-docs/:id', (req, res, next) => {
+  uploadPdfFile(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
   try {
     const data = {};
     if (req.body.title !== undefined) data.title = String(req.body.title).trim();
     if (req.body.fileUrl !== undefined) data.fileUrl = String(req.body.fileUrl).trim();
+    if (req.file) data.fileUrl = `/uploads/${req.file.filename}`;
     if (req.body.sortOrder !== undefined) data.sortOrder = parseSortOrder(req.body.sortOrder, 0);
     const doc = await prisma.licenseDocument.update({ where: { id: req.params.id }, data });
     res.json(doc);

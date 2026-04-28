@@ -55,6 +55,10 @@ export default function AdminPanel() {
   const [faqItems, setFaqItems] = useState([]);
   const [faqForm, setFaqForm] = useState({ question: '', answer: '', sortOrder: 0 });
   const [editingFaq, setEditingFaq] = useState(null);
+  const [licenseDocs, setLicenseDocs] = useState([]);
+  const [licenseForm, setLicenseForm] = useState({ title: '', fileUrl: '', sortOrder: 0 });
+  const [licensePdfFile, setLicensePdfFile] = useState(null);
+  const [editingLicenseDoc, setEditingLicenseDoc] = useState(null);
 
   const headers = () => ({ Authorization: `Bearer ${token}` });
 
@@ -74,6 +78,7 @@ export default function AdminPanel() {
     if (tab === 'hero') fetchHeroBanners();
     if (tab === 'partners') fetchPartners();
     if (tab === 'faq') fetchFaqItems();
+    if (tab === 'license-docs') fetchLicenseDocs();
   }, [token, tab]);
 
   async function fetchUsers() {
@@ -264,6 +269,38 @@ export default function AdminPanel() {
     fetchFaqItems();
   };
 
+  async function fetchLicenseDocs() {
+    const r = await fetch(`${API_BASE}/admin/license-docs`, { headers: headers() });
+    if (r.status === 401) { logout(); return; }
+    setLicenseDocs(await r.json());
+  }
+
+  const saveLicenseDoc = async () => {
+    const body = new FormData();
+    if (licenseForm.title) body.set('title', licenseForm.title);
+    if (licenseForm.fileUrl) body.set('fileUrl', licenseForm.fileUrl);
+    body.set('sortOrder', String(Number(licenseForm.sortOrder || 0)));
+    if (licensePdfFile) body.set('file', licensePdfFile);
+    const url = editingLicenseDoc ? `${API_BASE}/admin/license-docs/${editingLicenseDoc.id}` : `${API_BASE}/admin/license-docs`;
+    const resp = await fetch(url, { method: editingLicenseDoc ? 'PATCH' : 'POST', headers: headers(), body });
+    if (!resp.ok) {
+      const text = await resp.text();
+      const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
+      alert(data?.error || 'Не удалось сохранить PDF документ');
+      return;
+    }
+    setEditingLicenseDoc(null);
+    setLicensePdfFile(null);
+    setLicenseForm({ title: '', fileUrl: '', sortOrder: 0 });
+    fetchLicenseDocs();
+  };
+
+  const deleteLicenseDoc = async (id) => {
+    if (!confirm('Удалить PDF документ?')) return;
+    await fetch(`${API_BASE}/admin/license-docs/${id}`, { method: 'DELETE', headers: headers() });
+    fetchLicenseDocs();
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -438,6 +475,7 @@ export default function AdminPanel() {
         <button className={tab === 'hero' ? 'active' : ''} onClick={() => setTab('hero')}>Главный экран</button>
         <button className={tab === 'partners' ? 'active' : ''} onClick={() => setTab('partners')}>Партнеры</button>
         <button className={tab === 'faq' ? 'active' : ''} onClick={() => setTab('faq')}>FAQ</button>
+        <button className={tab === 'license-docs' ? 'active' : ''} onClick={() => setTab('license-docs')}>PDF лицензий</button>
       </nav>
 
       {tab === 'categories' && (
@@ -612,6 +650,41 @@ export default function AdminPanel() {
                   <td>
                     <button onClick={() => { setEditingFaq(f); setFaqForm({ question: f.question || '', answer: f.answer || '', sortOrder: f.sortOrder || 0 }); }}>Ред.</button>
                     <button onClick={() => deleteFaq(f.id)}>Удалить</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {tab === 'license-docs' && (
+        <section className="admin-section">
+          <h2>Лицензии и сертификаты (PDF)</h2>
+          <p style={{ margin: '0 0 8px', color: '#666' }}>
+            Постоянный документ «Реквизиты» отображается на странице автоматически и не редактируется здесь.
+          </p>
+          <div className="admin-form-row" style={{ marginBottom: 10 }}>
+            <input placeholder="Название PDF" value={licenseForm.title} onChange={(e) => setLicenseForm({ ...licenseForm, title: e.target.value })} />
+            <input type="number" placeholder="Порядок" value={licenseForm.sortOrder} onChange={(e) => setLicenseForm({ ...licenseForm, sortOrder: e.target.value })} />
+          </div>
+          <div className="admin-form-row" style={{ marginBottom: 10 }}>
+            <input type="file" accept="application/pdf,.pdf" onChange={(e) => { setLicensePdfFile(e.target.files?.[0] || null); if (e.target.files?.[0]) setLicenseForm({ ...licenseForm, fileUrl: '' }); }} />
+            <input placeholder="URL PDF (если без загрузки)" value={licenseForm.fileUrl} onChange={(e) => { setLicenseForm({ ...licenseForm, fileUrl: e.target.value }); if (e.target.value) setLicensePdfFile(null); }} disabled={!!licensePdfFile} style={{ width: 320 }} />
+            <button onClick={saveLicenseDoc}>{editingLicenseDoc ? 'Сохранить' : 'Добавить PDF'}</button>
+            {editingLicenseDoc && <button onClick={() => { setEditingLicenseDoc(null); setLicensePdfFile(null); setLicenseForm({ title: '', fileUrl: '', sortOrder: 0 }); }}>Отмена</button>}
+          </div>
+          <table>
+            <thead><tr><th>Название</th><th>PDF</th><th>Порядок</th><th></th></tr></thead>
+            <tbody>
+              {licenseDocs.map((doc) => (
+                <tr key={doc.id}>
+                  <td>{doc.title}</td>
+                  <td><a href={doc.fileUrl} target="_blank" rel="noreferrer">Открыть</a></td>
+                  <td>{doc.sortOrder}</td>
+                  <td>
+                    <button onClick={() => { setEditingLicenseDoc(doc); setLicensePdfFile(null); setLicenseForm({ title: doc.title || '', fileUrl: doc.fileUrl || '', sortOrder: doc.sortOrder || 0 }); }}>Ред.</button>
+                    <button onClick={() => deleteLicenseDoc(doc.id)}>Удалить</button>
                   </td>
                 </tr>
               ))}

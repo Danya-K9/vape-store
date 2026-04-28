@@ -4,6 +4,12 @@ import { motion } from 'framer-motion';
 import { contentApi } from '../lib/api';
 import './License.css';
 
+const REQUISITES_DOC = {
+  id: 'static-requisites',
+  title: 'Реквизиты',
+  fileUrl: '/docs/requisites.pdf',
+};
+
 export default function License() {
   const [docs, setDocs] = useState([]);
 
@@ -31,7 +37,7 @@ export default function License() {
       <h1>Лицензия и сертификаты</h1>
 
       <div className="license-docs-grid">
-        {docs.map((doc) => (
+        {[...docs, REQUISITES_DOC].map((doc) => (
           <a key={doc.id} href={doc.fileUrl} target="_blank" rel="noreferrer" className="license-doc-card">
             <span className="license-doc-icon">PDF</span>
             <div>
