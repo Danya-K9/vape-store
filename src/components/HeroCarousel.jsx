@@ -3,14 +3,19 @@ import { Link } from 'react-router-dom';
 import './HeroCarousel.css';
 
 const CONSTELLATION_POINTS = [
-  [0.16, 0.55], [0.24, 0.42], [0.34, 0.37], [0.48, 0.33], [0.62, 0.36], [0.74, 0.45], [0.8, 0.56],
-  [0.7, 0.64], [0.56, 0.69], [0.42, 0.71], [0.28, 0.67], [0.18, 0.61], [0.29, 0.51], [0.42, 0.47],
-  [0.56, 0.49], [0.68, 0.55], [0.56, 0.58], [0.44, 0.59], [0.34, 0.57],
+  // Cloud-like loop with inner “steam” strand.
+  [0.14, 0.56], [0.20, 0.44], [0.30, 0.36], [0.42, 0.32], [0.56, 0.34], [0.70, 0.42], [0.80, 0.55],
+  [0.76, 0.66], [0.64, 0.72], [0.50, 0.74], [0.36, 0.71], [0.24, 0.64], [0.18, 0.60],
+  [0.28, 0.52], [0.40, 0.48], [0.52, 0.50], [0.64, 0.56], [0.54, 0.60], [0.42, 0.61], [0.32, 0.58],
 ];
 
 const EDGES = [
-  [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [11, 0],
-  [1, 12], [12, 13], [13, 14], [14, 15], [15, 7], [12, 18], [18, 17], [17, 16], [16, 15], [13, 17],
+  // Outer loop.
+  [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [11, 12], [12, 0],
+  // Inner strand.
+  [1, 13], [13, 14], [14, 15], [15, 16], [16, 17], [17, 18], [18, 19], [19, 13],
+  // A few cross-links to read as “constellation”.
+  [2, 14], [4, 15], [6, 16], [8, 17], [10, 18],
 ];
 
 const hash = (x, y) => {
@@ -65,6 +70,7 @@ export default function HeroCarousel() {
     let stars = [];
     let vapor = [];
     let edgesPx = [];
+    let bgStars = [];
     const MAX_VAPOR = window.innerWidth < 900 ? 90 : 160;
 
     const resize = () => {
@@ -87,6 +93,15 @@ export default function HeroCarousel() {
         ...point,
         r: 1.2 + ((idx * 7) % 10) * 0.12,
         twinkleSeed: idx * 0.8 + 0.5,
+      }));
+
+      // Background stars (subtle, randomized).
+      bgStars = Array.from({ length: window.innerWidth < 900 ? 70 : 120 }).map((_, i) => ({
+        x: Math.random() * rect.width,
+        y: Math.random() * rect.height,
+        r: 0.6 + Math.random() * 1.2,
+        a: 0.08 + Math.random() * 0.22,
+        twinkleSeed: i * 0.31 + Math.random() * 2,
       }));
       vapor = [];
     };
@@ -140,10 +155,10 @@ export default function HeroCarousel() {
       const tangentY = nearest.ty / tLen;
       const towardX = nearest.dx / (nearest.dist + 1);
       const towardY = nearest.dy / (nearest.dist + 1);
-      const snap = Math.max(0, 1 - nearest.dist / 120);
+      const snap = Math.max(0, 1 - nearest.dist / 140);
       return {
-        ax: tangentX * 0.014 + towardX * 0.03 * snap,
-        ay: tangentY * 0.014 + towardY * 0.03 * snap,
+        ax: tangentX * 0.018 + towardX * 0.04 * snap,
+        ay: tangentY * 0.018 + towardY * 0.04 * snap,
       };
     };
 
@@ -161,6 +176,15 @@ export default function HeroCarousel() {
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, w, h);
 
+      // Background stars.
+      bgStars.forEach((s, i) => {
+        const tw = 0.5 + 0.5 * Math.sin(time * 0.0012 + s.twinkleSeed + i * 0.07);
+        ctx.fillStyle = `rgba(210, 230, 255, ${s.a + tw * 0.12})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r + tw * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
       if (vapor.length < MAX_VAPOR * 0.75) spawnVapor(2);
 
       for (let i = vapor.length - 1; i >= 0; i -= 1) {
@@ -173,8 +197,8 @@ export default function HeroCarousel() {
 
         const n = fractalNoise(p.x, p.y, time + p.seed);
         const angle = n * Math.PI * 2;
-        const flowX = Math.cos(angle) * 0.02;
-        const flowY = Math.sin(angle) * 0.02;
+        const flowX = Math.cos(angle) * 0.022;
+        const flowY = Math.sin(angle) * 0.022;
         const edge = nearestEdgeInfluence(p.x, p.y);
 
         p.vx = (p.vx + flowX + edge.ax) * 0.985;
@@ -184,9 +208,10 @@ export default function HeroCarousel() {
         p.size *= 1.0018;
 
         const fade = Math.max(0, 1 - p.life / p.ttl);
+        // Soft “vapor” look: slightly bluish-white core -> gray edge.
         const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-        g.addColorStop(0, `rgba(215, 225, 235, ${p.alpha * fade * 1.2})`);
-        g.addColorStop(0.35, `rgba(170, 185, 205, ${p.alpha * fade * 0.82})`);
+        g.addColorStop(0, `rgba(232, 242, 255, ${p.alpha * fade * 1.35})`);
+        g.addColorStop(0.35, `rgba(185, 205, 232, ${p.alpha * fade * 0.9})`);
         g.addColorStop(1, 'rgba(120, 135, 155, 0)');
         ctx.fillStyle = g;
         ctx.beginPath();
@@ -194,10 +219,11 @@ export default function HeroCarousel() {
         ctx.fill();
       }
 
-      ctx.strokeStyle = 'rgba(120, 180, 255, 0.25)';
+      // Constellation lines (thin + soft glow).
+      ctx.strokeStyle = 'rgba(130, 190, 255, 0.22)';
       ctx.lineWidth = 1;
-      ctx.shadowColor = 'rgba(120, 180, 255, 0.32)';
-      ctx.shadowBlur = 7;
+      ctx.shadowColor = 'rgba(130, 190, 255, 0.38)';
+      ctx.shadowBlur = 9;
       edgesPx.forEach(({ a, b }) => {
         ctx.beginPath();
         ctx.moveTo(a.x, a.y);
@@ -229,17 +255,23 @@ export default function HeroCarousel() {
 
   return (
     <section className="hero-vape">
-      <canvas ref={canvasRef} className="hero-vape-canvas" aria-hidden="true" />
-      <div className="hero-vape-overlay">
-        <p className="hero-vape-kicker">Облако пара</p>
-        <h1>Космический вейп-шоп с живым паром</h1>
-        <p>
-          Созвездие в форме облака и реалистичный поток пара с мягкой турбулентностью.
-          Выбирайте устройства, жидкости и комплектующие в нашем каталоге.
-        </p>
-        <div className="hero-vape-actions">
-          <Link to="/catalog" className="hero-vape-btn hero-vape-btn-primary">Перейти в каталог</Link>
-          <Link to="/contacts" className="hero-vape-btn hero-vape-btn-secondary">Контакты и магазины</Link>
+      <div className="hero-vape-grid">
+        <Link to="/catalog" className="hero-vape-main" aria-label="Перейти в каталог">
+          <canvas ref={canvasRef} className="hero-vape-canvas" aria-hidden="true" />
+        </Link>
+        <div className="hero-vape-side">
+          <Link
+            to="/catalog"
+            className="hero-vape-side-card"
+            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1609006152682-39654313bf1b?w=900')" }}
+            aria-label="Каталог — подборка 1"
+          />
+          <Link
+            to="/catalog"
+            className="hero-vape-side-card"
+            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=900')" }}
+            aria-label="Каталог — подборка 2"
+          />
         </div>
       </div>
     </section>

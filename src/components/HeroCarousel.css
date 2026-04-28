@@ -9,6 +9,24 @@
   box-shadow: 0 20px 60px rgba(1, 6, 17, 0.45);
 }
 
+.hero-vape-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 16px;
+  padding: 16px;
+  min-height: 360px;
+}
+
+.hero-vape-main {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+  min-height: 328px;
+  border: 1px solid rgba(120, 150, 210, 0.18);
+}
+
 .hero-vape-canvas {
   position: absolute;
   inset: 0;
@@ -17,71 +35,37 @@
   display: block;
 }
 
-.hero-vape-overlay {
-  position: relative;
-  z-index: 1;
-  max-width: 640px;
-  padding: 38px 34px;
-  background: linear-gradient(120deg, rgba(4, 9, 20, 0.76), rgba(4, 9, 20, 0.18));
-  height: 100%;
-}
-
-.hero-vape-kicker {
-  margin: 0 0 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 12px;
-  color: rgba(190, 220, 255, 0.92);
-}
-
-.hero-vape-overlay h1 {
-  margin: 0;
-  font-size: clamp(26px, 4.2vw, 44px);
-  line-height: 1.1;
-  color: #eef6ff;
-  text-shadow: 0 8px 30px rgba(15, 30, 56, 0.45);
-}
-
-.hero-vape-overlay p {
-  margin: 16px 0 0;
-  font-size: clamp(14px, 2.1vw, 17px);
-  line-height: 1.5;
-  color: rgba(224, 234, 250, 0.94);
-}
-
-.hero-vape-actions {
-  margin-top: 24px;
+.hero-vape-side {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.hero-vape-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 11px 18px;
-  border-radius: 999px;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 14px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+.hero-vape-side-card {
+  flex: 1;
+  min-height: 150px;
+  border-radius: 16px;
+  overflow: hidden;
+  display: block;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(120, 150, 210, 0.18);
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
-.hero-vape-btn:hover {
-  transform: translateY(-1px);
+.hero-vape-side-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(150, 200, 255, 0.16), transparent 55%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.45));
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
 }
 
-.hero-vape-btn-primary {
-  color: #03101f;
-  background: linear-gradient(135deg, #a4cbff, #8fe2ff);
-  box-shadow: 0 8px 20px rgba(125, 197, 255, 0.36);
-}
-
-.hero-vape-btn-secondary {
-  color: #e6f0ff;
-  background: rgba(10, 20, 36, 0.6);
-  border: 1px solid rgba(145, 178, 229, 0.5);
+.hero-vape-side-card:hover::after {
+  opacity: 0.7;
 }
 
 @media (max-width: 900px) {
@@ -91,8 +75,17 @@
     border-radius: 16px;
   }
 
-  .hero-vape-overlay {
-    padding: 26px 18px 22px;
-    background: linear-gradient(180deg, rgba(4, 9, 20, 0.82), rgba(4, 9, 20, 0.3));
+  .hero-vape-grid {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .hero-vape-side {
+    flex-direction: row;
+  }
+
+  .hero-vape-side-card {
+    min-height: 120px;
   }
 }
