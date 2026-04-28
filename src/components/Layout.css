@@ -25,4 +25,8 @@
 .main-content {
   flex: 1;
   width: 100%;
+  position: relative;
+  background: url('/bg-pattern.png') repeat;
+  background-size: 520px auto;
+  background-attachment: fixed;
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import './ProductCarousel.css';
 
@@ -16,12 +16,17 @@ function getVisibleCount() {
 
 export default function ProductCarousel({ products = [] }) {
   const safeProducts = Array.isArray(products) ? products : [];
-  const items = safeProducts.slice(0, 10);
-  const totalPages = items.length;
-  const extendedItems = [...items, ...items, ...items];
-  const [currentIndex, setCurrentIndex] = useState(totalPages);
   const [visibleCount, setVisibleCount] = useState(VISIBLE_DESKTOP);
-  const [isTransitioning, setIsTransitioning] = useState(true);
+  const items = useMemo(() => safeProducts.slice(0, 10), [safeProducts]);
+  const pageCount = Math.max(1, Math.ceil(items.length / Math.max(1, visibleCount)));
+  const pages = useMemo(() => {
+    const result = [];
+    for (let i = 0; i < pageCount; i += 1) {
+      result.push(items.slice(i * visibleCount, (i + 1) * visibleCount));
+    }
+    return result;
+  }, [items, pageCount, visibleCount]);
+  const [pageIndex, setPageIndex] = useState(0);
 
   useEffect(() => {
     const update = () => setVisibleCount(getVisibleCount());
@@ -30,72 +35,50 @@ export default function ProductCarousel({ products = [] }) {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  const offsetPercent = (currentIndex / extendedItems.length) * 100;
+  useEffect(() => {
+    setPageIndex(0);
+  }, [visibleCount, items.length]);
 
   const goToPage = useCallback(
     (page) => {
-      const safePage = ((page % totalPages) + totalPages) % totalPages;
-      setCurrentIndex(totalPages + safePage);
+      const safePage = ((page % pageCount) + pageCount) % pageCount;
+      setPageIndex(safePage);
     },
-    [totalPages]
+    [pageCount]
   );
 
   const next = useCallback(() => {
-    setIsTransitioning(true);
-    setCurrentIndex((i) => i + 1);
-  }, []);
+    setPageIndex((i) => (i + 1) % pageCount);
+  }, [pageCount]);
 
   const prev = useCallback(() => {
-    setIsTransitioning(true);
-    setCurrentIndex((i) => i - 1);
-  }, []);
+    setPageIndex((i) => (i - 1 + pageCount) % pageCount);
+  }, [pageCount]);
 
   useEffect(() => {
-    if (!isTransitioning) return;
-    const idx = currentIndex;
-    if (idx >= totalPages * 2) {
-      const timer = setTimeout(() => {
-        setIsTransitioning(false);
-        setCurrentIndex(totalPages + (idx % totalPages));
-      }, 600);
-      return () => clearTimeout(timer);
-    }
-    if (idx < totalPages) {
-      const timer = setTimeout(() => {
-        setIsTransitioning(false);
-        setCurrentIndex(totalPages + idx);
-      }, 600);
-      return () => clearTimeout(timer);
-    }
-  }, [currentIndex, isTransitioning, totalPages]);
-
-  useEffect(() => {
+    if (pageCount <= 1) return undefined;
     const timer = setInterval(next, AUTO_SLIDE_INTERVAL);
     return () => clearInterval(timer);
-  }, [next]);
-
-  const currentPage = ((currentIndex - totalPages) % totalPages + totalPages) % totalPages;
+  }, [next, pageCount]);
 
   return (
     <div className="product-carousel">
       <div className="product-carousel-viewport">
         <div
           className="product-carousel-track"
-          style={{
-            width: `${(extendedItems.length / visibleCount) * 100}%`,
-            transform: `translateX(-${offsetPercent}%)`,
-            transition: isTransitioning
-              ? 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-              : 'none',
-          }}
+          style={{ transform: `translateX(-${pageIndex * 100}%)` }}
         >
-          {extendedItems.map((product, i) => (
-            <div
-              key={`${product.id}-${i}`}
-              className="product-carousel-item"
-              style={{ flex: `0 0 ${100 / extendedItems.length}%` }}
-            >
-              <ProductCard product={product} index={i} />
+          {pages.map((page, pIdx) => (
+            <div key={pIdx} className="product-carousel-page">
+              {page.map((product, i) => (
+                <div
+                  key={`${product.id}-${pIdx}-${i}`}
+                  className="product-carousel-item"
+                  style={{ flex: `0 0 ${100 / Math.max(1, visibleCount)}%` }}
+                >
+                  <ProductCard product={product} index={i} />
+                </div>
+              ))}
             </div>
           ))}
         </div>
@@ -120,11 +103,11 @@ export default function ProductCarousel({ products = [] }) {
           </button>
         </div>
         <div className="product-carousel-dots">
-          {Array.from({ length: totalPages }).map((_, i) => (
+          {Array.from({ length: pageCount }).map((_, i) => (
             <button
               key={i}
               type="button"
-              className={`product-carousel-dot ${i === currentPage ? 'active' : ''}`}
+              className={`product-carousel-dot ${i === pageIndex ? 'active' : ''}`}
               onClick={() => goToPage(i)}
               aria-label={`Страница ${i + 1}`}
             />

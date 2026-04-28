@@ -9,6 +9,22 @@
   padding: 60px 20px;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+}
+
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/bg-pattern.png') repeat;
+  background-size: 520px auto;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.section > * {
+  position: relative;
+  z-index: 1;
 }
 
 .section.section-promo {
