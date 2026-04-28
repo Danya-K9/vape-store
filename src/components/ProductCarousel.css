@@ -11,13 +11,6 @@
   display: flex;
   flex-wrap: nowrap;
   will-change: transform;
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.product-carousel-page {
-  flex: 0 0 100%;
-  display: flex;
-  flex-wrap: nowrap;
 }
 
 .product-carousel-item {

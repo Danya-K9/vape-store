@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import ProductCard from './ProductCard';
 import './ProductCarousel.css';
 
@@ -16,17 +16,12 @@ function getVisibleCount() {
 
 export default function ProductCarousel({ products = [] }) {
   const safeProducts = Array.isArray(products) ? products : [];
-  const [visibleCount, setVisibleCount] = useState(VISIBLE_DESKTOP);
   const items = useMemo(() => safeProducts.slice(0, 10), [safeProducts]);
-  const pageCount = Math.max(1, Math.ceil(items.length / Math.max(1, visibleCount)));
-  const pages = useMemo(() => {
-    const result = [];
-    for (let i = 0; i < pageCount; i += 1) {
-      result.push(items.slice(i * visibleCount, (i + 1) * visibleCount));
-    }
-    return result;
-  }, [items, pageCount, visibleCount]);
-  const [pageIndex, setPageIndex] = useState(0);
+  const totalItems = items.length;
+  const extendedItems = useMemo(() => [...items, ...items, ...items], [items]);
+  const [visibleCount, setVisibleCount] = useState(VISIBLE_DESKTOP);
+  const [currentIndex, setCurrentIndex] = useState(totalItems);
+  const [isTransitioning, setIsTransitioning] = useState(true);
 
   useEffect(() => {
     const update = () => setVisibleCount(getVisibleCount());
@@ -36,49 +31,88 @@ export default function ProductCarousel({ products = [] }) {
   }, []);
 
   useEffect(() => {
-    setPageIndex(0);
-  }, [visibleCount, items.length]);
+    setIsTransitioning(false);
+    setCurrentIndex(totalItems);
+    const t = setTimeout(() => setIsTransitioning(true), 0);
+    return () => clearTimeout(t);
+  }, [visibleCount, totalItems]);
+
+  const stepPercent = extendedItems.length > 0 ? (100 / extendedItems.length) : 0;
+  const offsetPercent = currentIndex * stepPercent;
 
   const goToPage = useCallback(
-    (page) => {
-      const safePage = ((page % pageCount) + pageCount) % pageCount;
-      setPageIndex(safePage);
+    (index) => {
+      if (totalItems <= 0) return;
+      const safe = ((index % totalItems) + totalItems) % totalItems;
+      setIsTransitioning(true);
+      setCurrentIndex(totalItems + safe);
     },
-    [pageCount]
+    [totalItems]
   );
 
   const next = useCallback(() => {
-    setPageIndex((i) => (i + 1) % pageCount);
-  }, [pageCount]);
+    if (totalItems <= 1) return;
+    setIsTransitioning(true);
+    setCurrentIndex((i) => i + 1);
+  }, [totalItems]);
 
   const prev = useCallback(() => {
-    setPageIndex((i) => (i - 1 + pageCount) % pageCount);
-  }, [pageCount]);
+    if (totalItems <= 1) return;
+    setIsTransitioning(true);
+    setCurrentIndex((i) => i - 1);
+  }, [totalItems]);
 
   useEffect(() => {
-    if (pageCount <= 1) return undefined;
+    if (!isTransitioning) return;
+    if (totalItems <= 1) return;
+    const idx = currentIndex;
+    if (idx >= totalItems * 2) {
+      const timer = setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentIndex(totalItems + (idx % totalItems));
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+    if (idx < totalItems) {
+      const timer = setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentIndex(totalItems + idx);
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [currentIndex, isTransitioning, totalItems]);
+
+  useEffect(() => {
+    if (totalItems <= 1) return undefined;
     const timer = setInterval(next, AUTO_SLIDE_INTERVAL);
     return () => clearInterval(timer);
-  }, [next, pageCount]);
+  }, [next, totalItems]);
+
+  const activeDot = totalItems > 0
+    ? ((currentIndex - totalItems) % totalItems + totalItems) % totalItems
+    : 0;
 
   return (
     <div className="product-carousel">
       <div className="product-carousel-viewport">
         <div
           className="product-carousel-track"
-          style={{ transform: `translateX(-${pageIndex * 100}%)` }}
+          style={{
+            width: visibleCount > 0 ? `${(extendedItems.length / visibleCount) * 100}%` : '100%',
+            transform: `translateX(-${offsetPercent}%)`,
+            transition: isTransitioning
+              ? 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)'
+              : 'none',
+          }}
         >
-          {pages.map((page, pIdx) => (
-            <div key={pIdx} className="product-carousel-page">
-              {page.map((product, i) => (
-                <div
-                  key={`${product.id}-${pIdx}-${i}`}
-                  className="product-carousel-item"
-                  style={{ flex: `0 0 ${100 / Math.max(1, visibleCount)}%` }}
-                >
-                  <ProductCard product={product} index={i} />
-                </div>
-              ))}
+          {extendedItems.map((product, i) => (
+            <div
+              key={`${product.id}-${i}`}
+              className="product-carousel-item"
+              style={{ flex: `0 0 ${100 / Math.max(1, extendedItems.length)}%` }}
+            >
+              <ProductCard product={product} index={i} />
             </div>
           ))}
         </div>
@@ -89,7 +123,7 @@ export default function ProductCarousel({ products = [] }) {
             type="button"
             className="product-carousel-arrow"
             onClick={prev}
-            aria-label="Предыдущая страница"
+            aria-label="Предыдущий товар"
           >
             ‹
           </button>
@@ -97,19 +131,19 @@ export default function ProductCarousel({ products = [] }) {
             type="button"
             className="product-carousel-arrow"
             onClick={next}
-            aria-label="Следующая страница"
+            aria-label="Следующий товар"
           >
             ›
           </button>
         </div>
         <div className="product-carousel-dots">
-          {Array.from({ length: pageCount }).map((_, i) => (
+          {Array.from({ length: totalItems }).map((_, i) => (
             <button
               key={i}
               type="button"
-              className={`product-carousel-dot ${i === pageIndex ? 'active' : ''}`}
+              className={`product-carousel-dot ${i === activeDot ? 'active' : ''}`}
               onClick={() => goToPage(i)}
-              aria-label={`Страница ${i + 1}`}
+              aria-label={`Товар ${i + 1}`}
             />
           ))}
         </div>
