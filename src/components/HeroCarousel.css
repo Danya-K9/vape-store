@@ -42,6 +42,7 @@
   align-items: center;
   justify-content: center;
   transition: background 0.2s, color 0.2s;
+  border-radius: 999px;
 }
 
 .hero-arrow:hover {

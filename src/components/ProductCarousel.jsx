@@ -101,6 +101,24 @@ export default function ProductCarousel({ products = [] }) {
         </div>
       </div>
       <div className="product-carousel-nav">
+        <div className="product-carousel-arrows">
+          <button
+            type="button"
+            className="product-carousel-arrow"
+            onClick={prev}
+            aria-label="Предыдущая страница"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            className="product-carousel-arrow"
+            onClick={next}
+            aria-label="Следующая страница"
+          >
+            ›
+          </button>
+        </div>
         <div className="product-carousel-dots">
           {Array.from({ length: totalPages }).map((_, i) => (
             <button

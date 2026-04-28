@@ -94,6 +94,9 @@ export default function Header() {
     const amount = Math.max(220, Math.floor(el.clientWidth * 0.6));
     el.scrollBy({ left: direction * amount, behavior: 'smooth' });
   };
+  const activeCatalogSlug = location.pathname.startsWith('/catalog/')
+    ? decodeURIComponent(location.pathname.split('/')[2] || '')
+    : '';
 
   return (
     <header className={`header header-light ${scrolled ? 'header-scrolled' : ''} ${catalogOpen ? 'catalog-open' : ''}`}>
@@ -246,7 +249,7 @@ export default function Header() {
           </button>
           <nav className="nav-categories" ref={navCategoriesRef}>
             {categories.map((c) => (
-              <Link key={c.slug} to={`/catalog/${c.slug}`} className={location.pathname.includes(`/${c.slug}`) ? 'active' : ''}>{c.name}</Link>
+              <Link key={c.slug} to={`/catalog/${c.slug}`} className={activeCatalogSlug === c.slug ? 'active' : ''}>{c.name}</Link>
             ))}
           </nav>
           <button

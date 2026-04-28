@@ -179,14 +179,14 @@ export default function ProductDetail() {
           <div className="product-actions">
             <button className="btn-primary" onClick={handleAddToCart}>Добавить в корзину</button>
           </div>
-          {(product.fullDescription || product.description) && (
-            <div className="product-full-desc">
-              <h3>Описание</h3>
-              <p>{product.fullDescription || product.description}</p>
-            </div>
-          )}
         </motion.div>
       </div>
+      {(product.fullDescription || product.description) && (
+        <section className="product-full-desc product-full-desc-wide">
+          <h3>Описание</h3>
+          <p>{product.fullDescription || product.description}</p>
+        </section>
+      )}
       {recentProducts.length > 0 && (
         <section className="recently-viewed">
           <h2>Так же вы смотрели</h2>

@@ -6,7 +6,7 @@
 
 .about-content h1 {
   font-size: 32px;
-  color: #fff;
+  color: #111827;
   margin: 0 0 24px;
 }
 
@@ -19,20 +19,21 @@
 
 .about-content h3 {
   font-size: 18px;
-  color: #fff;
+  color: #111827;
   margin: 32px 0 12px;
 }
 
 .about-content p {
-  color: #aaa;
+  color: #1f2937;
   line-height: 1.8;
   margin: 0 0 20px;
+  font-weight: 500;
 }
 
 .about-closing {
   margin-top: 24px;
-  font-weight: 500;
-  color: #ddd !important;
+  font-weight: 600;
+  color: #111827 !important;
 }
 
 .about-actions {
