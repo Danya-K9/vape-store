@@ -27,10 +27,11 @@
   width: 100%;
   position: relative;
   isolation: isolate;
+  overflow: hidden;
 }
 
 .smoke-trail-canvas {
-  position: fixed;
+  position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
