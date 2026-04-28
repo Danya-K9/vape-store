@@ -26,6 +26,19 @@
   flex: 1;
   width: 100%;
   position: relative;
+  isolation: isolate;
+}
+
+.smoke-trail-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.layout-page-content {
+  position: relative;
+  z-index: 1;
 }
 
 .side-marquee {

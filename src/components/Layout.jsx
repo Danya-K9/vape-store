@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Header from './Header';
 import Footer from './Footer';
 import AgeGate from './AgeGate';
+import SmokeTrailCanvas from './SmokeTrailCanvas';
 import './Layout.css';
 
 const SIDE_TEXT = 'ОБЛАКО ПАРА ВЕЙП ШОП';
@@ -23,6 +24,7 @@ export default function Layout() {
         <Header />
         <div className="layout-body">
           <main className="main-content">
+            <SmokeTrailCanvas />
             <aside className="side-marquee side-marquee-left" aria-hidden="true">
               <div className="side-marquee-track">
                 {[...sideChars, ...sideChars].map((char, idx) => (
@@ -42,6 +44,7 @@ export default function Layout() {
               </div>
             </aside>
             <motion.div
+              className="layout-page-content"
               key={location.pathname}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
