@@ -7,9 +7,9 @@ const router = Router();
 router.get('/', async (req, res) => {
   try {
     const { category } = req.query;
-    if (!category) return res.status(400).json({ error: 'category required' });
+    const where = category ? { category } : undefined;
     const options = await prisma.filterOption.findMany({
-      where: { category },
+      where,
       orderBy: [{ filterKey: 'asc' }, { sortOrder: 'asc' }, { value: 'asc' }],
     });
     const grouped = {};
@@ -17,6 +17,9 @@ router.get('/', async (req, res) => {
       if (!grouped[o.filterKey]) grouped[o.filterKey] = [];
       grouped[o.filterKey].push(o.value);
     }
+    Object.keys(grouped).forEach((key) => {
+      grouped[key] = [...new Set(grouped[key])];
+    });
     res.json(grouped);
   } catch (e) {
     res.status(500).json({ error: e.message });

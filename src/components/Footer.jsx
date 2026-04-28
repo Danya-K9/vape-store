@@ -1,11 +1,29 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PHONE, SOCIAL_ICONS_FOOTER } from '../constants/socialIcons';
+import { contentApi } from '../lib/api';
 import './Footer.css';
 
 const PHONE_DISPLAY = '+375 (29) 539-75-10';
 const VIBER_LINK = `https://viber.click/${PHONE.replace(/\D/g, '')}`;
 
 export default function Footer() {
+  const [categories, setCategories] = useState([
+    { slug: 'liquids', name: 'Жидкости для электронных парогенераторов' },
+    { slug: 'disposables', name: 'Одноразовые/многоразовые парогенераторы' },
+    { slug: 'pod-systems', name: 'Электронные парогенераторы' },
+    { slug: 'pouches', name: 'Никотиновые паучи' },
+    { slug: 'hookah-mix', name: 'Смесь для кальянов' },
+    { slug: 'hookah-coals', name: 'Угли для кальянов' },
+    { slug: 'accessories', name: 'Комплектующие' },
+  ]);
+
+  useEffect(() => {
+    contentApi.categories().then((data) => {
+      if (Array.isArray(data) && data.length > 0) setCategories(data);
+    }).catch(() => {});
+  }, []);
+
   return (
     <footer className="footer footer-dark">
       <div className="footer-main">
@@ -35,13 +53,9 @@ export default function Footer() {
           </div>
           <div className="footer-column">
             <h4>Каталог</h4>
-            <Link to="/catalog/liquids">Жидкости для электронных парогенераторов</Link>
-            <Link to="/catalog/disposables">Одноразовые/многоразовые парогенераторы</Link>
-            <Link to="/catalog/pod-systems">Электронные парогенераторы</Link>
-            <Link to="/catalog/pouches">Никотиновые паучи</Link>
-            <Link to="/catalog/hookah-mix">Смесь для кальянов</Link>
-            <Link to="/catalog/hookah-coals">Угли для кальянов</Link>
-            <Link to="/catalog/accessories">Комплектующие</Link>
+            {categories.map((category) => (
+              <Link key={category.slug} to={`/catalog/${category.slug}`}>{category.name}</Link>
+            ))}
           </div>
           <div className="footer-column">
             <h4>О нас</h4>

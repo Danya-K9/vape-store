@@ -177,12 +177,23 @@ router.post('/products', (req, res, next) => {
         if (Array.isArray(parsed)) imagesArr = [...extraUrls, ...parsed.filter(Boolean)];
       } catch (_) {}
     }
+    const name = String(req.body.name || '').trim();
+    const parsedPrice = Number.parseFloat(req.body.price);
+    const shortDescription = req.body.shortDescription ? String(req.body.shortDescription).trim() : null;
+    const fullDescriptionRaw = req.body.fullDescription ?? req.body.description;
+    const fullDescription = fullDescriptionRaw ? String(fullDescriptionRaw).trim() : null;
+    if (!name) return res.status(400).json({ error: 'Название товара обязательно' });
+    if (!Number.isFinite(parsedPrice) || parsedPrice < 0) return res.status(400).json({ error: 'Укажите корректную цену' });
+    if (shortDescription && shortDescription.length > 1000) return res.status(400).json({ error: 'Краткое описание не должно быть длиннее 1000 символов' });
+    if (fullDescription && fullDescription.length > 2500) return res.status(400).json({ error: 'Полное описание не должно быть длиннее 2500 символов' });
     const data = {
-      name: req.body.name,
-      description: req.body.description || null,
+      name,
+      shortDescription,
+      fullDescription,
+      description: fullDescription,
       image: imageUrl,
       images: imagesArr,
-      price: parseFloat(req.body.price),
+      price: parsedPrice,
       category: req.body.category || 'disposables',
       badge: req.body.badge || null,
       blurImage: req.body.blurImage === 'true' || req.body.blurImage === true,
@@ -227,6 +238,28 @@ router.patch('/products/:id', (req, res, next) => {
     const extraFiles = req.files?.images || [];
     const body = { ...req.body };
     if (imgFiles) body.image = `/uploads/${imgFiles.filename}`;
+    if (body.name !== undefined && !String(body.name).trim()) {
+      return res.status(400).json({ error: 'Название товара обязательно' });
+    }
+    if (body.price !== undefined) {
+      const parsedPrice = Number.parseFloat(body.price);
+      if (!Number.isFinite(parsedPrice) || parsedPrice < 0) return res.status(400).json({ error: 'Укажите корректную цену' });
+      body.price = parsedPrice;
+    }
+    if (body.shortDescription !== undefined) {
+      body.shortDescription = body.shortDescription ? String(body.shortDescription).trim() : null;
+      if (body.shortDescription && body.shortDescription.length > 1000) {
+        return res.status(400).json({ error: 'Краткое описание не должно быть длиннее 1000 символов' });
+      }
+    }
+    if (body.fullDescription !== undefined || body.description !== undefined) {
+      const fullDescription = body.fullDescription ?? body.description;
+      body.fullDescription = fullDescription ? String(fullDescription).trim() : null;
+      body.description = body.fullDescription;
+      if (body.fullDescription && body.fullDescription.length > 2500) {
+        return res.status(400).json({ error: 'Полное описание не должно быть длиннее 2500 символов' });
+      }
+    }
     let imagesArr = [];
     if (body.imagesJson) {
       try {
@@ -245,7 +278,7 @@ router.patch('/products/:id', (req, res, next) => {
     } else if (imagesArr.length > 0) {
       body.images = imagesArr;
     }
-    const numFields = ['price', 'puffCount', 'strength', 'volume', 'battery'];
+    const numFields = ['puffCount', 'strength', 'volume', 'battery'];
     numFields.forEach((f) => {
       if (body[f] !== undefined) body[f] = parseFloat(body[f]) || parseInt(body[f], 10) || null;
     });

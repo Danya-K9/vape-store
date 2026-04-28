@@ -88,7 +88,7 @@ export const storesApi = {
 };
 
 export const filtersApi = {
-  list: (category) => api(`/filters?category=${encodeURIComponent(category)}`),
+  list: (category) => api(`/filters${category ? `?category=${encodeURIComponent(category)}` : ''}`),
 };
 
 export const contentApi = {

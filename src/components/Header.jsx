@@ -104,6 +104,8 @@ export default function Header() {
       <div className="header-utility">
           <div className="header-utility-inner">
             <nav className="header-links">
+              <Link to="/catalog">Каталог</Link>
+              <span className="link-dot">•</span>
               <Link to="/delivery">Доставка</Link>
               <span className="link-dot">•</span>
               <Link to="/payment">Оплата</Link>

@@ -26,10 +26,20 @@ export default function AdminPanel() {
   const [form, setForm] = useState({});
   const [imageFile, setImageFile] = useState(null);
   const [imageFiles, setImageFiles] = useState([]); // Extra images for pod-systems
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([
+    { slug: 'liquids', name: 'Жидкости для электронных парогенераторов' },
+    { slug: 'disposables', name: 'Одноразовые/многоразовые парогенераторы' },
+    { slug: 'pod-systems', name: 'Электронные парогенераторы' },
+    { slug: 'pouches', name: 'Никотиновые паучи' },
+    { slug: 'hookah-mix', name: 'Смесь для кальянов' },
+    { slug: 'hookah-coals', name: 'Угли для кальянов' },
+    { slug: 'accessories', name: 'Комплектующие' },
+  ]);
   const [categoryForm, setCategoryForm] = useState({ slug: '', name: '', sortOrder: 0 });
   const [editingCategory, setEditingCategory] = useState(null);
   const [categoryError, setCategoryError] = useState('');
+  const [productError, setProductError] = useState('');
+  const [productFieldErrors, setProductFieldErrors] = useState({});
   const [blogPosts, setBlogPosts] = useState([]);
   const [blogForm, setBlogForm] = useState({ title: '', slug: '', dateLabel: '', teaser: '', description: '', image: '', showOnHome: true, sortOrder: 0 });
   const [blogImageFile, setBlogImageFile] = useState(null);
@@ -51,6 +61,7 @@ export default function AdminPanel() {
   useEffect(() => {
     if (!token) return;
     fetchProducts();
+    fetchCategories();
   }, [token]);
 
   useEffect(() => {
@@ -305,6 +316,24 @@ export default function AdminPanel() {
   };
 
   const saveProduct = async () => {
+    setProductError('');
+    const nextFieldErrors = {};
+    const name = String(form.name || '').trim();
+    const shortDescription = String(form.shortDescription || '').trim();
+    const fullDescription = String(form.fullDescription || '').trim();
+    const legacyDescription = String(form.description || '').trim();
+    const activeDescription = fullDescription || legacyDescription;
+    if (!name) nextFieldErrors.name = 'Введите название товара';
+    const parsedPrice = Number.parseFloat(form.price);
+    if (!Number.isFinite(parsedPrice) || parsedPrice < 0) nextFieldErrors.price = 'Введите корректную цену';
+    if (shortDescription.length > 1000) nextFieldErrors.shortDescription = 'Краткое описание: максимум 1000 символов';
+    if (activeDescription.length > 2500) nextFieldErrors.description = 'Полное описание: максимум 2500 символов';
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setProductFieldErrors(nextFieldErrors);
+      setProductError('Исправьте ошибки в полях товара');
+      return;
+    }
+    setProductFieldErrors({});
     const body = new FormData();
     Object.entries(form).forEach(([k, v]) => {
       if (v != null && v !== '' && k !== 'id' && k !== 'image' && k !== 'images') body.append(k, v);
@@ -318,18 +347,23 @@ export default function AdminPanel() {
     if (cat === 'pod-systems' && imageFiles.length > 0) {
       imageFiles.forEach((f) => body.append('images', f));
     }
-    if (editing && editing !== 'new') {
-      await fetch(`${API_BASE}/admin/products/${editing.id}`, {
+    const request = editing && editing !== 'new'
+      ? fetch(`${API_BASE}/admin/products/${editing.id}`, {
         method: 'PATCH',
         headers: headers(),
         body,
-      });
-    } else {
-      await fetch(`${API_BASE}/admin/products`, {
+      })
+      : fetch(`${API_BASE}/admin/products`, {
         method: 'POST',
         headers: headers(),
         body,
       });
+    const resp = await request;
+    const text = await resp.text();
+    const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
+    if (!resp.ok) {
+      setProductError(data?.error || 'Не удалось сохранить товар');
+      return;
     }
     setEditing(null);
     setForm({});
@@ -591,13 +625,9 @@ export default function AdminPanel() {
           <h2>Управление вариантами фильтров по категориям</h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
             <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
-              <option value="liquids">Жидкости для электронных парогенераторов</option>
-              <option value="disposables">Одноразовые/многоразовые парогенераторы</option>
-              <option value="pod-systems">Электронные парогенераторы</option>
-              <option value="pouches">Никотиновые паучи</option>
-              <option value="hookah-mix">Смесь для кальянов</option>
-              <option value="hookah-coals">Угли для кальянов</option>
-              <option value="accessories">Комплектующие</option>
+              {categories.map((c) => (
+                <option key={c.slug} value={c.slug}>{c.name}</option>
+              ))}
             </select>
             <select value={filterForm.filterKey} onChange={(e) => setFilterForm({ ...filterForm, filterKey: e.target.value })}>
               <option value="manufacturer">Производитель</option>
@@ -686,6 +716,7 @@ export default function AdminPanel() {
       {tab === 'products' && (
         <section className="admin-section">
           <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'liquids', image: '', images: [], description: '', manufacturer: '', supplier: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', watts: '', resistance: '', battery: '', tobacco: '', weight: '', coalType: '', packCount: '', color: '', display: '', badge: '', blurImage: false }); setImageFile(null); setImageFiles([]); }}>Добавить товар</button>
+          {productError && <p className="admin-error" style={{ marginBottom: 8 }}>{productError}</p>}
           <table>
             <thead>
               <tr><th>Название</th><th>Цена</th><th>Категория</th><th>Новинки</th><th>Лидеры</th><th></th></tr>
@@ -696,16 +727,12 @@ export default function AdminPanel() {
                   <td colSpan="10" className="admin-product-edit-cell">
                     <div className="admin-product-form">
                       <div className="admin-form-row">
-                        <input placeholder="Название" value={form.name ?? ''} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                        <input type="number" placeholder="Цена" value={form.price ?? ''} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+                        <input className={productFieldErrors.name ? 'input-error' : ''} placeholder="Название" value={form.name ?? ''} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                        <input className={productFieldErrors.price ? 'input-error' : ''} type="text" inputMode="decimal" placeholder="Цена" value={form.price ?? ''} onChange={(e) => setForm({ ...form, price: e.target.value.replace(',', '.') })} />
                         <select value={form.category ?? 'liquids'} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                          <option value="liquids">Жидкости для электронных парогенераторов</option>
-                          <option value="disposables">Одноразовые/многоразовые парогенераторы</option>
-                          <option value="pod-systems">Электронные парогенераторы</option>
-                          <option value="pouches">Никотиновые паучи</option>
-                          <option value="hookah-mix">Смесь для кальянов</option>
-                          <option value="hookah-coals">Угли для кальянов</option>
-                          <option value="accessories">Комплектующие</option>
+                          {categories.map((c) => (
+                            <option key={c.slug} value={c.slug}>{c.name}</option>
+                          ))}
                         </select>
                         <label><input type="checkbox" checked={form.blurImage ?? false} onChange={(e) => setForm({ ...form, blurImage: e.target.checked })} /> Блюр</label>
                         <label><input type="checkbox" checked={form.showInNew ?? false} onChange={(e) => setForm({ ...form, showInNew: e.target.checked })} /> Новинки</label>
@@ -932,7 +959,24 @@ export default function AdminPanel() {
                           return null;
                         })()}
                       </div>
-                      <textarea placeholder="Описание" value={form.description ?? ''} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} style={{ width: '100%', marginBottom: 8 }} />
+                      <textarea
+                        className={productFieldErrors.shortDescription ? 'input-error' : ''}
+                        placeholder="Краткое описание (до 1000)"
+                        value={form.shortDescription ?? ''}
+                        onChange={(e) => setForm({ ...form, shortDescription: e.target.value.slice(0, 1000) })}
+                        rows={2}
+                        style={{ width: '100%', marginBottom: 4 }}
+                      />
+                      <p style={{ margin: '0 0 8px', color: '#666', fontSize: 12 }}>{(form.shortDescription || '').length}/1000</p>
+                      <textarea
+                        className={productFieldErrors.description ? 'input-error' : ''}
+                        placeholder="Полное описание (до 2500)"
+                        value={form.fullDescription ?? form.description ?? ''}
+                        onChange={(e) => setForm({ ...form, fullDescription: e.target.value.slice(0, 2500), description: e.target.value.slice(0, 2500) })}
+                        rows={4}
+                        style={{ width: '100%', marginBottom: 4 }}
+                      />
+                      <p style={{ margin: '0 0 8px', color: '#666', fontSize: 12 }}>{(form.fullDescription ?? form.description ?? '').length}/2500</p>
                       <div className="admin-form-row">
                         <input type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; setImageFile(f || null); if (f) setForm({ ...form, image: '' }); e.target.value = ''; }} title="Файл" />
                         <input placeholder="URL картинки" value={form.image ?? ''} onChange={(e) => { setForm({ ...form, image: e.target.value }); if (e.target.value) setImageFile(null); }} style={{ width: '200px' }} disabled={!!imageFile} />
@@ -957,16 +1001,12 @@ export default function AdminPanel() {
                     <td colSpan="10" className="admin-product-edit-cell">
                       <div className="admin-product-form">
                         <div className="admin-form-row">
-                          <input placeholder="Название" value={form.name ?? p.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                          <input type="number" placeholder="Цена" value={form.price ?? p.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+                          <input className={productFieldErrors.name ? 'input-error' : ''} placeholder="Название" value={form.name ?? p.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                          <input className={productFieldErrors.price ? 'input-error' : ''} type="text" inputMode="decimal" placeholder="Цена" value={form.price ?? p.price} onChange={(e) => setForm({ ...form, price: e.target.value.replace(',', '.') })} />
                           <select value={form.category ?? p.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                            <option value="liquids">Жидкости для электронных парогенераторов</option>
-                            <option value="disposables">Одноразовые/многоразовые парогенераторы</option>
-                            <option value="pod-systems">Электронные парогенераторы</option>
-                            <option value="pouches">Никотиновые паучи</option>
-                            <option value="hookah-mix">Смесь для кальянов</option>
-                            <option value="hookah-coals">Угли для кальянов</option>
-                            <option value="accessories">Комплектующие</option>
+                            {categories.map((c) => (
+                              <option key={c.slug} value={c.slug}>{c.name}</option>
+                            ))}
                           </select>
                           <label><input type="checkbox" checked={form.blurImage ?? p.blurImage ?? false} onChange={(e) => setForm({ ...form, blurImage: e.target.checked })} /> Блюр</label>
                           <label><input type="checkbox" checked={form.showInNew ?? p.showInNew} onChange={(e) => setForm({ ...form, showInNew: e.target.checked })} /> Новинки</label>
@@ -1169,7 +1209,24 @@ export default function AdminPanel() {
                             return null;
                           })()}
                         </div>
-                        <textarea placeholder="Описание" value={form.description ?? p.description ?? ''} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} style={{ width: '100%', marginBottom: 8 }} />
+                        <textarea
+                          className={productFieldErrors.shortDescription ? 'input-error' : ''}
+                          placeholder="Краткое описание (до 1000)"
+                          value={form.shortDescription ?? p.shortDescription ?? ''}
+                          onChange={(e) => setForm({ ...form, shortDescription: e.target.value.slice(0, 1000) })}
+                          rows={2}
+                          style={{ width: '100%', marginBottom: 4 }}
+                        />
+                        <p style={{ margin: '0 0 8px', color: '#666', fontSize: 12 }}>{(form.shortDescription ?? p.shortDescription ?? '').length}/1000</p>
+                        <textarea
+                          className={productFieldErrors.description ? 'input-error' : ''}
+                          placeholder="Полное описание (до 2500)"
+                          value={form.fullDescription ?? form.description ?? p.fullDescription ?? p.description ?? ''}
+                          onChange={(e) => setForm({ ...form, fullDescription: e.target.value.slice(0, 2500), description: e.target.value.slice(0, 2500) })}
+                          rows={4}
+                          style={{ width: '100%', marginBottom: 4 }}
+                        />
+                        <p style={{ margin: '0 0 8px', color: '#666', fontSize: 12 }}>{(form.fullDescription ?? form.description ?? p.fullDescription ?? p.description ?? '').length}/2500</p>
                         <div className="admin-form-row">
                           <input type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; setImageFile(f || null); if (f) setForm({ ...form, image: '' }); e.target.value = ''; }} title="Файл" />
                           <input placeholder="URL картинки" value={form.image ?? p.image ?? ''} onChange={(e) => { setForm({ ...form, image: e.target.value }); if (e.target.value) setImageFile(null); }} style={{ width: '200px' }} disabled={!!imageFile} />

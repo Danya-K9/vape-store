@@ -9,6 +9,8 @@ import { favoritesApi } from '../lib/api';
 import ProductImageCarousel from '../components/ProductImageCarousel';
 import './ProductDetail.css';
 
+const RECENTLY_VIEWED_KEY = 'recentlyViewedProducts';
+
 export default function ProductDetail() {
   const { id } = useParams();
   const { addToCart } = useCart();
@@ -16,6 +18,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [fav, setFav] = useState(false);
   const [qty, setQty] = useState(1);
+  const [recentProducts, setRecentProducts] = useState([]);
 
   useEffect(() => {
     const numId = parseInt(id, 10);
@@ -25,6 +28,26 @@ export default function ProductDetail() {
     }
     productsApi.get(id).then(setProduct).catch(() => setProduct(null));
   }, [id]);
+
+  useEffect(() => {
+    productsApi.list().then((items) => {
+      if (!Array.isArray(items) || items.length === 0) return;
+      const storedIds = JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY) || '[]');
+      const list = storedIds
+        .filter((storedId) => storedId !== id)
+        .map((storedId) => items.find((item) => item.id === storedId))
+        .filter(Boolean)
+        .slice(0, 5);
+      setRecentProducts(list);
+    }).catch(() => setRecentProducts([]));
+  }, [id]);
+
+  useEffect(() => {
+    if (!product?.id) return;
+    const storedIds = JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY) || '[]');
+    const nextIds = [product.id, ...storedIds.filter((storedId) => storedId !== product.id)].slice(0, 6);
+    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(nextIds));
+  }, [product?.id]);
 
   const handleAddToCart = () => {
     if (product) addToCart(product, qty);
@@ -102,7 +125,11 @@ export default function ProductDetail() {
                 className="product-detail-carousel"
               />
             ) : (
-              <img src={product.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=600'} alt={product.name} />
+              <img
+                src={product.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=600'}
+                alt={product.name}
+                className={product.blurImage ? 'product-detail-image-blur' : ''}
+              />
             )}
             {product.badge && (
               <span className="product-badge">{product.badge}</span>
@@ -119,7 +146,7 @@ export default function ProductDetail() {
           <h1>{product.name}</h1>
           <div className="product-price">{product.price} руб.</div>
           <p className="product-desc">
-            {product.description || 'Качественный продукт от проверенного производителя. В наличии в нашем магазине. Оформите бронирование для резерва.'}
+            {product.shortDescription || product.description || 'Качественный продукт от проверенного производителя. В наличии в нашем магазине. Оформите бронирование для резерва.'}
           </p>
           {specs.length > 0 && (
             <div className="product-specs">
@@ -136,14 +163,46 @@ export default function ProductDetail() {
           )}
           <div className="product-quantity">
             <button type="button" onClick={() => setQty((x) => Math.max(1, x - 1))}>−</button>
-            <span>{qty}</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={qty}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/[^\d]/g, '');
+                if (!raw) { setQty(1); return; }
+                setQty(Math.max(1, parseInt(raw, 10) || 1));
+              }}
+              aria-label="Количество"
+            />
             <button type="button" onClick={() => setQty((x) => x + 1)}>+</button>
           </div>
           <div className="product-actions">
             <button className="btn-primary" onClick={handleAddToCart}>Добавить в корзину</button>
           </div>
+          {(product.fullDescription || product.description) && (
+            <div className="product-full-desc">
+              <h3>Описание</h3>
+              <p>{product.fullDescription || product.description}</p>
+            </div>
+          )}
         </motion.div>
       </div>
+      {recentProducts.length > 0 && (
+        <section className="recently-viewed">
+          <h2>Так же вы смотрели</h2>
+          <div className="recently-viewed-grid">
+            {recentProducts.map((item) => (
+              <Link key={item.id} to={`/product/${item.id}`} className="recently-viewed-card">
+                <img src={item.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=600'} alt={item.name} />
+                <div>
+                  <p>{item.name}</p>
+                  <span>{item.price} руб.</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </motion.div>
   );
 }

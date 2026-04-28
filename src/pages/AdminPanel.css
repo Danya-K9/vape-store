@@ -143,6 +143,11 @@
   margin-right: 0;
 }
 
+.input-error {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.15);
+}
+
 .admin-product-edit-cell {
   background: #fafafa;
   padding: 20px !important;

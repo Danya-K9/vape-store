@@ -38,6 +38,7 @@ export default function Catalog() {
   const [puffCounts, setPuffCounts] = useState([]);
   const [nicotineTypes, setNicotineTypes] = useState([]);
   const [flavors, setFlavors] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [strengths, setStrengths] = useState([]);
   const [volumes, setVolumes] = useState([]);
   const [vgpgValues, setVgpgValues] = useState([]);
@@ -51,6 +52,8 @@ export default function Catalog() {
   const [weightValues, setWeightValues] = useState([]);
   const [coalTypeValues, setCoalTypeValues] = useState([]);
   const [packCountValues, setPackCountValues] = useState([]);
+  const [colorValues, setColorValues] = useState([]);
+  const [displayValues, setDisplayValues] = useState([]);
   const [apiProducts, setApiProducts] = useState(null);
   const [dynamicCategories, setDynamicCategories] = useState(categories);
   const [applyCounter, setApplyCounter] = useState(0);
@@ -61,6 +64,7 @@ export default function Catalog() {
     puffCounts: [],
     nicotineTypes: [],
     flavors: [],
+    countries: [],
     strengths: [],
     volumes: [],
     vgpgValues: [],
@@ -74,6 +78,8 @@ export default function Catalog() {
     weightValues: [],
     coalTypeValues: [],
     packCountValues: [],
+    colorValues: [],
+    displayValues: [],
   });
   const prevCategoryRef = useRef(category);
 
@@ -96,6 +102,7 @@ export default function Catalog() {
     if (appliedFilters.puffCounts.length) params.puffCount = appliedFilters.puffCounts.join(',');
     if (appliedFilters.nicotineTypes.length) params.nicotineType = appliedFilters.nicotineTypes.join(',');
     if (appliedFilters.flavors.length) params.flavor = appliedFilters.flavors.join(',');
+    if (appliedFilters.countries.length) params.country = appliedFilters.countries.join(',');
     if (appliedFilters.strengths.length) params.strength = appliedFilters.strengths.join(',');
     if (appliedFilters.volumes.length) params.volume = appliedFilters.volumes.join(',');
     if (appliedFilters.vgpgValues.length) params.vgpg = appliedFilters.vgpgValues.join(',');
@@ -109,6 +116,8 @@ export default function Catalog() {
     if (appliedFilters.weightValues.length) params.weight = appliedFilters.weightValues.join(',');
     if (appliedFilters.coalTypeValues.length) params.coalType = appliedFilters.coalTypeValues.join(',');
     if (appliedFilters.packCountValues.length) params.packCount = appliedFilters.packCountValues.join(',');
+    if (appliedFilters.colorValues.length) params.color = appliedFilters.colorValues.join(',');
+    if (appliedFilters.displayValues.length) params.display = appliedFilters.displayValues.join(',');
     productsApi.list(params).then(setApiProducts).catch(() => setApiProducts([]));
   }, [category, search, applyCounter]);
 
@@ -177,6 +186,7 @@ export default function Catalog() {
     setPuffCounts([]);
     setNicotineTypes([]);
     setFlavors([]);
+    setCountries([]);
     setStrengths([]);
     setVolumes([]);
     setVgpgValues([]);
@@ -190,6 +200,8 @@ export default function Catalog() {
     setWeightValues([]);
     setCoalTypeValues([]);
     setPackCountValues([]);
+    setColorValues([]);
+    setDisplayValues([]);
     const resetFilters = {
       priceMin: 0,
       priceMax: 150,
@@ -197,6 +209,7 @@ export default function Catalog() {
       puffCounts: [],
       nicotineTypes: [],
       flavors: [],
+      countries: [],
       strengths: [],
       volumes: [],
       vgpgValues: [],
@@ -210,6 +223,8 @@ export default function Catalog() {
       weightValues: [],
       coalTypeValues: [],
       packCountValues: [],
+      colorValues: [],
+      displayValues: [],
     };
     setAppliedFilters(resetFilters);
     setApplyCounter((x) => x + 1);
@@ -225,6 +240,7 @@ export default function Catalog() {
       puffCounts,
       nicotineTypes,
       flavors,
+      countries,
       strengths,
       volumes,
       vgpgValues,
@@ -238,6 +254,8 @@ export default function Catalog() {
       weightValues,
       coalTypeValues,
       packCountValues,
+      colorValues,
+      displayValues,
     });
     setApplyCounter((x) => x + 1);
   };
@@ -281,6 +299,8 @@ export default function Catalog() {
         onNicotineToggle={handleNicotineToggle}
         flavors={flavors}
         onFlavorToggle={toggleArray(setFlavors)}
+        countries={countries}
+        onCountryToggle={toggleArray(setCountries)}
         strengths={strengths}
         onStrengthToggle={toggleArray(setStrengths)}
         volumes={volumes}
@@ -307,6 +327,10 @@ export default function Catalog() {
         onCoalTypeToggle={toggleArray(setCoalTypeValues)}
         packCountValues={packCountValues}
         onPackCountToggle={toggleArray(setPackCountValues)}
+        colorValues={colorValues}
+        onColorToggle={toggleArray(setColorValues)}
+        displayValues={displayValues}
+        onDisplayToggle={toggleArray(setDisplayValues)}
         onApply={handleApplyFilters}
         onReset={handleReset}
       />

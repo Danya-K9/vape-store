@@ -29,6 +29,8 @@ model User {
 model Product {
   id              String    @id @default(cuid())
   name            String
+  shortDescription String?  @db.VarChar(1000)
+  fullDescription String?   @db.VarChar(2500)
   description     String?
   image           String?
   images          String[]  @default([]) // Multiple images for pod-systems (different colors)
