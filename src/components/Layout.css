@@ -30,13 +30,6 @@
   overflow: hidden;
 }
 
-.smoke-trail-canvas {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
 .layout-page-content {
   position: relative;
   z-index: 1;

@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import Header from './Header';
 import Footer from './Footer';
 import AgeGate from './AgeGate';
-import SmokeTrailCanvas from './SmokeTrailCanvas';
 import './Layout.css';
 
 const SIDE_TEXT = 'ОБЛАКО ПАРА ВЕЙП ШОП';
@@ -29,20 +28,24 @@ export default function Layout() {
     if (typeof window === 'undefined') return undefined;
 
     const updateSideTop = () => {
+      const STRIP_HEIGHT = 260;
+      const MARGIN = 16;
+
       if (!isHome) {
-        setSideTop(Math.max(20, Math.round(window.innerHeight * 0.36)));
+        setSideTop(Math.round(window.innerHeight / 2 - STRIP_HEIGHT / 2));
         return;
       }
-      const hero = document.querySelector('.hero-carousel');
+      const hero = document.querySelector('.hero-vape') || document.querySelector('.hero-carousel');
       if (!hero) {
-        setSideTop(Math.max(20, Math.round(window.innerHeight * 0.36)));
+        setSideTop(Math.round(window.innerHeight / 2 - STRIP_HEIGHT / 2));
         return;
       }
       const heroRect = hero.getBoundingClientRect();
       const topFromHero = heroRect.bottom + 8;
+      const centerTop = window.innerHeight / 2 - STRIP_HEIGHT / 2;
       const clamped = Math.min(
-        Math.max(20, topFromHero),
-        Math.max(20, window.innerHeight - 280)
+        Math.max(MARGIN, topFromHero, centerTop),
+        Math.max(MARGIN, window.innerHeight - STRIP_HEIGHT - MARGIN)
       );
       setSideTop(Math.round(clamped));
     };
@@ -68,7 +71,6 @@ export default function Layout() {
             ref={mainRef}
             style={{ '--side-strip-top': `${sideTop}px` }}
           >
-            <SmokeTrailCanvas enabled={isHome} />
             <aside className="side-marquee side-marquee-left" aria-hidden="true">
               <div className="side-marquee-track">
                 {sideCharLoop.map((char, idx) => (
