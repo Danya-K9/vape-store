@@ -30,27 +30,31 @@ export default function Layout() {
 
     const updateSideTop = () => {
       if (!isHome) {
-        setSideTop(24);
+        setSideTop(Math.max(20, Math.round(window.innerHeight * 0.36)));
         return;
       }
-      const main = mainRef.current;
       const hero = document.querySelector('.hero-carousel');
-      if (!main || !hero) {
-        setSideTop(24);
+      if (!hero) {
+        setSideTop(Math.max(20, Math.round(window.innerHeight * 0.36)));
         return;
       }
-      const mainRect = main.getBoundingClientRect();
       const heroRect = hero.getBoundingClientRect();
-      const start = Math.max(24, heroRect.bottom - mainRect.top + 10);
-      setSideTop(Math.round(start));
+      const topFromHero = heroRect.bottom + 8;
+      const clamped = Math.min(
+        Math.max(20, topFromHero),
+        Math.max(20, window.innerHeight - 280)
+      );
+      setSideTop(Math.round(clamped));
     };
 
     updateSideTop();
     window.addEventListener('resize', updateSideTop);
+    window.addEventListener('scroll', updateSideTop, { passive: true });
     const delayed = window.setTimeout(updateSideTop, 80);
     return () => {
       window.clearTimeout(delayed);
       window.removeEventListener('resize', updateSideTop);
+      window.removeEventListener('scroll', updateSideTop);
     };
   }, [isHome, location.pathname]);
 
@@ -64,7 +68,7 @@ export default function Layout() {
             ref={mainRef}
             style={{ '--side-strip-top': `${sideTop}px` }}
           >
-            <SmokeTrailCanvas />
+            <SmokeTrailCanvas enabled={isHome} />
             <aside className="side-marquee side-marquee-left" aria-hidden="true">
               <div className="side-marquee-track">
                 {sideCharLoop.map((char, idx) => (

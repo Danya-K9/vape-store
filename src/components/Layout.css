@@ -43,11 +43,10 @@
 }
 
 .side-marquee {
-  position: absolute;
+  position: fixed;
   top: var(--side-strip-top, 24px);
   width: 28px;
-  height: calc(100% - var(--side-strip-top, 24px) - 12px);
-  min-height: 220px;
+  height: 260px;
   border-radius: 999px;
   background: #111;
   overflow: hidden;

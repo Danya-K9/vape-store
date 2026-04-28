@@ -1,14 +1,15 @@
 import { useEffect, useRef } from 'react';
 
-const MAX_PARTICLES = 180;
+const MAX_PARTICLES = 200;
 const BASE_EMIT_PER_FRAME = 1;
 const POINTER_EMIT_BURST = 3;
 const FRAME_INTERVAL_MS = 1000 / 45;
 
-export default function SmokeTrailCanvas() {
+export default function SmokeTrailCanvas({ enabled = true }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    if (!enabled) return undefined;
     if (typeof window === 'undefined') return undefined;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
     if (window.innerWidth < 900) return undefined;
@@ -180,6 +181,8 @@ export default function SmokeTrailCanvas() {
         p.y += p.vy + turbulenceY;
         p.vx = (p.vx + swirl) * (p.type === 'core' ? 0.988 : 0.982);
         p.vy = (p.vy - p.lift) * (p.type === 'core' ? 0.991 : 0.986);
+        // Side drift makes vapor spread horizontally instead of collapsing into circles.
+        p.vx += Math.sin((p.life + p.noiseSeed) * 0.02) * 0.006;
         p.radius *= p.growth;
         const t = p.life / p.maxLife;
         const fade = Math.max(0, 1 - t * 0.95);
@@ -212,6 +215,8 @@ export default function SmokeTrailCanvas() {
         spawn(pointerX, pointerY, Math.min(1.25, 0.55 + pointerSpeed * 0.02), 1);
       }
 
+      pointerSpeed *= 0.94;
+
       rafId = window.requestAnimationFrame(render);
     };
 
@@ -235,7 +240,7 @@ export default function SmokeTrailCanvas() {
       window.removeEventListener('scroll', updateZones);
       window.removeEventListener('pointermove', onPointerMove);
     };
-  }, []);
+  }, [enabled]);
 
   return <canvas className="smoke-trail-canvas" ref={canvasRef} aria-hidden="true" />;
 }
