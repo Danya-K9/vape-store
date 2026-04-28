@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
 
-const MAX_PARTICLES = 520;
-const BASE_EMIT_PER_FRAME = 2;
-const POINTER_EMIT_BURST = 7;
+const MAX_PARTICLES = 180;
+const BASE_EMIT_PER_FRAME = 1;
+const POINTER_EMIT_BURST = 3;
+const FRAME_INTERVAL_MS = 1000 / 45;
 
 export default function SmokeTrailCanvas() {
   const canvasRef = useRef(null);
@@ -18,6 +19,7 @@ export default function SmokeTrailCanvas() {
     if (!ctx) return undefined;
 
     let rafId = 0;
+    let lastFrameTs = 0;
     const particles = [];
     let pointerX = window.innerWidth * 0.5;
     let pointerY = window.innerHeight * 0.4;
@@ -27,6 +29,8 @@ export default function SmokeTrailCanvas() {
     let prevPointerY = pointerY;
     let mainArea = null;
     let footerArea = null;
+    let darkTexture = null;
+    let lightTexture = null;
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -58,13 +62,44 @@ export default function SmokeTrailCanvas() {
       return inMain && !inFooter;
     };
 
+    const createSmokeTexture = (kind = 'dark') => {
+      const t = document.createElement('canvas');
+      t.width = 160;
+      t.height = 160;
+      const tctx = t.getContext('2d');
+      if (!tctx) return null;
+      tctx.clearRect(0, 0, t.width, t.height);
+
+      const blobs = kind === 'dark' ? 8 : 6;
+      for (let i = 0; i < blobs; i += 1) {
+        const x = 46 + Math.random() * 68;
+        const y = 42 + Math.random() * 76;
+        const r = 22 + Math.random() * 34;
+        const g = tctx.createRadialGradient(x, y, 0, x, y, r);
+        if (kind === 'dark') {
+          g.addColorStop(0, `rgba(${10 + Math.random() * 20}, ${10 + Math.random() * 20}, ${10 + Math.random() * 20}, ${0.35 + Math.random() * 0.25})`);
+          g.addColorStop(0.65, `rgba(${45 + Math.random() * 25}, ${45 + Math.random() * 25}, ${45 + Math.random() * 25}, ${0.16 + Math.random() * 0.12})`);
+        } else {
+          g.addColorStop(0, `rgba(${180 + Math.random() * 60}, ${180 + Math.random() * 60}, ${180 + Math.random() * 60}, ${0.22 + Math.random() * 0.18})`);
+          g.addColorStop(0.65, `rgba(${150 + Math.random() * 40}, ${150 + Math.random() * 40}, ${150 + Math.random() * 40}, ${0.08 + Math.random() * 0.09})`);
+        }
+        g.addColorStop(1, 'rgba(200, 200, 200, 0)');
+        tctx.fillStyle = g;
+        tctx.beginPath();
+        tctx.arc(x, y, r, 0, Math.PI * 2);
+        tctx.fill();
+      }
+      return t;
+    };
+
     const emitParticle = (x, y, strength = 1, type = 'core') => {
       if (particles.length >= MAX_PARTICLES) particles.shift();
       const angle = Math.random() * Math.PI * 2;
-      const baseSpeed = (0.08 + Math.random() * 0.55) * strength;
+      const baseSpeed = (0.08 + Math.random() * 0.42) * strength;
       const spread = type === 'core' ? (8 + Math.random() * 14) : (16 + Math.random() * 20);
-      const ttl = type === 'core' ? (160 + Math.random() * 140) : (120 + Math.random() * 110);
-      const baseRadius = type === 'core' ? (12 + Math.random() * 30) : (8 + Math.random() * 18);
+      const ttl = type === 'core' ? (130 + Math.random() * 110) : (95 + Math.random() * 90);
+      const baseRadius = type === 'core' ? (14 + Math.random() * 26) : (8 + Math.random() * 16);
+      const stretch = 0.75 + Math.random() * 0.55;
       particles.push({
         x: x + (Math.random() - 0.5) * spread,
         y: y + (Math.random() - 0.5) * spread,
@@ -76,6 +111,9 @@ export default function SmokeTrailCanvas() {
         noiseSeed: Math.random() * 2000,
         growth: type === 'core' ? (1.006 + Math.random() * 0.004) : (1.004 + Math.random() * 0.003),
         lift: 0.002 + Math.random() * 0.004,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.02,
+        stretch,
         life: 0,
         maxLife: ttl,
         type,
@@ -106,10 +144,15 @@ export default function SmokeTrailCanvas() {
       pointerY = event.clientY;
       pointerSpeed = Math.min(36, dist);
       hasPointer = true;
-      spawn(pointerX, pointerY, Math.min(3.4, 1.1 + dist * 0.08), POINTER_EMIT_BURST);
+      spawn(pointerX, pointerY, Math.min(2.4, 0.9 + dist * 0.05), POINTER_EMIT_BURST);
     };
 
-    const render = () => {
+    const render = (ts = 0) => {
+      if (ts - lastFrameTs < FRAME_INTERVAL_MS) {
+        rafId = window.requestAnimationFrame(render);
+        return;
+      }
+      lastFrameTs = ts;
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       ctx.globalCompositeOperation = 'source-over';
 
@@ -118,7 +161,7 @@ export default function SmokeTrailCanvas() {
         const driftY = pointerY - prevPointerY;
         prevPointerX += driftX * 0.24;
         prevPointerY += driftY * 0.24;
-        const trailingStrength = Math.min(2.6, 0.8 + pointerSpeed * 0.05);
+        const trailingStrength = Math.min(1.8, 0.7 + pointerSpeed * 0.03);
         spawn(prevPointerX, prevPointerY, trailingStrength, BASE_EMIT_PER_FRAME);
       }
 
@@ -141,63 +184,32 @@ export default function SmokeTrailCanvas() {
         const t = p.life / p.maxLife;
         const fade = Math.max(0, 1 - t * 0.95);
         const density = Math.sin((1 - t) * Math.PI);
-        const blurRadius = p.radius * (1.1 + density * 0.34);
-
-        const darkLayer = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, blurRadius);
-        darkLayer.addColorStop(0, `rgba(8, 8, 8, ${p.alpha * fade * (p.type === 'core' ? 1.35 : 0.95)})`);
-        darkLayer.addColorStop(0.42, `rgba(26, 26, 26, ${p.alpha * fade * 0.92})`);
-        darkLayer.addColorStop(0.75, `rgba(48, 48, 48, ${p.alpha * fade * 0.42})`);
-        darkLayer.addColorStop(1, 'rgba(88, 88, 88, 0)');
-        ctx.fillStyle = darkLayer;
-        ctx.beginPath();
-        ctx.ellipse(
-          p.x,
-          p.y,
-          blurRadius * (p.type === 'core' ? 1.12 : 0.95),
-          blurRadius * (p.type === 'core' ? 0.82 : 0.92),
-          swirl * (p.type === 'core' ? 8 : 14),
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        const grayLayer = ctx.createRadialGradient(
-          p.x + p.radius * 0.16,
-          p.y - p.radius * 0.1,
-          0,
-          p.x,
-          p.y,
-          blurRadius * 1.3,
-        );
-        grayLayer.addColorStop(0, `rgba(92, 92, 92, ${p.alpha * fade * 0.42})`);
-        grayLayer.addColorStop(0.7, `rgba(152, 152, 152, ${p.alpha * fade * 0.16})`);
-        grayLayer.addColorStop(1, 'rgba(182, 182, 182, 0)');
-        ctx.fillStyle = grayLayer;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, blurRadius * 1.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.globalCompositeOperation = 'lighter';
-        const highlight = ctx.createRadialGradient(
-          p.x - p.radius * 0.22,
-          p.y - p.radius * 0.22,
-          0,
-          p.x,
-          p.y,
-          blurRadius * 0.88
-        );
-        highlight.addColorStop(0, `rgba(248, 248, 248, ${p.alpha * fade * 0.22})`);
-        highlight.addColorStop(0.45, `rgba(215, 215, 215, ${p.alpha * fade * 0.1})`);
-        highlight.addColorStop(1, 'rgba(230, 230, 230, 0)');
-        ctx.fillStyle = highlight;
-        ctx.beginPath();
-        ctx.arc(p.x - p.radius * 0.05, p.y - p.radius * 0.05, blurRadius * 0.84, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalCompositeOperation = 'source-over';
+        const drawSize = p.radius * (1.28 + density * 0.3);
+        p.rotation += p.rotationSpeed + swirl * 0.03;
+        if (darkTexture) {
+          ctx.save();
+          ctx.globalAlpha = p.alpha * fade * (p.type === 'core' ? 1.05 : 0.85);
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          ctx.scale(1 + p.stretch * 0.35, 0.85 + p.stretch * 0.2);
+          ctx.drawImage(darkTexture, -drawSize, -drawSize, drawSize * 2, drawSize * 2);
+          ctx.restore();
+        }
+        if (lightTexture) {
+          ctx.save();
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.globalAlpha = p.alpha * fade * 0.42;
+          ctx.translate(p.x - p.radius * 0.12, p.y - p.radius * 0.08);
+          ctx.rotate(-p.rotation * 0.75);
+          ctx.scale(0.9 + p.stretch * 0.2, 0.85 + p.stretch * 0.1);
+          ctx.drawImage(lightTexture, -drawSize * 0.82, -drawSize * 0.82, drawSize * 1.64, drawSize * 1.64);
+          ctx.restore();
+          ctx.globalCompositeOperation = 'source-over';
+        }
       }
 
-      if (hasPointer && particles.length < 130) {
-        spawn(pointerX, pointerY, Math.min(1.8, 0.7 + pointerSpeed * 0.03), 1);
+      if (hasPointer && particles.length < 110) {
+        spawn(pointerX, pointerY, Math.min(1.25, 0.55 + pointerSpeed * 0.02), 1);
       }
 
       rafId = window.requestAnimationFrame(render);
@@ -210,6 +222,8 @@ export default function SmokeTrailCanvas() {
 
     updateZones();
     resize();
+    darkTexture = createSmokeTexture('dark');
+    lightTexture = createSmokeTexture('light');
     window.addEventListener('resize', onResize);
     window.addEventListener('scroll', updateZones, { passive: true });
     window.addEventListener('pointermove', onPointerMove, { passive: true });

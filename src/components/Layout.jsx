@@ -47,10 +47,10 @@ export default function Layout() {
 
     updateSideTop();
     window.addEventListener('resize', updateSideTop);
-    window.addEventListener('scroll', updateSideTop, { passive: true });
+    const delayed = window.setTimeout(updateSideTop, 80);
     return () => {
+      window.clearTimeout(delayed);
       window.removeEventListener('resize', updateSideTop);
-      window.removeEventListener('scroll', updateSideTop);
     };
   }, [isHome, location.pathname]);
 
