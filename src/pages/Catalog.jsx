@@ -3,6 +3,7 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
 import CatalogFilters from '../components/CatalogFilters';
+import { categories } from '../data/products';
 import { productsApi } from '../lib/api';
 import { contentApi } from '../lib/api';
 import './Catalog.css';
@@ -54,7 +55,7 @@ export default function Catalog() {
   const [colorValues, setColorValues] = useState([]);
   const [displayValues, setDisplayValues] = useState([]);
   const [apiProducts, setApiProducts] = useState(null);
-  const [dynamicCategories, setDynamicCategories] = useState([]);
+  const [dynamicCategories, setDynamicCategories] = useState(categories);
   const [applyCounter, setApplyCounter] = useState(0);
   const [appliedFilters, setAppliedFilters] = useState({
     priceMin: 0,

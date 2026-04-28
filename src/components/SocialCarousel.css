@@ -2,25 +2,11 @@
   padding: 40px 20px 48px;
   background: #fff;
   border-top: 1px solid #eee;
-  position: relative;
-  overflow: hidden;
-}
-
-.social-carousel-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url('/bg-pattern.png') repeat;
-  background-size: 520px auto;
-  opacity: 0.12;
-  pointer-events: none;
 }
 
 .social-carousel-wrap {
   max-width: 1200px;
   margin: 0 auto;
-  position: relative;
-  z-index: 1;
 }
 
 .social-carousel-viewport {

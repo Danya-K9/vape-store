@@ -1,3 +1,14 @@
+export const categories = [
+  { id: 'liquids', name: 'Жидкости для электронных парогенераторов', slug: 'liquids' },
+  { id: 'disposables', name: 'Одноразовые/многоразовые парогенераторы', slug: 'disposables' },
+  { id: 'pod-systems', name: 'Электронные парогенераторы', slug: 'pod-systems' },
+  { id: 'pouches', name: 'Никотиновые паучи', slug: 'pouches' },
+  { id: 'hookah-mix', name: 'Смесь для кальянов', slug: 'hookah-mix' },
+  { id: 'hookah-coals', name: 'Угли для кальянов', slug: 'hookah-coals' },
+  { id: 'accessories', name: 'Комплектующие', slug: 'accessories' },
+  { id: 'hookah-accessories', name: 'Комплектующие для кальяна', slug: 'hookah-accessories' },
+];
+
 export const blogPosts = [
   {
     id: 1,
