@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { products as localProducts } from '../data/products';
 import { productsApi } from '../lib/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -21,11 +20,6 @@ export default function ProductDetail() {
   const [recentProducts, setRecentProducts] = useState([]);
 
   useEffect(() => {
-    const numId = parseInt(id, 10);
-    if (!isNaN(numId)) {
-      const local = localProducts.find((p) => p.id === numId);
-      if (local) { setProduct(local); return; }
-    }
     productsApi.get(id).then(setProduct).catch(() => setProduct(null));
   }, [id]);
 

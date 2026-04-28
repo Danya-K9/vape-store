@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import ProductCarousel from '../components/ProductCarousel';
 import HeroCarousel from '../components/HeroCarousel';
 import SocialCarousel from '../components/SocialCarousel';
-import { blogPosts, reviews, products as localProducts } from '../data/products';
+import { blogPosts, reviews } from '../data/products';
 import { productsApi, contentApi } from '../lib/api';
 import './Home.css';
 
@@ -35,24 +35,21 @@ export default function Home() {
   const blogSwipeRef = useRef({ startX: 0, deltaX: 0, active: false });
   const blogTimerRef = useRef(null);
 
-  const newFallback = (localProducts || []).filter((p) => p.badge === 'Новинка');
-  const bestsellerFallback = (localProducts || []).filter((p) => p.badge === 'Хит' || p.badge === 'Советуем');
-
   useEffect(() => {
     productsApi.list({ newOnly: 'true' })
       .then((data) => {
         const arr = Array.isArray(data) ? data : [];
-        setNewProducts(arr.length > 0 ? arr : newFallback);
+        setNewProducts(arr);
       })
-      .catch(() => setNewProducts(newFallback));
+      .catch(() => setNewProducts([]));
   }, []);
   useEffect(() => {
     productsApi.list({ bestsellers: 'true' })
       .then((data) => {
         const arr = Array.isArray(data) ? data : [];
-        setBestsellerProducts(arr.length > 0 ? arr : bestsellerFallback);
+        setBestsellerProducts(arr);
       })
-      .catch(() => setBestsellerProducts(bestsellerFallback));
+      .catch(() => setBestsellerProducts([]));
   }, []);
   useEffect(() => {
     contentApi.blogPosts({ homeOnly: 'true' })
