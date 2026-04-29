@@ -33,8 +33,8 @@
   height: 100%;
   display: block;
   pointer-events: none;
-  z-index: 1;
-  opacity: 0.9;
+  z-index: 3;
+  opacity: 1;
 }
 
 .hero-arrow {
@@ -48,7 +48,7 @@
   color: #333;
   font-size: 28px;
   cursor: pointer;
-  z-index: 3;
+  z-index: 6;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -139,7 +139,7 @@
   transform: translateX(-50%);
   display: flex;
   gap: 8px;
-  z-index: 4;
+  z-index: 6;
 }
 
 .hero-indicator {

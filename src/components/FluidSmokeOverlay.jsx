@@ -180,8 +180,10 @@ varying vec2 vUv;
 uniform sampler2D uTexture;
 void main () {
   vec3 C = texture2D(uTexture, vUv).rgb;
-  float a = max(C.r, max(C.g, C.b));
-  gl_FragColor = vec4(C, a);
+  float g = dot(C, vec3(0.299, 0.587, 0.114));
+  vec3 smoke = vec3(g * 1.05, g * 0.95, g * 0.9);
+  float a = clamp(g * 2.0, 0.0, 1.0);
+  gl_FragColor = vec4(smoke, a);
 }
 `;
 
@@ -442,7 +444,8 @@ export default function FluidSmokeOverlay() {
       pointers.dx = dx;
       pointers.dy = dy;
 
-      splat(pointers.x, pointers.y, pointers.dx, pointers.dy, [0.12, 0.12, 0.12]);
+      const shade = 0.12 + (Math.sin(t * 0.7) * 0.5 + 0.5) * 0.25;
+      splat(pointers.x, pointers.y, pointers.dx, pointers.dy, [shade, shade * 0.95, shade * 0.9]);
       step(dt);
       render();
       rafId = requestAnimationFrame(tick);
