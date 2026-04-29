@@ -16,7 +16,7 @@
   height: 100vh;
   pointer-events: none;
   z-index: 2;
-  opacity: 0.82;
+  opacity: 1;
 }
 
 .section {

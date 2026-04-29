@@ -181,9 +181,8 @@ uniform sampler2D uTexture;
 void main () {
   vec3 C = texture2D(uTexture, vUv).rgb;
   float g = dot(C, vec3(0.299, 0.587, 0.114));
-  float alphaMask = smoothstep(0.05, 0.42, g);
-  vec3 smoke = vec3(g * 0.96, g * 0.96, g * 0.96);
-  float a = alphaMask * 0.92;
+  float a = clamp(g * 3.6, 0.0, 1.0);
+  vec3 smoke = vec3(g * 1.6);
   gl_FragColor = vec4(smoke, a);
 }
 `;
@@ -240,6 +239,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     if (!gl) return undefined;
 
     const pointers = { x: 0.5, y: 0.5, dx: 0, dy: 0, moved: false };
+    let hadFirstSplat = false;
     const texType = gl.UNSIGNED_BYTE;
     const texFormat = gl.RGBA;
     const filtering = gl.LINEAR;
@@ -446,8 +446,13 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       lastTime = now;
 
       if (pointers.moved) {
-        splat(pointers.x, pointers.y, pointers.dx, pointers.dy, [0.1, 0.1, 0.1]);
+        splat(pointers.x, pointers.y, pointers.dx, pointers.dy, [0.18, 0.18, 0.18]);
         pointers.moved = false;
+        hadFirstSplat = true;
+      } else if (!hadFirstSplat) {
+        // Ensure visible smoke even before first pointer movement.
+        splat(0.5, 0.52, 0.0, 0.0, [0.16, 0.16, 0.16]);
+        hadFirstSplat = true;
       } else {
         pointers.dx *= 0.85;
         pointers.dy *= 0.85;
