@@ -291,7 +291,9 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     };
 
     const blit = (target) => {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, target);
+      const isDefault = !target;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, isDefault ? null : target.fbo);
+      gl.viewport(0, 0, isDefault ? canvas.width : target.width, isDefault ? canvas.height : target.height);
       gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
     };
 
@@ -321,21 +323,22 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
         gl.useProgram(programs.clear);
         bindAttrib(programs.clear);
         gl.uniform4f(gl.getUniformLocation(programs.clear, 'color'), rgba[0], rgba[1], rgba[2], rgba[3]);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, targetFbo);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, targetFbo.fbo);
+        gl.viewport(0, 0, targetFbo.width, targetFbo.height);
         gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
       };
 
       // velocity/density/pressure are double FBOs
-      clearTo(velocity.read.fbo, [0, 0, 0, 1]);
-      clearTo(velocity.write.fbo, [0, 0, 0, 1]);
-      clearTo(density.read.fbo, [0, 0, 0, 1]);
-      clearTo(density.write.fbo, [0, 0, 0, 1]);
-      clearTo(pressure.read.fbo, [0, 0, 0, 1]);
-      clearTo(pressure.write.fbo, [0, 0, 0, 1]);
+      clearTo(velocity.read, [0, 0, 0, 1]);
+      clearTo(velocity.write, [0, 0, 0, 1]);
+      clearTo(density.read, [0, 0, 0, 1]);
+      clearTo(density.write, [0, 0, 0, 1]);
+      clearTo(pressure.read, [0, 0, 0, 1]);
+      clearTo(pressure.write, [0, 0, 0, 1]);
 
       // single FBOs
-      clearTo(divergence.fbo, [0, 0, 0, 1]);
-      clearTo(curl.fbo, [0, 0, 0, 1]);
+      clearTo(divergence, [0, 0, 0, 1]);
+      clearTo(curl, [0, 0, 0, 1]);
     };
 
     const onPointerMove = (event) => {
@@ -378,13 +381,13 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
       gl.uniform1i(gl.getUniformLocation(programs.splat, 'uTarget'), 0);
-      blit(velocity.write.fbo);
+      blit(velocity.write);
       velocity.swap();
 
       gl.uniform3f(gl.getUniformLocation(programs.splat, 'color'), color[0], color[1], color[2]);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, density.read.texture);
-      blit(density.write.fbo);
+      blit(density.write);
       density.swap();
     };
 
@@ -397,7 +400,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
       gl.uniform1i(gl.getUniformLocation(programs.curl, 'uVelocity'), 0);
-      blit(curl.fbo);
+      blit(curl);
 
       gl.useProgram(programs.vorticity);
       bindAttrib(programs.vorticity);
@@ -410,7 +413,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, curl.texture);
       gl.uniform1i(gl.getUniformLocation(programs.vorticity, 'uCurl'), 1);
-      blit(velocity.write.fbo);
+      blit(velocity.write);
       velocity.swap();
 
       gl.useProgram(programs.divergence);
@@ -419,12 +422,12 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
       gl.uniform1i(gl.getUniformLocation(programs.divergence, 'uVelocity'), 0);
-      blit(divergence.fbo);
+      blit(divergence);
 
       gl.useProgram(programs.clear);
       bindAttrib(programs.clear);
       gl.uniform4f(gl.getUniformLocation(programs.clear, 'color'), 0, 0, 0, 1);
-      blit(pressure.write.fbo);
+      blit(pressure.write);
       pressure.swap();
 
       gl.useProgram(programs.pressure);
@@ -438,7 +441,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       for (let i = 0; i < 15; i += 1) {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, pressure.read.texture);
-        blit(pressure.write.fbo);
+        blit(pressure.write);
         pressure.swap();
       }
 
@@ -451,7 +454,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
       gl.uniform1i(gl.getUniformLocation(programs.gradSub, 'uVelocity'), 1);
-      blit(velocity.write.fbo);
+      blit(velocity.write);
       velocity.swap();
 
       gl.useProgram(programs.advection);
@@ -465,7 +468,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
       gl.uniform1i(gl.getUniformLocation(programs.advection, 'uSource'), 1);
-      blit(velocity.write.fbo);
+      blit(velocity.write);
       velocity.swap();
 
       setTexel(programs.advection, density.read);
@@ -474,7 +477,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, density.read.texture);
-      blit(density.write.fbo);
+      blit(density.write);
       density.swap();
     };
 
