@@ -118,24 +118,14 @@ export default function ProductCarousel({ products = [] }) {
         </div>
       </div>
       <div className="product-carousel-nav">
-        <div className="product-carousel-arrows">
-          <button
-            type="button"
-            className="product-carousel-arrow"
-            onClick={prev}
-            aria-label="Предыдущий товар"
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            className="product-carousel-arrow"
-            onClick={next}
-            aria-label="Следующий товар"
-          >
-            ›
-          </button>
-        </div>
+        <button
+          type="button"
+          className="product-carousel-arrow"
+          onClick={prev}
+          aria-label="Предыдущий товар"
+        >
+          ‹
+        </button>
         <div className="product-carousel-dots">
           {Array.from({ length: totalItems }).map((_, i) => (
             <button
@@ -147,6 +137,14 @@ export default function ProductCarousel({ products = [] }) {
             />
           ))}
         </div>
+        <button
+          type="button"
+          className="product-carousel-arrow"
+          onClick={next}
+          aria-label="Следующий товар"
+        >
+          ›
+        </button>
       </div>
     </div>
   );
