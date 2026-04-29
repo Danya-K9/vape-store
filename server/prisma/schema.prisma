@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -33,7 +33,7 @@ model Product {
   fullDescription String?   @db.VarChar(2500)
   description     String?
   image           String?
-  images          String[]  @default([]) // Multiple images for pod-systems (different colors)
+  images          Json? // Multiple images for pod-systems (different colors)
   price           Float
   category        String
   badge           String?   // Новинка, Хит, Советуем

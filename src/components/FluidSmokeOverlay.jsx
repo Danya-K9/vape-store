@@ -200,6 +200,24 @@ void main () {
 }
 `;
 
+const BLUR_SHADER = `
+precision mediump float;
+precision mediump sampler2D;
+varying vec2 vL;
+varying vec2 vR;
+varying vec2 vT;
+varying vec2 vB;
+uniform sampler2D uTexture;
+void main () {
+  vec4 sum = vec4(0.0);
+  sum += texture2D(uTexture, vL);
+  sum += texture2D(uTexture, vR);
+  sum += texture2D(uTexture, vT);
+  sum += texture2D(uTexture, vB);
+  gl_FragColor = sum * 0.25;
+}
+`;
+
 function compileShader(gl, type, source) {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
@@ -277,6 +295,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       pressure: createProgram(gl, baseVertex, PRESSURE_SHADER),
       gradSub: createProgram(gl, baseVertex, GRADIENT_SUB_SHADER),
       display: createProgram(gl, baseVertex, DISPLAY_SHADER),
+      blur: createProgram(gl, baseVertex, BLUR_SHADER),
     };
 
     const quad = gl.createBuffer();
@@ -495,6 +514,18 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       gl.bindTexture(gl.TEXTURE_2D, density.read.texture);
       blit(density.write);
       density.swap();
+
+      // Soften "circle" artifacts in splats to look more like vapor wisps.
+      gl.useProgram(programs.blur);
+      bindAttrib(programs.blur);
+      setTexel(programs.blur, density.read);
+      gl.uniform1i(gl.getUniformLocation(programs.blur, 'uTexture'), 0);
+      for (let i = 0; i < 2; i += 1) {
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, density.read.texture);
+        blit(density.write);
+        density.swap();
+      }
     };
 
     const render = () => {

@@ -33,6 +33,15 @@ app.use(cors(corsOptions));
 // Explicitly handle preflight, otherwise OPTIONS may fall through to static and return 405
 app.options('*', cors(corsOptions));
 app.use(express.json());
+app.use('/uploads', (req, res, next) => {
+  const ext = path.extname(req.path || '').toLowerCase();
+  if (ext === '.pdf') {
+    const safeName = path.basename(req.path || 'document.pdf');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${safeName}"`);
+  }
+  next();
+});
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Serve static docs inline (so PDFs open in browser, not download).
