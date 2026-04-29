@@ -286,6 +286,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     };
 
     const resize = () => {
+      hadFirstSplat = false;
       const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
       const rect = canvas.getBoundingClientRect();
       canvas.width = Math.max(2, Math.floor(rect.width * dpr));
@@ -299,6 +300,28 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       divergence = createFBO(gl, simWidth, simHeight, texFormat, texFormat, texType, gl.NEAREST);
       curl = createFBO(gl, simWidth, simHeight, texFormat, texFormat, texType, gl.NEAREST);
       pressure = createDoubleFBO(gl, simWidth, simHeight, texFormat, texFormat, texType, gl.NEAREST);
+
+      // IMPORTANT: clear all simulation buffers.
+      // Without this, uninitialized GPU textures can cause flickering/garbage frames.
+      const clearTo = (targetFbo, rgba) => {
+        gl.useProgram(programs.clear);
+        bindAttrib(programs.clear);
+        gl.uniform4f(gl.getUniformLocation(programs.clear, 'color'), rgba[0], rgba[1], rgba[2], rgba[3]);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, targetFbo);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+      };
+
+      // velocity/density/pressure are double FBOs
+      clearTo(velocity.read.fbo, [0, 0, 0, 1]);
+      clearTo(velocity.write.fbo, [0, 0, 0, 1]);
+      clearTo(density.read.fbo, [0, 0, 0, 1]);
+      clearTo(density.write.fbo, [0, 0, 0, 1]);
+      clearTo(pressure.read.fbo, [0, 0, 0, 1]);
+      clearTo(pressure.write.fbo, [0, 0, 0, 1]);
+
+      // single FBOs
+      clearTo(divergence.fbo, [0, 0, 0, 1]);
+      clearTo(curl.fbo, [0, 0, 0, 1]);
     };
 
     const onPointerMove = (event) => {
@@ -431,6 +454,10 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     };
 
     const render = () => {
+      // Smoke overlay should be alpha-blended, not opaque-override.
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
       gl.useProgram(programs.display);
       bindAttrib(programs.display);
       setTexel(programs.display, density.read);
