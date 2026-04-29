@@ -180,8 +180,23 @@ varying vec2 vUv;
 uniform sampler2D uTexture;
 void main () {
   vec3 C = texture2D(uTexture, vUv).rgb;
-  float a = max(C.r, max(C.g, C.b));
-  gl_FragColor = vec4(C, a);
+  float d = max(C.r, max(C.g, C.b));
+
+  // d в нашей симуляции довольно маленький (0..~0.05).
+  // Делаем тёмно-серый дым + светлые белые блики.
+  float t = smoothstep(0.010, 0.040, d);
+  float t2 = pow(t, 1.7);
+
+  vec3 base = vec3(0.02);     // чёрный дым
+  vec3 mid = vec3(0.18);     // серый
+  vec3 hi = vec3(0.92);      // белые отенки
+
+  vec3 smoke = mix(base, mid, t2);
+  smoke = mix(smoke, hi, pow(t, 6.0) * 0.85);
+
+  // Альфа контролирует “густоту” дыма.
+  float a = clamp(t * 0.85, 0.0, 1.0);
+  gl_FragColor = vec4(smoke, a);
 }
 `;
 
@@ -244,7 +259,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       dx: 0,
       dy: 0,
       moved: false,
-      color: [0.02, 0.02, 0.02], // "серый пар" (eU())
+      color: [0.010, 0.010, 0.010], // темный "дым" (eU() в ARMA, но темнее для белого сайта)
     };
     let hadFirstSplat = false;
     const texType = gl.UNSIGNED_BYTE;
@@ -277,7 +292,8 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     let simHeight = 0;
     let cssWidth = 1;
     let cssHeight = 1;
-    const cachedSplatRadius = 0.3 / 100; // ARMA: SPLAT_RADIUS / 100
+    // Под белый фон чуть меньше радиус, чтобы не выглядело "кругами".
+    const cachedSplatRadius = 0.3 / 180;
     let rafId = 0;
     let lastTime = performance.now();
 
@@ -351,8 +367,8 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       pointers.x = x;
       pointers.y = y;
 
-      // Match ARMA grayscale range (their eU()).
-      const gray = 0.02 + Math.random() * 0.03;
+      // Темный пар под белый фон.
+      const gray = 0.006 + Math.random() * 0.016;
       pointers.color = [gray, gray, gray];
       pointers.moved = true;
     };
@@ -484,8 +500,9 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     const render = () => {
       // Smoke overlay should be alpha-blended, not opaque-override.
       gl.enable(gl.BLEND);
-      // Match ARMA additive compositing (their blendFunc is ONE,ONE).
-      gl.blendFunc(gl.ONE, gl.ONE);
+      // Для белого сайта НЕ используем additive (ONE,ONE),
+      // иначе дым быстро превращается в белые пятна.
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
       gl.useProgram(programs.display);
       bindAttrib(programs.display);
