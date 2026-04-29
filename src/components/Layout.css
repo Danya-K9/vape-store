@@ -39,7 +39,7 @@
   position: fixed;
   top: var(--side-strip-top, 24px);
   width: 28px;
-  height: 260px;
+  height: var(--side-strip-height, 260px);
   border-radius: 999px;
   background: #111;
   overflow: hidden;

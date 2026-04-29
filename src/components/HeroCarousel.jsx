@@ -1,21 +1,43 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './HeroCarousel.css';
 
+const SIDE_DURATION_TOP = 4200;
+const SIDE_DURATION_BOTTOM = 5600;
+const SIDE_TICK = 50;
+
+const sideBanners = [
+  {
+    id: 'sideTop',
+    slides: [
+      'https://images.unsplash.com/photo-1609006152682-39654313bf1b?w=900',
+      'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=900',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900',
+    ],
+    duration: SIDE_DURATION_TOP,
+  },
+  {
+    id: 'sideBottom',
+    slides: [
+      'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=900',
+      'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=900',
+      'https://images.unsplash.com/photo-1611131642167-5b2d7e9b1f5a?w=900',
+    ],
+    duration: SIDE_DURATION_BOTTOM,
+  },
+];
+
 const CONSTELLATION_POINTS = [
-  // Cloud-like loop with inner “steam” strand.
-  [0.14, 0.56], [0.20, 0.44], [0.30, 0.36], [0.42, 0.32], [0.56, 0.34], [0.70, 0.42], [0.80, 0.55],
-  [0.76, 0.66], [0.64, 0.72], [0.50, 0.74], [0.36, 0.71], [0.24, 0.64], [0.18, 0.60],
-  [0.28, 0.52], [0.40, 0.48], [0.52, 0.50], [0.64, 0.56], [0.54, 0.60], [0.42, 0.61], [0.32, 0.58],
+  // Five-point star + inner pentagon.
+  [0.50, 0.20], [0.60, 0.44], [0.84, 0.44], [0.65, 0.58], [0.74, 0.82],
+  [0.50, 0.67], [0.26, 0.82], [0.35, 0.58], [0.16, 0.44], [0.40, 0.44],
+  [0.50, 0.34], [0.58, 0.47], [0.53, 0.60], [0.47, 0.60], [0.42, 0.47],
 ];
 
 const EDGES = [
-  // Outer loop.
-  [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [11, 12], [12, 0],
-  // Inner strand.
-  [1, 13], [13, 14], [14, 15], [15, 16], [16, 17], [17, 18], [18, 19], [19, 13],
-  // A few cross-links to read as “constellation”.
-  [2, 14], [4, 15], [6, 16], [8, 17], [10, 18],
+  [0, 3], [3, 6], [6, 9], [9, 2], [2, 5], [5, 8], [8, 1], [1, 4], [4, 7], [7, 0],
+  [10, 11], [11, 12], [12, 13], [13, 14], [14, 10],
+  [0, 10], [3, 11], [5, 12], [7, 13], [9, 14],
 ];
 
 const hash = (x, y) => {
@@ -56,6 +78,28 @@ const fractalNoise = (x, y, t) => {
 export default function HeroCarousel() {
   const canvasRef = useRef(null);
   const constellation = useMemo(() => ({ points: CONSTELLATION_POINTS, edges: EDGES }), []);
+  const [sideState, setSideState] = useState(() => ({
+    sideTop: { index: 0, progress: 0 },
+    sideBottom: { index: 0, progress: 0 },
+  }));
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setSideState((prev) => {
+        const nextState = { ...prev };
+        sideBanners.forEach((banner) => {
+          const current = prev[banner.id];
+          const step = 100 / (banner.duration / SIDE_TICK);
+          const nextProgress = current.progress + step;
+          nextState[banner.id] = nextProgress >= 100
+            ? { index: (current.index + 1) % banner.slides.length, progress: 0 }
+            : { index: current.index, progress: nextProgress };
+        });
+        return nextState;
+      });
+    }, SIDE_TICK);
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -70,7 +114,6 @@ export default function HeroCarousel() {
     let stars = [];
     let vapor = [];
     let edgesPx = [];
-    let bgStars = [];
     const MAX_VAPOR = window.innerWidth < 900 ? 90 : 160;
 
     const resize = () => {
@@ -95,14 +138,6 @@ export default function HeroCarousel() {
         twinkleSeed: idx * 0.8 + 0.5,
       }));
 
-      // Background stars (subtle, randomized).
-      bgStars = Array.from({ length: window.innerWidth < 900 ? 70 : 120 }).map((_, i) => ({
-        x: Math.random() * rect.width,
-        y: Math.random() * rect.height,
-        r: 0.6 + Math.random() * 1.2,
-        a: 0.08 + Math.random() * 0.22,
-        twinkleSeed: i * 0.31 + Math.random() * 2,
-      }));
       vapor = [];
     };
 
@@ -168,22 +203,7 @@ export default function HeroCarousel() {
       time += dt;
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
-
-      const bg = ctx.createLinearGradient(0, 0, 0, h);
-      bg.addColorStop(0, '#030711');
-      bg.addColorStop(0.5, '#050d1f');
-      bg.addColorStop(1, '#070b16');
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, w, h);
-
-      // Background stars.
-      bgStars.forEach((s, i) => {
-        const tw = 0.5 + 0.5 * Math.sin(time * 0.0012 + s.twinkleSeed + i * 0.07);
-        ctx.fillStyle = `rgba(210, 230, 255, ${s.a + tw * 0.12})`;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r + tw * 0.4, 0, Math.PI * 2);
-        ctx.fill();
-      });
+      ctx.clearRect(0, 0, w, h);
 
       if (vapor.length < MAX_VAPOR * 0.75) spawnVapor(2);
 
@@ -219,11 +239,11 @@ export default function HeroCarousel() {
         ctx.fill();
       }
 
-      // Constellation lines (thin + soft glow).
-      ctx.strokeStyle = 'rgba(130, 190, 255, 0.22)';
+      // Constellation lines (black as requested).
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
       ctx.lineWidth = 1;
-      ctx.shadowColor = 'rgba(130, 190, 255, 0.38)';
-      ctx.shadowBlur = 9;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.18)';
+      ctx.shadowBlur = 4;
       edgesPx.forEach(({ a, b }) => {
         ctx.beginPath();
         ctx.moveTo(a.x, a.y);
@@ -235,7 +255,7 @@ export default function HeroCarousel() {
       stars.forEach((s, i) => {
         const tw = 0.5 + 0.5 * Math.sin(time * 0.0018 + s.twinkleSeed + i * 0.17);
         const r = s.r + tw * 0.9;
-        ctx.fillStyle = `rgba(220, 238, 255, ${0.36 + tw * 0.55})`;
+        ctx.fillStyle = `rgba(0, 0, 0, ${0.26 + tw * 0.42})`;
         ctx.beginPath();
         ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
         ctx.fill();
@@ -260,18 +280,30 @@ export default function HeroCarousel() {
           <canvas ref={canvasRef} className="hero-vape-canvas" aria-hidden="true" />
         </Link>
         <div className="hero-vape-side">
-          <Link
-            to="/catalog"
-            className="hero-vape-side-card"
-            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1609006152682-39654313bf1b?w=900')" }}
-            aria-label="Каталог — подборка 1"
-          />
-          <Link
-            to="/catalog"
-            className="hero-vape-side-card"
-            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=900')" }}
-            aria-label="Каталог — подборка 2"
-          />
+          {sideBanners.map((banner) => (
+            <Link
+              key={banner.id}
+              to="/catalog"
+              className="hero-vape-side-card"
+              style={{ backgroundImage: `url('${banner.slides[sideState[banner.id].index]}')` }}
+              aria-label="Каталог — подборка"
+            >
+              <span className="hero-vape-side-progress" aria-hidden="true">
+                {banner.slides.map((_, idx) => (
+                  <span key={idx} className="hero-vape-side-progress-item">
+                    <span
+                      className="hero-vape-side-progress-fill"
+                      style={{
+                        width: idx === sideState[banner.id].index
+                          ? `${sideState[banner.id].progress}%`
+                          : idx < sideState[banner.id].index ? '100%' : '0%',
+                      }}
+                    />
+                  </span>
+                ))}
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

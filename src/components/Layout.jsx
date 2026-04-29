@@ -13,6 +13,7 @@ export default function Layout() {
   const sideChars = SIDE_TEXT.split('');
   const mainRef = useRef(null);
   const [sideTop, setSideTop] = useState(24);
+  const [sideHeight, setSideHeight] = useState(260);
   const isHome = location.pathname === '/';
   const sideCharLoop = useMemo(
     () => [...sideChars, ...sideChars, ...sideChars],
@@ -28,26 +29,42 @@ export default function Layout() {
     if (typeof window === 'undefined') return undefined;
 
     const updateSideTop = () => {
-      const STRIP_HEIGHT = 260;
+      const STRIP_HEIGHT_DEFAULT = 260;
+      const STRIP_HEIGHT_MIN = 170;
       const MARGIN = 16;
+      const footer = document.querySelector('.footer-dark');
+      const footerRect = footer?.getBoundingClientRect();
+      const footerTop = footerRect ? footerRect.top - MARGIN : window.innerHeight - MARGIN;
 
       if (!isHome) {
-        setSideTop(Math.round(window.innerHeight / 2 - STRIP_HEIGHT / 2));
+        const allowedHeight = Math.max(
+          STRIP_HEIGHT_MIN,
+          Math.min(STRIP_HEIGHT_DEFAULT, footerTop - MARGIN - STRIP_HEIGHT_MIN)
+        );
+        setSideHeight(Math.round(allowedHeight));
+        setSideTop(Math.round(Math.max(MARGIN, Math.min(window.innerHeight / 2 - allowedHeight / 2, footerTop - allowedHeight))));
         return;
       }
       const hero = document.querySelector('.hero-vape') || document.querySelector('.hero-carousel');
       if (!hero) {
-        setSideTop(Math.round(window.innerHeight / 2 - STRIP_HEIGHT / 2));
+        const allowedHeight = Math.max(
+          STRIP_HEIGHT_MIN,
+          Math.min(STRIP_HEIGHT_DEFAULT, footerTop - MARGIN - STRIP_HEIGHT_MIN)
+        );
+        setSideHeight(Math.round(allowedHeight));
+        setSideTop(Math.round(Math.max(MARGIN, Math.min(window.innerHeight / 2 - allowedHeight / 2, footerTop - allowedHeight))));
         return;
       }
       const heroRect = hero.getBoundingClientRect();
       const topFromHero = heroRect.bottom + 8;
-      const centerTop = window.innerHeight / 2 - STRIP_HEIGHT / 2;
-      const clamped = Math.min(
-        Math.max(MARGIN, topFromHero, centerTop),
-        Math.max(MARGIN, window.innerHeight - STRIP_HEIGHT - MARGIN)
-      );
-      setSideTop(Math.round(clamped));
+      const available = Math.max(STRIP_HEIGHT_MIN, footerTop - topFromHero);
+      const dynamicHeight = Math.min(STRIP_HEIGHT_DEFAULT, available);
+      setSideHeight(Math.round(dynamicHeight));
+      const centerTop = window.innerHeight / 2 - dynamicHeight / 2;
+      const minTop = Math.max(MARGIN, topFromHero);
+      const maxTop = Math.max(minTop, footerTop - dynamicHeight);
+      const clampedTop = Math.min(Math.max(centerTop, minTop), maxTop);
+      setSideTop(Math.round(clampedTop));
     };
 
     updateSideTop();
@@ -69,7 +86,10 @@ export default function Layout() {
           <main
             className="main-content"
             ref={mainRef}
-            style={{ '--side-strip-top': `${sideTop}px` }}
+            style={{
+              '--side-strip-top': `${sideTop}px`,
+              '--side-strip-height': `${sideHeight}px`,
+            }}
           >
             <aside className="side-marquee side-marquee-left" aria-hidden="true">
               <div className="side-marquee-track">
