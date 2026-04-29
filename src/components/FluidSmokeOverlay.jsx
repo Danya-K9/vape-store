@@ -180,10 +180,8 @@ varying vec2 vUv;
 uniform sampler2D uTexture;
 void main () {
   vec3 C = texture2D(uTexture, vUv).rgb;
-  float g = dot(C, vec3(0.299, 0.587, 0.114));
-  float a = clamp(g * 3.6, 0.0, 1.0);
-  vec3 smoke = vec3(g * 1.6);
-  gl_FragColor = vec4(smoke, a);
+  float a = max(C.r, max(C.g, C.b));
+  gl_FragColor = vec4(C, a);
 }
 `;
 
@@ -238,7 +236,16 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     const gl = canvas.getContext('webgl', { alpha: true, antialias: false, premultipliedAlpha: false });
     if (!gl) return undefined;
 
-    const pointers = { x: 0.5, y: 0.5, dx: 0, dy: 0, moved: false };
+    // ARMA хранит координаты в пикселях (от верхнего-левого угла canvas),
+    // а в shader передаёт normalized point (x/width, 1-y/height).
+    const pointers = {
+      x: 0,
+      y: 0,
+      dx: 0,
+      dy: 0,
+      moved: false,
+      color: [0.02, 0.02, 0.02], // "серый пар" (eU())
+    };
     let hadFirstSplat = false;
     const texType = gl.UNSIGNED_BYTE;
     const texFormat = gl.RGBA;
@@ -268,6 +275,9 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     let pressure;
     let simWidth = 0;
     let simHeight = 0;
+    let cssWidth = 1;
+    let cssHeight = 1;
+    const cachedSplatRadius = 0.3 / 100; // ARMA: SPLAT_RADIUS / 100
     let rafId = 0;
     let lastTime = performance.now();
 
@@ -289,6 +299,10 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       hadFirstSplat = false;
       const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
       const rect = canvas.getBoundingClientRect();
+      cssWidth = Math.max(1, rect.width);
+      cssHeight = Math.max(1, rect.height);
+      pointers.x = cssWidth / 2;
+      pointers.y = cssHeight / 2;
       canvas.width = Math.max(2, Math.floor(rect.width * dpr));
       canvas.height = Math.max(2, Math.floor(rect.height * dpr));
       gl.viewport(0, 0, canvas.width, canvas.height);
@@ -325,12 +339,18 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     };
 
     const onPointerMove = (event) => {
-      const nx = event.clientX / Math.max(1, window.innerWidth);
-      const ny = 1 - event.clientY / Math.max(1, window.innerHeight);
-      pointers.dx = (nx - pointers.x) * 1800;
-      pointers.dy = (ny - pointers.y) * 1800;
-      pointers.x = nx;
-      pointers.y = ny;
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      pointers.dx = 1.5 * (x - pointers.x);
+      pointers.dy = 1.5 * (y - pointers.y);
+      pointers.x = x;
+      pointers.y = y;
+
+      // Match ARMA grayscale range (their eU()).
+      const gray = 0.02 + Math.random() * 0.03;
+      pointers.color = [gray, gray, gray];
       pointers.moved = true;
     };
 
@@ -345,10 +365,15 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       bindAttrib(programs.splat);
 
       setTexel(programs.splat, velocity.read);
-      gl.uniform1f(gl.getUniformLocation(programs.splat, 'aspectRatio'), canvas.width / canvas.height);
-      gl.uniform2f(gl.getUniformLocation(programs.splat, 'point'), x, y);
-      gl.uniform3f(gl.getUniformLocation(programs.splat, 'color'), dx, -dy, 0);
-      gl.uniform1f(gl.getUniformLocation(programs.splat, 'radius'), 0.00045 * (canvas.width + canvas.height));
+      gl.uniform1f(gl.getUniformLocation(programs.splat, 'aspectRatio'), cssWidth / cssHeight);
+      // Screen coords (x,y) are top-left origin; convert to vUv coords (bottom-left origin, 0..1).
+      gl.uniform2f(
+        gl.getUniformLocation(programs.splat, 'point'),
+        x / cssWidth,
+        1 - y / cssHeight
+      );
+      gl.uniform3f(gl.getUniformLocation(programs.splat, 'color'), dx, -dy, 1);
+      gl.uniform1f(gl.getUniformLocation(programs.splat, 'radius'), cachedSplatRadius);
 
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
@@ -377,7 +402,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       gl.useProgram(programs.vorticity);
       bindAttrib(programs.vorticity);
       setTexel(programs.vorticity, velocity.read);
-      gl.uniform1f(gl.getUniformLocation(programs.vorticity, 'curl'), 30.0);
+      gl.uniform1f(gl.getUniformLocation(programs.vorticity, 'curl'), 15.0);
       gl.uniform1f(gl.getUniformLocation(programs.vorticity, 'dt'), dt);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
@@ -410,7 +435,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, divergence.texture);
       gl.uniform1i(gl.getUniformLocation(programs.pressure, 'uDivergence'), 1);
-      for (let i = 0; i < 10; i += 1) {
+      for (let i = 0; i < 15; i += 1) {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, pressure.read.texture);
         blit(pressure.write.fbo);
@@ -433,7 +458,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       bindAttrib(programs.advection);
       setTexel(programs.advection, velocity.read);
       gl.uniform1f(gl.getUniformLocation(programs.advection, 'dt'), dt);
-      gl.uniform1f(gl.getUniformLocation(programs.advection, 'dissipation'), 0.985);
+      gl.uniform1f(gl.getUniformLocation(programs.advection, 'dissipation'), 0.992);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
       gl.uniform1i(gl.getUniformLocation(programs.advection, 'uVelocity'), 0);
@@ -444,7 +469,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       velocity.swap();
 
       setTexel(programs.advection, density.read);
-      gl.uniform1f(gl.getUniformLocation(programs.advection, 'dissipation'), 0.992);
+      gl.uniform1f(gl.getUniformLocation(programs.advection, 'dissipation'), 0.99);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
       gl.activeTexture(gl.TEXTURE1);
@@ -456,7 +481,8 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     const render = () => {
       // Smoke overlay should be alpha-blended, not opaque-override.
       gl.enable(gl.BLEND);
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      // Match ARMA additive compositing (their blendFunc is ONE,ONE).
+      gl.blendFunc(gl.ONE, gl.ONE);
 
       gl.useProgram(programs.display);
       bindAttrib(programs.display);
@@ -473,16 +499,15 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       lastTime = now;
 
       if (pointers.moved) {
-        splat(pointers.x, pointers.y, pointers.dx, pointers.dy, [0.18, 0.18, 0.18]);
+        splat(pointers.x, pointers.y, pointers.dx, pointers.dy, pointers.color);
         pointers.moved = false;
+        pointers.dx = 0;
+        pointers.dy = 0;
         hadFirstSplat = true;
       } else if (!hadFirstSplat) {
-        // Ensure visible smoke even before first pointer movement.
-        splat(0.5, 0.52, 0.0, 0.0, [0.16, 0.16, 0.16]);
+        // Visible smoke right away (before first pointer movement).
+        splat(cssWidth / 2, cssHeight / 2, 0, 0, pointers.color);
         hadFirstSplat = true;
-      } else {
-        pointers.dx *= 0.85;
-        pointers.dy *= 0.85;
       }
 
       step(dt);
