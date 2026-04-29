@@ -11,9 +11,11 @@
 
 .home-fluid-smoke {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: var(--smoke-footer-cut, 0px);
   width: 100vw;
-  height: 100vh;
   pointer-events: none;
   z-index: 0;
   opacity: 1;

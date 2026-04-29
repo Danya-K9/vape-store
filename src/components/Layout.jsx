@@ -37,6 +37,7 @@ export default function Layout() {
       const footerTop = footerRect ? footerRect.top - MARGIN : window.innerHeight - MARGIN;
 
       if (!isHome) {
+        document.documentElement.style.setProperty('--smoke-footer-cut', '0px');
         const allowedHeight = Math.max(
           STRIP_HEIGHT_MIN,
           Math.min(STRIP_HEIGHT_DEFAULT, footerTop - MARGIN - STRIP_HEIGHT_MIN)
@@ -47,6 +48,7 @@ export default function Layout() {
       }
       const hero = document.querySelector('.hero-vape') || document.querySelector('.hero-carousel');
       if (!hero) {
+        document.documentElement.style.setProperty('--smoke-footer-cut', '0px');
         const allowedHeight = Math.max(
           STRIP_HEIGHT_MIN,
           Math.min(STRIP_HEIGHT_DEFAULT, footerTop - MARGIN - STRIP_HEIGHT_MIN)
@@ -57,6 +59,11 @@ export default function Layout() {
       }
       const heroRect = hero.getBoundingClientRect();
       const topFromHero = heroRect.bottom + 8;
+      // Limit smoke overlay so it doesn't go into the footer area.
+      const footerTopPx = footerRect ? footerRect.top : window.innerHeight;
+      const smokeCut = Math.max(0, window.innerHeight - footerTopPx);
+      document.documentElement.style.setProperty('--smoke-footer-cut', `${smokeCut}px`);
+
       const available = Math.max(STRIP_HEIGHT_MIN, footerTop - topFromHero);
       const dynamicHeight = Math.min(STRIP_HEIGHT_DEFAULT, available);
       setSideHeight(Math.round(dynamicHeight));

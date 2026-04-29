@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { prisma } from './lib/prisma.js';
 import authRoutes from './routes/auth.js';
@@ -33,6 +34,36 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Serve static docs inline (so PDFs open in browser, not download).
+// This is required for links in the "Лицензия и сертификаты" page.
+app.get('/docs/:fileName', (req, res) => {
+  const fileName = req.params.fileName;
+  const safeName = path.basename(fileName);
+  const ext = path.extname(safeName).toLowerCase();
+
+  // Allowed file types only.
+  if (!['.pdf', '.png', '.jpg', '.jpeg', '.webp'].includes(ext)) {
+    return res.status(400).send('Unsupported file type');
+  }
+
+  const docsDir = path.join(__dirname, '../public/docs');
+  const filePath = path.join(docsDir, safeName);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('File not found');
+  }
+
+  if (ext === '.pdf') {
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${safeName}"`);
+  } else {
+    // Let browser handle image/viewers.
+    res.setHeader('Content-Disposition', `inline; filename="${safeName}"`);
+  }
+
+  return res.sendFile(filePath);
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

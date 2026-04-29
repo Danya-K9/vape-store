@@ -28,6 +28,26 @@
   background: #fff;
 }
 
+.license-doc-card-requisites {
+  padding: 16px 14px;
+}
+
+.license-doc-requisites-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.license-doc-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  padding: 0;
+}
+
 .license-doc-card h3 {
   margin: 0 0 4px;
   font-size: 16px;
