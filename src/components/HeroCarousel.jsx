@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { contentApi } from '../lib/api';
+import FluidSmokeOverlay from './FluidSmokeOverlay';
 import './HeroCarousel.css';
 
 const MAIN_SLIDE_DURATION = 5000;
@@ -131,6 +132,7 @@ export default function HeroCarousel() {
       <div className="hero-carousel-inner">
         <div className="hero-main-area">
           <Link to="/catalog" className="hero-main-slide-wrap">
+            <FluidSmokeOverlay />
             <button
               type="button"
               className="hero-arrow hero-arrow-left"

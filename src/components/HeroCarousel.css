@@ -26,6 +26,17 @@
   min-height: 320px;
 }
 
+.fluid-smoke-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.9;
+}
+
 .hero-arrow {
   position: absolute;
   top: 50%;
@@ -37,7 +48,7 @@
   color: #333;
   font-size: 28px;
   cursor: pointer;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,6 +72,7 @@
   position: relative;
   width: 100%;
   height: 320px;
+  z-index: 2;
 }
 
 .hero-slide {
@@ -127,7 +139,7 @@
   transform: translateX(-50%);
   display: flex;
   gap: 8px;
-  z-index: 3;
+  z-index: 4;
 }
 
 .hero-indicator {
