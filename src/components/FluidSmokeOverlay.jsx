@@ -181,8 +181,9 @@ uniform sampler2D uTexture;
 void main () {
   vec3 C = texture2D(uTexture, vUv).rgb;
   float g = dot(C, vec3(0.299, 0.587, 0.114));
-  vec3 smoke = vec3(g * 1.05, g * 0.95, g * 0.9);
-  float a = clamp(g * 2.0, 0.0, 1.0);
+  float alphaMask = smoothstep(0.05, 0.42, g);
+  vec3 smoke = vec3(g * 0.96, g * 0.96, g * 0.96);
+  float a = alphaMask * 0.92;
   gl_FragColor = vec4(smoke, a);
 }
 `;
@@ -238,7 +239,7 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
     const gl = canvas.getContext('webgl', { alpha: true, antialias: false, premultipliedAlpha: false });
     if (!gl) return undefined;
 
-    const pointers = { x: 0.5, y: 0.5, dx: 0, dy: 0 };
+    const pointers = { x: 0.5, y: 0.5, dx: 0, dy: 0, moved: false };
     const texType = gl.UNSIGNED_BYTE;
     const texFormat = gl.RGBA;
     const filtering = gl.LINEAR;
@@ -298,6 +299,16 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       divergence = createFBO(gl, simWidth, simHeight, texFormat, texFormat, texType, gl.NEAREST);
       curl = createFBO(gl, simWidth, simHeight, texFormat, texFormat, texType, gl.NEAREST);
       pressure = createDoubleFBO(gl, simWidth, simHeight, texFormat, texFormat, texType, gl.NEAREST);
+    };
+
+    const onPointerMove = (event) => {
+      const nx = event.clientX / Math.max(1, window.innerWidth);
+      const ny = 1 - event.clientY / Math.max(1, window.innerHeight);
+      pointers.dx = (nx - pointers.x) * 1800;
+      pointers.dy = (ny - pointers.y) * 1800;
+      pointers.x = nx;
+      pointers.y = ny;
+      pointers.moved = true;
     };
 
     const setTexel = (program, fbo) => {
@@ -434,18 +445,14 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
       const dt = Math.min((now - lastTime) / 1000, 0.016);
       lastTime = now;
 
-      const t = now * 0.0012;
-      const x = 0.5 + Math.cos(t * 0.8) * 0.17;
-      const y = 0.52 + Math.sin(t) * 0.13;
-      const dx = (x - pointers.x) * 2200;
-      const dy = (y - pointers.y) * 2200;
-      pointers.x = x;
-      pointers.y = y;
-      pointers.dx = dx;
-      pointers.dy = dy;
+      if (pointers.moved) {
+        splat(pointers.x, pointers.y, pointers.dx, pointers.dy, [0.1, 0.1, 0.1]);
+        pointers.moved = false;
+      } else {
+        pointers.dx *= 0.85;
+        pointers.dy *= 0.85;
+      }
 
-      const shade = 0.12 + (Math.sin(t * 0.7) * 0.5 + 0.5) * 0.25;
-      splat(pointers.x, pointers.y, pointers.dx, pointers.dy, [shade, shade * 0.95, shade * 0.9]);
       step(dt);
       render();
       rafId = requestAnimationFrame(tick);
@@ -453,10 +460,12 @@ export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' })
 
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
     rafId = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', resize);
+      window.removeEventListener('pointermove', onPointerMove);
     };
   }, []);
 

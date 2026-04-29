@@ -16,8 +16,7 @@
   height: 100vh;
   pointer-events: none;
   z-index: 2;
-  opacity: 0.9;
-  mix-blend-mode: multiply;
+  opacity: 0.82;
 }
 
 .section {
