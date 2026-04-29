@@ -229,7 +229,7 @@ function createDoubleFBO(gl, w, h, internalFormat, format, type, filter) {
   };
 }
 
-export default function FluidSmokeOverlay() {
+export default function FluidSmokeOverlay({ className = 'fluid-smoke-overlay' }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -460,6 +460,6 @@ export default function FluidSmokeOverlay() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="fluid-smoke-overlay" aria-hidden="true" />;
+  return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
 }
 

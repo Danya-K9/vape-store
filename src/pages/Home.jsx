@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import ProductCarousel from '../components/ProductCarousel';
 import HeroCarousel from '../components/HeroCarousel';
 import SocialCarousel from '../components/SocialCarousel';
+import FluidSmokeOverlay from '../components/FluidSmokeOverlay';
 import { blogPosts, reviews } from '../data/products';
 import { productsApi, contentApi } from '../lib/api';
 import './Home.css';
@@ -147,6 +148,7 @@ export default function Home() {
 
   return (
     <div className="home">
+      <FluidSmokeOverlay className="home-fluid-smoke" />
       <HeroCarousel />
 
       <section className="section section-promo">

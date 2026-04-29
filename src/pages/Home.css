@@ -1,6 +1,23 @@
 .home {
   overflow-x: hidden;
   width: 100%;
+  position: relative;
+}
+
+.home > * {
+  position: relative;
+  z-index: 1;
+}
+
+.home-fluid-smoke {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.9;
+  mix-blend-mode: multiply;
 }
 
 .section {
