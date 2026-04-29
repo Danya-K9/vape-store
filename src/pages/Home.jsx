@@ -33,6 +33,7 @@ export default function Home() {
   const [blogPostsData, setBlogPostsData] = useState(blogPosts);
   const [categoryFilters, setCategoryFilters] = useState(defaultCategoryFilters);
   const [visibleYandexReviews, setVisibleYandexReviews] = useState([]);
+  const [yandexReviewsData, setYandexReviewsData] = useState([]);
   const blogSwipeRef = useRef({ startX: 0, deltaX: 0, active: false });
   const blogTimerRef = useRef(null);
 
@@ -63,6 +64,10 @@ export default function Home() {
         }
       })
       .catch(() => {});
+
+    contentApi.yandexReviews()
+      .then((data) => setYandexReviewsData(Array.isArray(data) ? data : []))
+      .catch(() => setYandexReviewsData([]));
   }, []);
 
   const blogCount = blogPostsData.length;
@@ -128,7 +133,10 @@ export default function Home() {
   const blogPrev = () => safeSetBlogSlide((i) => (i - 1 + blogCount) % blogCount);
   const blogNext = () => safeSetBlogSlide((i) => (i + 1) % blogCount);
 
-  const yandexReviews = useMemo(() => (reviews || []).filter((r) => r.source === 'yandex'), []);
+  const yandexReviews = useMemo(() => {
+    if (Array.isArray(yandexReviewsData) && yandexReviewsData.length > 0) return yandexReviewsData;
+    return (reviews || []).filter((r) => r.source === 'yandex');
+  }, [yandexReviewsData]);
   const getRandomYandexReviews = () => {
     const src = [...yandexReviews];
     for (let i = src.length - 1; i > 0; i -= 1) {

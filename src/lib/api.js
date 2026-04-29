@@ -103,4 +103,5 @@ export const contentApi = {
   partners: () => api('/content/partners'),
   faq: () => api('/content/faq'),
   licenseDocs: () => api('/content/license-docs'),
+  yandexReviews: () => api('/content/yandex-reviews'),
 };
