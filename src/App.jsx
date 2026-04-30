@@ -17,6 +17,7 @@ import Favorites from './pages/Favorites';
 import Checkout from './pages/Checkout';
 import AdminPanel from './pages/AdminPanel';
 import NotFound from './pages/NotFound';
+import AdminErrorBoundary from './components/AdminErrorBoundary';
 import './App.css';
 
 function AppRoutes() {
@@ -39,7 +40,7 @@ function AppRoutes() {
           <Route path="partners" element={<Partners />} />
           <Route path="favorites" element={<Favorites />} />
           <Route path="checkout" element={<Checkout />} />
-          <Route path="vapeAdminDanik" element={<AdminPanel />} />
+          <Route path="vapeAdminDanik" element={<AdminErrorBoundary><AdminPanel /></AdminErrorBoundary>} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

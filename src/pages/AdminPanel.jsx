@@ -82,9 +82,16 @@ export default function AdminPanel() {
   }, [token, tab]);
 
   async function fetchUsers() {
-    const r = await fetch(`${API_BASE}/admin/users`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setUsers(await r.json());
+    try {
+      const r = await fetch(`${API_BASE}/admin/users`, { headers: headers() });
+      if (r.status === 401) { logout(); return; }
+      const data = await r.json();
+      setUsers(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) setError('Ошибка загрузки пользователей');
+    } catch {
+      setUsers([]);
+      setError('Не удалось загрузить пользователей');
+    }
   }
 
   async function fetchProducts() {
@@ -101,15 +108,29 @@ export default function AdminPanel() {
   }
 
   async function fetchFilterOptions() {
-    const r = await fetch(`${API_BASE}/admin/filters?category=${encodeURIComponent(filterCategory)}`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setFilterOptions(await r.json());
+    try {
+      const r = await fetch(`${API_BASE}/admin/filters?category=${encodeURIComponent(filterCategory)}`, { headers: headers() });
+      if (r.status === 401) { logout(); return; }
+      const data = await r.json();
+      setFilterOptions(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) setError('Ошибка загрузки фильтров');
+    } catch {
+      setFilterOptions([]);
+      setError('Не удалось загрузить фильтры');
+    }
   }
 
   async function fetchOrders() {
-    const r = await fetch(`${API_BASE}/admin/orders`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setOrders(await r.json());
+    try {
+      const r = await fetch(`${API_BASE}/admin/orders`, { headers: headers() });
+      if (r.status === 401) { logout(); return; }
+      const data = await r.json();
+      setOrders(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) setError('Ошибка загрузки заказов');
+    } catch {
+      setOrders([]);
+      setError('Не удалось загрузить заказы');
+    }
   }
 
   async function fetchCategories() {
@@ -158,9 +179,16 @@ export default function AdminPanel() {
   };
 
   async function fetchBlogPosts() {
-    const r = await fetch(`${API_BASE}/admin/blog-posts`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setBlogPosts(await r.json());
+    try {
+      const r = await fetch(`${API_BASE}/admin/blog-posts`, { headers: headers() });
+      if (r.status === 401) { logout(); return; }
+      const data = await r.json();
+      setBlogPosts(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) setError('Ошибка загрузки блога');
+    } catch {
+      setBlogPosts([]);
+      setError('Не удалось загрузить блог');
+    }
   }
 
   const saveBlogPost = async () => {
@@ -201,9 +229,16 @@ export default function AdminPanel() {
   };
 
   async function fetchHeroBanners() {
-    const r = await fetch(`${API_BASE}/admin/hero-banners`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setHeroBanners(await r.json());
+    try {
+      const r = await fetch(`${API_BASE}/admin/hero-banners`, { headers: headers() });
+      if (r.status === 401) { logout(); return; }
+      const data = await r.json();
+      setHeroBanners(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) setError('Ошибка загрузки баннеров');
+    } catch {
+      setHeroBanners([]);
+      setError('Не удалось загрузить баннеры');
+    }
   }
 
   const saveHeroBanner = async () => {
@@ -234,9 +269,16 @@ export default function AdminPanel() {
   };
 
   async function fetchPartners() {
-    const r = await fetch(`${API_BASE}/admin/partners`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setPartners(await r.json());
+    try {
+      const r = await fetch(`${API_BASE}/admin/partners`, { headers: headers() });
+      if (r.status === 401) { logout(); return; }
+      const data = await r.json();
+      setPartners(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) setError('Ошибка загрузки партнеров');
+    } catch {
+      setPartners([]);
+      setError('Не удалось загрузить партнеров');
+    }
   }
 
   const savePartner = async () => {
@@ -260,9 +302,16 @@ export default function AdminPanel() {
   };
 
   async function fetchFaqItems() {
-    const r = await fetch(`${API_BASE}/admin/faq`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setFaqItems(await r.json());
+    try {
+      const r = await fetch(`${API_BASE}/admin/faq`, { headers: headers() });
+      if (r.status === 401) { logout(); return; }
+      const data = await r.json();
+      setFaqItems(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) setError('Ошибка загрузки FAQ');
+    } catch {
+      setFaqItems([]);
+      setError('Не удалось загрузить FAQ');
+    }
   }
 
   const saveFaq = async () => {
@@ -284,9 +333,16 @@ export default function AdminPanel() {
   };
 
   async function fetchLicenseDocs() {
-    const r = await fetch(`${API_BASE}/admin/license-docs`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setLicenseDocs(await r.json());
+    try {
+      const r = await fetch(`${API_BASE}/admin/license-docs`, { headers: headers() });
+      if (r.status === 401) { logout(); return; }
+      const data = await r.json();
+      setLicenseDocs(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) setError('Ошибка загрузки PDF документов');
+    } catch {
+      setLicenseDocs([]);
+      setError('Не удалось загрузить PDF документы');
+    }
   }
 
   const saveLicenseDoc = async () => {
