@@ -30,8 +30,18 @@ const uploadProductFiles = multer({
   { name: 'images', maxCount: 50 },
 ]);
 
+const pdfStorage = multer.diskStorage({
+  destination: (_, __, cb) => cb(null, path.join(__dirname, '../uploads')),
+  filename: (_, file, cb) => {
+    const base = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const originalExt = path.extname(file.originalname || '').toLowerCase();
+    const ext = originalExt === '.pdf' ? '.pdf' : '.pdf';
+    cb(null, `${base}${ext}`);
+  },
+});
+
 const uploadPdfFile = multer({
-  dest: path.join(__dirname, '../uploads'),
+  storage: pdfStorage,
   limits: { fileSize: 20 * 1024 * 1024 },
   fileFilter: (_, file, cb) => {
     if (file.mimetype === 'application/pdf' || file.originalname.toLowerCase().endsWith('.pdf')) cb(null, true);
