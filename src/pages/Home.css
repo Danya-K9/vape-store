@@ -9,18 +9,6 @@
   z-index: 2;
 }
 
-.home-fluid-smoke {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: var(--smoke-footer-cut, 0px);
-  width: 100vw;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 1;
-}
-
 .section {
   max-width: 1400px;
   margin: 0 auto;

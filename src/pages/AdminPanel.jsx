@@ -88,9 +88,16 @@ export default function AdminPanel() {
   }
 
   async function fetchProducts() {
-    const r = await fetch(`${API_BASE}/admin/products`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setProducts(await r.json());
+    try {
+      const r = await fetch(`${API_BASE}/admin/products`, { headers: headers() });
+      if (r.status === 401) { logout(); return; }
+      const data = await r.json();
+      setProducts(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) setError('Ошибка загрузки товаров');
+    } catch {
+      setProducts([]);
+      setError('Не удалось загрузить товары');
+    }
   }
 
   async function fetchFilterOptions() {
@@ -106,9 +113,16 @@ export default function AdminPanel() {
   }
 
   async function fetchCategories() {
-    const r = await fetch(`${API_BASE}/admin/categories`, { headers: headers() });
-    if (r.status === 401) { logout(); return; }
-    setCategories(await r.json());
+    try {
+      const r = await fetch(`${API_BASE}/admin/categories`, { headers: headers() });
+      if (r.status === 401) { logout(); return; }
+      const data = await r.json();
+      setCategories(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) setError('Ошибка загрузки категорий');
+    } catch {
+      setCategories([]);
+      setError('Не удалось загрузить категории');
+    }
   }
 
   const saveCategory = async () => {
