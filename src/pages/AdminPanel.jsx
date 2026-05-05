@@ -2,12 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
 
-const API_BASE = (() => {
-  const raw = import.meta?.env?.VITE_API_URL;
-  const base = raw ? String(raw).trim().replace(/^['"]|['"]$/g, '').replace(/\/+$/, '') : '';
-  if (!base) return '/api';
-  return base.endsWith('/api') ? base : `${base}/api`;
-})();
+const API_BASE = '/api';
 
 export default function AdminPanel() {
   const navigate = useNavigate();

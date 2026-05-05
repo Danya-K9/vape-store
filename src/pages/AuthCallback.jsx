@@ -3,12 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { setToken } from '../lib/api';
 
-const API_BASE = (() => {
-  const raw = import.meta?.env?.VITE_API_URL;
-  const base = raw ? String(raw).trim().replace(/^['"]|['"]$/g, '').replace(/\/+$/, '') : '';
-  if (!base) return '/api';
-  return base.endsWith('/api') ? base : `${base}/api`;
-})();
+const API_BASE = '/api';
 
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();

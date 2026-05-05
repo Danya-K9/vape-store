@@ -2,12 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './DirectorModal.css';
 
-const API_BASE = (() => {
-  const raw = import.meta?.env?.VITE_API_URL;
-  const base = raw ? String(raw).trim().replace(/^['"]|['"]$/g, '').replace(/\/+$/, '') : '';
-  if (!base) return '/api';
-  return base.endsWith('/api') ? base : `${base}/api`;
-})();
+const API_BASE = '/api';
 
 export default function DirectorModal({ isOpen, onClose }) {
   const [form, setForm] = useState({
