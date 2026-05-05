@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import Seo from '../components/Seo';
 import { blogPosts } from '../data/products';
 import { contentApi } from '../lib/api';
 import './Blog.css';
@@ -54,6 +55,12 @@ export default function Blog() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
+      <Seo
+        title="Блог — Облако Пара"
+        description="Новости, советы и статьи о вейпинге, устройствах и жидкостях. Обзоры и рекомендации от «Облако Пара»."
+        canonicalPath="/blog"
+        ogType="website"
+      />
       <div className="blog-header">
         <h1>Блог</h1>
         <p>Новости и статьи о вейпинге</p>

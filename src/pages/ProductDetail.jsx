@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { favoritesApi } from '../lib/api';
 import ProductImageCarousel from '../components/ProductImageCarousel';
+import Seo from '../components/Seo';
 import './ProductDetail.css';
 
 const RECENTLY_VIEWED_KEY = 'recentlyViewedProducts';
@@ -22,6 +23,13 @@ export default function ProductDetail() {
   useEffect(() => {
     productsApi.get(id).then(setProduct).catch(() => setProduct(null));
   }, [id]);
+
+  const seoTitle = product?.name ? `${product.name} — Облако Пара` : 'Товар — Облако Пара';
+  const seoDescription = product?.shortDescription
+    || product?.fullDescription
+    || product?.description
+    || 'Товар в наличии в вейп-шопе «Облако Пара». Онлайн-бронирование и консультация.';
+  const seoImage = product?.image || '/logo.png?v=6';
 
   useEffect(() => {
     productsApi.list().then((items) => {
@@ -96,6 +104,13 @@ export default function ProductDetail() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
+      <Seo
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={`/product/${id}`}
+        image={seoImage}
+        ogType="product"
+      />
       <nav className="breadcrumb">
         <Link to="/">Главная</Link>
         <span>/</span>

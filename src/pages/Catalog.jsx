@@ -3,6 +3,7 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
 import CatalogFilters from '../components/CatalogFilters';
+import Seo from '../components/Seo';
 import { categories } from '../data/products';
 import { productsApi } from '../lib/api';
 import { contentApi } from '../lib/api';
@@ -151,6 +152,10 @@ export default function Catalog() {
 
   const categoryNames = Object.fromEntries(dynamicCategories.map((c) => [c.slug, c.name]));
   const title = category ? categoryNames[category] || 'Каталог' : 'Каталог';
+  const seoTitle = category ? `${title} — Облако Пара` : 'Каталог — Облако Пара';
+  const seoDescription = category
+    ? `Категория: ${title}. Подбор устройств и жидкостей, консультация, онлайн-бронирование.`
+    : 'Каталог вейп-товаров: POD-системы, жидкости, одноразовые устройства, паучи, аксессуары. Онлайн-бронирование.';
 
   const handlePriceChange = (min, max) => {
     setPriceMin(min);
@@ -268,6 +273,12 @@ export default function Catalog() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
+      <Seo
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={typeof window !== 'undefined' ? window.location.pathname : '/catalog'}
+        ogType="website"
+      />
       <div className="catalog-header">
         <h1>{title}</h1>
         <nav className="breadcrumb">

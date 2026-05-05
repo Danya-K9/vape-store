@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Seo from '../components/Seo';
 import { contentApi } from '../lib/api';
 import './License.css';
 
@@ -26,6 +27,12 @@ export default function License() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.35 }}
     >
+      <Seo
+        title="Лицензия и сертификаты — Облако Пара"
+        description="Лицензии, сертификаты и реквизиты вейп-шопа «Облако Пара». Официальные документы в PDF."
+        canonicalPath="/license"
+        ogType="website"
+      />
       <nav className="breadcrumb">
         <Link to="/">Главная</Link>
         <span> — </span>

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import YandexShopMap from '../components/YandexShopMap';
+import Seo from '../components/Seo';
 import { PHONE, SOCIAL_ICONS } from '../constants/socialIcons';
 import './Contacts.css';
 
@@ -24,6 +25,12 @@ export default function Contacts() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
+      <Seo
+        title="Контакты — Облако Пара"
+        description="Адреса магазинов, карта, телефон и мессенджеры. Связь с «Облако Пара» (Орша)."
+        canonicalPath="/contacts"
+        ogType="website"
+      />
       <nav className="breadcrumb">
         <Link to="/">Главная</Link>
         <span> — </span>

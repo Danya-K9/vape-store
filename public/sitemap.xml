@@ -7,10 +7,22 @@
     <loc>https://oblakopara.by/catalog</loc>
   </url>
   <url>
+    <loc>https://oblakopara.by/blog</loc>
+  </url>
+  <url>
     <loc>https://oblakopara.by/about</loc>
   </url>
   <url>
     <loc>https://oblakopara.by/contacts</loc>
+  </url>
+  <url>
+    <loc>https://oblakopara.by/delivery</loc>
+  </url>
+  <url>
+    <loc>https://oblakopara.by/payment</loc>
+  </url>
+  <url>
+    <loc>https://oblakopara.by/partners</loc>
   </url>
   <url>
     <loc>https://oblakopara.by/faq</loc>

@@ -87,6 +87,66 @@ app.use('/api/admin', adminRoutes);
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));
 
+app.get('/sitemap.xml', async (_req, res) => {
+  try {
+    const site = (process.env.FRONTEND_URL || 'https://oblakopara.by')
+      .replace(/\/+$/, '');
+    const staticPaths = [
+      '/',
+      '/catalog',
+      '/about',
+      '/contacts',
+      '/faq',
+      '/license',
+      '/privacy',
+      '/delivery',
+      '/payment',
+      '/partners',
+      '/blog',
+    ];
+
+    const products = await prisma.product.findMany({
+      select: { id: true, updatedAt: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+      take: 5000,
+    });
+    const posts = await prisma.blogPost.findMany({
+      select: { slug: true, id: true, updatedAt: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+      take: 2000,
+    });
+
+    const urls = [
+      ...staticPaths.map((p) => ({ loc: `${site}${p}`, lastmod: null })),
+      ...products.map((p) => ({
+        loc: `${site}/product/${p.id}`,
+        lastmod: (p.updatedAt || p.createdAt || new Date()).toISOString(),
+      })),
+      ...posts.map((p) => ({
+        loc: `${site}/blog/${p.slug || p.id}`,
+        lastmod: (p.updatedAt || p.createdAt || new Date()).toISOString(),
+      })),
+    ];
+
+    const xml = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+      ...urls.map((u) => (
+        u.lastmod
+          ? `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod></url>`
+          : `  <url><loc>${u.loc}</loc></url>`
+      )),
+      '</urlset>',
+      '',
+    ].join('\n');
+
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.send(xml);
+  } catch (e) {
+    res.status(500).send('sitemap error');
+  }
+});
+
 // Serve frontend (Vite build) from the same Railway service
 const distPath = path.join(__dirname, '../dist');
 app.use(express.static(distPath));

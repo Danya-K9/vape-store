@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Seo from '../components/Seo';
 import { blogPosts } from '../data/products';
 import { contentApi } from '../lib/api';
 import './BlogDetail.css';
@@ -16,6 +17,10 @@ export default function BlogDetail() {
   }, []);
 
   const post = posts.find((p) => String(p.id) === id || p.slug === id);
+  const canonicalSlug = post?.slug || id;
+  const seoTitle = post?.title ? `${post.title} — Блог «Облако Пара»` : 'Статья — Блог «Облако Пара»';
+  const seoDescription = post?.teaser || post?.description || 'Статья из блога вейп-шопа «Облако Пара».';
+  const seoImage = post?.image || '/logo.png?v=6';
 
   if (!post) {
     return (
@@ -33,6 +38,13 @@ export default function BlogDetail() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
+      <Seo
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={`/blog/${canonicalSlug}`}
+        image={seoImage}
+        ogType="article"
+      />
       <nav className="breadcrumb">
         <Link to="/">Главная</Link>
         <span> — </span>

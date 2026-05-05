@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import ProductCarousel from '../components/ProductCarousel';
 import HeroCarousel from '../components/HeroCarousel';
 import SocialCarousel from '../components/SocialCarousel';
+import Seo from '../components/Seo';
 import { blogPosts, reviews } from '../data/products';
 import { productsApi, contentApi } from '../lib/api';
 import './Home.css';
@@ -155,6 +156,12 @@ export default function Home() {
 
   return (
     <div className="home">
+      <Seo
+        title="Облако Пара — вейп-шоп в Орше"
+        description="Облако Пара — вейп-шоп в Орше. POD-системы, жидкости, картриджи, паучи, кальянные смеси и комплектующие. Онлайн-бронирование и консультация."
+        canonicalPath="/"
+        ogType="website"
+      />
       <HeroCarousel />
 
       <section className="section section-promo">
