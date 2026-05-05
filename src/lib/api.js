@@ -1,4 +1,8 @@
-const API = '/api';
+const API = (() => {
+  const raw = import.meta?.env?.VITE_API_URL;
+  const base = raw ? String(raw).trim().replace(/^['"]|['"]$/g, '').replace(/\/+$/, '') : '';
+  return base || '/api';
+})();
 
 export function getToken() {
   return localStorage.getItem('token');
