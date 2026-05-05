@@ -163,7 +163,7 @@ export const blogPosts = [
     id: 4,
     title: 'Смесь для кальяна: вкусы, крепость и как не ошибиться с выбором',
     date: '15 апреля 2026',
-    image: 'https://images.unsplash.com/photo-1544359043-01ce18ab622b?w=900',
+    image: '/logo.png?v=6',
     slug: 'smes-dlya-kalyana-vybory',
     teaser:
       'Линейки табака, лёд-мииксы и фруктовые бленды — на что смотреть в магазине перед покупкой чаши.',
@@ -187,7 +187,7 @@ export const blogPosts = [
     id: 5,
     title: 'Угли для кальяна: кокосовые и не только',
     date: '15 апреля 2026',
-    image: 'https://images.unsplash.com/photo-1595839056655-071e9d07f142?w=900',
+    image: '/logo.png?v=6',
     slug: 'ugli-dlya-kalyana-kokos',
     teaser:
       'Почему чаще берут кокосовые кубики, как разогревать равномерно и когда менять уголь в чаше.',
