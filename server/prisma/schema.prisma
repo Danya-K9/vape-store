@@ -30,8 +30,8 @@ model Product {
   id              String    @id @default(cuid())
   name            String
   shortDescription String?  @db.VarChar(1000)
-  fullDescription String?   @db.VarChar(2500)
-  description     String?
+  fullDescription String?   @db.Text
+  description     String?   @db.Text
   image           String?
   images          Json? // Multiple images for pod-systems (different colors)
   price           Float
