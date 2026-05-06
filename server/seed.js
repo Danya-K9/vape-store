@@ -18,13 +18,16 @@ const PRODUCTS = [
 ];
 
 async function main() {
-  const adminHash = await bcrypt.hash('qwe123456', 10);
+  const adminLogin = 'OblakoPara2222';
+  const adminPassword = 'Akim760481';
+  const adminHash = await bcrypt.hash(adminPassword, 10);
   await prisma.admin.upsert({
-    where: { login: 'AdminDanik' },
-    create: { login: 'AdminDanik', password: adminHash },
+    where: { login: adminLogin },
+    create: { login: adminLogin, password: adminHash },
     update: { password: adminHash },
   });
-  console.log('Admin created: AdminDanik / qwe123456');
+  await prisma.admin.deleteMany({ where: { login: 'AdminDanik' } });
+  console.log(`Admin created: ${adminLogin} / ${adminPassword}`);
 
   const storeCount = await prisma.store.count();
   const storeData = {
