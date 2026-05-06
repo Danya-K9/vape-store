@@ -1,37 +1,33 @@
--- CreateTable
-CREATE TABLE "Partner" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT,
-    "website" TEXT,
-    "image" TEXT,
-    "sortOrder" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- MySQL-compatible DDL.
 
-    CONSTRAINT "Partner_pkey" PRIMARY KEY ("id")
-);
+CREATE TABLE `Partner` (
+  `id` VARCHAR(191) NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `description` TEXT NULL,
+  `website` VARCHAR(500) NULL,
+  `image` TEXT NULL,
+  `sortOrder` INT NOT NULL DEFAULT 0,
+  `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` DATETIME(3) NOT NULL,
+  PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
-CREATE TABLE "FaqItem" (
-    "id" TEXT NOT NULL,
-    "question" TEXT NOT NULL,
-    "answer" TEXT NOT NULL,
-    "sortOrder" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+CREATE TABLE `FaqItem` (
+  `id` VARCHAR(191) NOT NULL,
+  `question` VARCHAR(1000) NOT NULL,
+  `answer` TEXT NOT NULL,
+  `sortOrder` INT NOT NULL DEFAULT 0,
+  `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` DATETIME(3) NOT NULL,
+  PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-    CONSTRAINT "FaqItem_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "LicenseDocument" (
-    "id" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "fileUrl" TEXT NOT NULL,
-    "sortOrder" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "LicenseDocument_pkey" PRIMARY KEY ("id")
-);
+CREATE TABLE `LicenseDocument` (
+  `id` VARCHAR(191) NOT NULL,
+  `title` VARCHAR(500) NOT NULL,
+  `fileUrl` TEXT NOT NULL,
+  `sortOrder` INT NOT NULL DEFAULT 0,
+  `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` DATETIME(3) NOT NULL,
+  PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
