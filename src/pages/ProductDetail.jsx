@@ -202,7 +202,11 @@ export default function ProductDetail() {
           <div className="recently-viewed-grid">
             {recentProducts.map((item) => (
               <Link key={item.id} to={`/product/${item.id}`} className="recently-viewed-card">
-                <img src={item.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=600'} alt={item.name} />
+                <img
+                  src={item.image || 'https://images.unsplash.com/photo-1584735175097-719d848f8449?w=600'}
+                  alt={item.name}
+                  className={item.blurImage ? 'product-detail-image-blur' : ''}
+                />
                 <div>
                   <p>{item.name}</p>
                   <span>{item.price} руб.</span>
