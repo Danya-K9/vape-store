@@ -98,7 +98,10 @@ router.get('/', async (req, res) => {
       color,
       display,
     } = req.query;
-    const where = {};
+    const where = {
+      isActive: true,
+      OR: [{ stock: null }, { stock: { gt: 0 } }],
+    };
     const minPriceParsed = Number.parseFloat(priceMin);
     const maxPriceParsed = Number.parseFloat(priceMax);
     if (category) where.category = category;
@@ -106,9 +109,13 @@ router.get('/', async (req, res) => {
     if (searchTokens.length > 0) {
       // Smart search for MySQL: each token can match name/description/specs.
       // Avoid Prisma `mode: 'insensitive'` because it's not supported on MySQL.
-      where.AND = searchTokens.map((token) => ({
-        OR: buildTokenSearchConditions(token),
-      }));
+      const existingAnd = Array.isArray(where.AND) ? where.AND : [];
+      where.AND = [
+        ...existingAnd,
+        ...searchTokens.map((token) => ({
+          OR: buildTokenSearchConditions(token),
+        })),
+      ];
     }
     if (newOnly === 'true') where.showInNew = true;
     if (bestsellers === 'true') where.showInBestsellers = true;

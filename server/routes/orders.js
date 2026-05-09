@@ -31,8 +31,18 @@ router.post('/', async (req, res) => {
     }
     const productIds = items.map((i) => i.productId);
     const products = await prisma.product.findMany({ where: { id: { in: productIds } } });
+    const productMap = Object.fromEntries(products.map((p) => [p.id, p]));
     const priceMap = Object.fromEntries(products.map((p) => [p.id, p.price]));
     let total = 0;
+    for (const i of items) {
+      const qty = i.quantity || 1;
+      const p = productMap[i.productId];
+      if (!p) return res.status(400).json({ error: 'Товар не найден' });
+      if (p.isActive === false) return res.status(400).json({ error: `Товар недоступен: ${p.name}` });
+      if (p.stock !== null && p.stock !== undefined && qty > p.stock) {
+        return res.status(400).json({ error: `Недостаточно товара: ${p.name}. Осталось: ${p.stock}` });
+      }
+    }
     const orderItems = items.map((i) => {
       const price = priceMap[i.productId] || 0;
       total += price * (i.quantity || 1);
