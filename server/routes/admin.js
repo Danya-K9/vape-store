@@ -214,6 +214,12 @@ router.post('/products', (req, res, next) => {
       images: imagesArr,
       price: parsedPrice,
       category: req.body.category || 'disposables',
+      stock: req.body.stock !== undefined && req.body.stock !== ''
+        ? parseInt(req.body.stock, 10)
+        : null,
+      isActive: req.body.isActive === undefined
+        ? true
+        : (req.body.isActive === 'true' || req.body.isActive === true),
       badge: req.body.badge || null,
       blurImage: req.body.blurImage === 'true' || req.body.blurImage === true,
       showInNew: req.body.showInNew === 'true' || req.body.showInNew === true,
@@ -297,13 +303,14 @@ router.patch('/products/:id', (req, res, next) => {
     } else if (imagesArr.length > 0) {
       body.images = imagesArr;
     }
-    const numFields = ['puffCount', 'strength', 'volume', 'battery'];
+    const numFields = ['puffCount', 'strength', 'volume', 'battery', 'stock'];
     numFields.forEach((f) => {
       if (body[f] !== undefined) body[f] = parseFloat(body[f]) || parseInt(body[f], 10) || null;
     });
     if (body.showInNew !== undefined) body.showInNew = body.showInNew === 'true' || body.showInNew === true;
     if (body.showInBestsellers !== undefined) body.showInBestsellers = body.showInBestsellers === 'true' || body.showInBestsellers === true;
     if (body.blurImage !== undefined) body.blurImage = body.blurImage === 'true' || body.blurImage === true;
+    if (body.isActive !== undefined) body.isActive = body.isActive === 'true' || body.isActive === true;
     const product = await prisma.product.update({
       where: { id: req.params.id },
       data: body,

@@ -853,7 +853,7 @@ export default function AdminPanel() {
 
       {tab === 'products' && (
         <section className="admin-section">
-          <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'liquids', image: '', images: [], description: '', manufacturer: '', supplier: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', watts: '', resistance: '', battery: '', tobacco: '', weight: '', coalType: '', packCount: '', color: '', display: '', badge: '', blurImage: false }); setImageFile(null); setImageFiles([]); }}>Добавить товар</button>
+          <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'liquids', stock: '', isActive: true, image: '', images: [], description: '', manufacturer: '', supplier: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', watts: '', resistance: '', battery: '', tobacco: '', weight: '', coalType: '', packCount: '', color: '', display: '', badge: '', blurImage: false }); setImageFile(null); setImageFiles([]); }}>Добавить товар</button>
           {productError && <p className="admin-error" style={{ marginBottom: 8 }}>{productError}</p>}
           <table>
             <thead>
@@ -872,6 +872,14 @@ export default function AdminPanel() {
                             <option key={c.slug} value={c.slug}>{c.name}</option>
                           ))}
                         </select>
+                          <input
+                            type="number"
+                            placeholder="Остаток"
+                            value={form.stock ?? ''}
+                            onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                            style={{ width: 90 }}
+                          />
+                          <label><input type="checkbox" checked={form.isActive ?? true} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} /> Активен</label>
                         <label><input type="checkbox" checked={form.blurImage ?? false} onChange={(e) => setForm({ ...form, blurImage: e.target.checked })} /> Блюр</label>
                         <label><input type="checkbox" checked={form.showInNew ?? false} onChange={(e) => setForm({ ...form, showInNew: e.target.checked })} /> Новинки</label>
                         <label><input type="checkbox" checked={form.showInBestsellers ?? false} onChange={(e) => setForm({ ...form, showInBestsellers: e.target.checked })} /> Лидеры</label>
@@ -1146,6 +1154,14 @@ export default function AdminPanel() {
                               <option key={c.slug} value={c.slug}>{c.name}</option>
                             ))}
                           </select>
+                          <input
+                            type="number"
+                            placeholder="Остаток"
+                            value={form.stock ?? (p.stock ?? '')}
+                            onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                            style={{ width: 90 }}
+                          />
+                          <label><input type="checkbox" checked={form.isActive ?? p.isActive ?? true} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} /> Активен</label>
                           <label><input type="checkbox" checked={form.blurImage ?? p.blurImage ?? false} onChange={(e) => setForm({ ...form, blurImage: e.target.checked })} /> Блюр</label>
                           <label><input type="checkbox" checked={form.showInNew ?? p.showInNew} onChange={(e) => setForm({ ...form, showInNew: e.target.checked })} /> Новинки</label>
                           <label><input type="checkbox" checked={form.showInBestsellers ?? p.showInBestsellers} onChange={(e) => setForm({ ...form, showInBestsellers: e.target.checked })} /> Лидеры</label>
