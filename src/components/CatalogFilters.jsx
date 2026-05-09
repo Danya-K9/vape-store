@@ -20,7 +20,7 @@ function FilterSection({ title, open, onToggle, children }) {
 export default function CatalogFilters({
   category,
   priceMin = 0,
-  priceMax = 200,
+  priceMax = 500,
   onPriceChange,
   manufacturers = [],
   onManufacturerToggle,
@@ -69,7 +69,7 @@ export default function CatalogFilters({
   const [priceMaxInput, setPriceMaxInput] = useState(String(priceMax ?? 0));
   const [priceSliderValue, setPriceSliderValue] = useState(Number(priceMax) || 0);
   const sliderUpperBound = Math.max(
-    200,
+    500,
     Number(priceMax) || 0,
     Math.ceil(parseFloat(String(priceMaxInput).replace(',', '.')) || 0),
     Math.ceil(parseFloat(String(priceMinInput).replace(',', '.')) || 0)

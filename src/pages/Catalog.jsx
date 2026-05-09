@@ -34,7 +34,7 @@ export default function Catalog() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(200);
+  const [priceMax, setPriceMax] = useState(500);
   const [manufacturers, setManufacturers] = useState([]);
   const [puffCounts, setPuffCounts] = useState([]);
   const [nicotineTypes, setNicotineTypes] = useState([]);
@@ -58,9 +58,10 @@ export default function Catalog() {
   const [apiProducts, setApiProducts] = useState(null);
   const [dynamicCategories, setDynamicCategories] = useState(categories);
   const [applyCounter, setApplyCounter] = useState(0);
+  const [isPriceFilterApplied, setIsPriceFilterApplied] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({
     priceMin: 0,
-    priceMax: 200,
+    priceMax: 500,
     manufacturers: [],
     puffCounts: [],
     nicotineTypes: [],
@@ -84,7 +85,7 @@ export default function Catalog() {
   });
   const prevCategoryRef = useRef(category);
   const DEFAULT_PRICE_MIN = 0;
-  const DEFAULT_PRICE_MAX = 200;
+  const DEFAULT_PRICE_MAX = 500;
 
   const resetAllFiltersState = () => {
     setPriceMin(DEFAULT_PRICE_MIN);
@@ -133,6 +134,7 @@ export default function Catalog() {
       colorValues: [],
       displayValues: [],
     });
+    setIsPriceFilterApplied(false);
   };
 
   useEffect(() => {
@@ -150,7 +152,11 @@ export default function Catalog() {
       resetAllFiltersState();
       setApiProducts(null);
     }
-    const params = { category: category || undefined, search: search || undefined, priceMin: appliedFilters.priceMin, priceMax: appliedFilters.priceMax };
+    const params = { category: category || undefined, search: search || undefined };
+    if (isPriceFilterApplied) {
+      params.priceMin = appliedFilters.priceMin;
+      params.priceMax = appliedFilters.priceMax;
+    }
     if (appliedFilters.manufacturers.length) params.manufacturer = appliedFilters.manufacturers.join(',');
     if (appliedFilters.puffCounts.length) params.puffCount = appliedFilters.puffCounts.join(',');
     if (appliedFilters.nicotineTypes.length) params.nicotineType = appliedFilters.nicotineTypes.join(',');
@@ -172,7 +178,7 @@ export default function Catalog() {
     if (appliedFilters.colorValues.length) params.color = appliedFilters.colorValues.join(',');
     if (appliedFilters.displayValues.length) params.display = appliedFilters.displayValues.join(',');
     productsApi.list(params).then(setApiProducts).catch(() => setApiProducts([]));
-  }, [category, search, applyCounter]);
+  }, [category, search, applyCounter, isPriceFilterApplied]);
 
   const products = Array.isArray(apiProducts) ? apiProducts : [];
   const fromApi = apiProducts !== null;
@@ -261,7 +267,7 @@ export default function Catalog() {
     setDisplayValues([]);
     const resetFilters = {
       priceMin: 0,
-      priceMax: 200,
+      priceMax: 500,
       manufacturers: [],
       puffCounts: [],
       nicotineTypes: [],
@@ -284,6 +290,7 @@ export default function Catalog() {
       displayValues: [],
     };
     setAppliedFilters(resetFilters);
+    setIsPriceFilterApplied(false);
     setApplyCounter((x) => x + 1);
   };
 
@@ -314,6 +321,7 @@ export default function Catalog() {
       colorValues,
       displayValues,
     });
+    setIsPriceFilterApplied(true);
     setApplyCounter((x) => x + 1);
   };
 
