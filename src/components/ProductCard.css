@@ -121,6 +121,10 @@
   min-height: 28px;
 }
 
+.product-meta span + span {
+  margin-left: 8px;
+}
+
 .product-meta.empty {
   visibility: hidden;
 }
