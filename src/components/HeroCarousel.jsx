@@ -8,6 +8,17 @@ const SIDE1_DURATION = 3600;
 const SIDE2_DURATION = 6100;
 const TICK_MS = 50;
 
+const MAIN_SLIDE_LINKS = [
+  '/catalog/liquids',      // 1) Жидкости
+  '/catalog/pod-systems',  // 2) Парогенераторы
+  '/catalog/pouches',      // 3) Никотиновые паучи
+  '/catalog/disposables',  // 4) Одноразовые парогенераторы
+];
+
+function getMainSlideLink(index) {
+  return MAIN_SLIDE_LINKS[index] || '/catalog';
+}
+
 const mainSlides = [
   {
     id: 1,
@@ -130,7 +141,7 @@ export default function HeroCarousel() {
     <section className="hero-carousel">
       <div className="hero-carousel-inner">
         <div className="hero-main-area">
-          <Link to="/catalog" className="hero-main-slide-wrap">
+          <Link to={getMainSlideLink(activeIndex)} className="hero-main-slide-wrap">
             <button
               type="button"
               className="hero-arrow hero-arrow-left"
