@@ -55,6 +55,15 @@ export default function ProductDetail() {
     if (product) addToCart(product, qty);
   };
 
+  const stock = product?.stock;
+  const hasStockLimit = typeof stock === 'number' && Number.isFinite(stock);
+  const maxQty = hasStockLimit ? Math.max(0, stock) : null;
+  const clampQty = (next) => {
+    const n = Math.max(1, parseInt(next, 10) || 1);
+    if (!hasStockLimit) return n;
+    return Math.min(n, Math.max(1, maxQty));
+  };
+
   const SPEC_LABELS = {
     manufacturer: 'Производитель',
     puffCount: 'Кол-во затяжек',
@@ -171,7 +180,13 @@ export default function ProductDetail() {
             </div>
           )}
           <div className="product-quantity">
-            <button type="button" onClick={() => setQty((x) => Math.max(1, x - 1))}>−</button>
+            <button
+              type="button"
+              onClick={() => setQty((x) => Math.max(1, x - 1))}
+              disabled={hasStockLimit && maxQty <= 0}
+            >
+              −
+            </button>
             <input
               type="text"
               inputMode="numeric"
@@ -179,14 +194,29 @@ export default function ProductDetail() {
               onChange={(e) => {
                 const raw = e.target.value.replace(/[^\d]/g, '');
                 if (!raw) { setQty(1); return; }
-                setQty(Math.max(1, parseInt(raw, 10) || 1));
+                setQty(clampQty(raw));
               }}
               aria-label="Количество"
             />
-            <button type="button" onClick={() => setQty((x) => x + 1)}>+</button>
+            <button
+              type="button"
+              onClick={() => setQty((x) => clampQty(x + 1))}
+              disabled={hasStockLimit && maxQty <= qty}
+            >
+              +
+            </button>
           </div>
+          {hasStockLimit && (
+            <div className="product-stock-hint">Осталось: {Math.max(0, maxQty)} шт.</div>
+          )}
           <div className="product-actions">
-            <button className="btn-primary" onClick={handleAddToCart}>Добавить в корзину</button>
+            <button
+              className="btn-primary"
+              onClick={handleAddToCart}
+              disabled={hasStockLimit && maxQty <= 0}
+            >
+              Добавить в корзину
+            </button>
           </div>
         </motion.div>
       </div>

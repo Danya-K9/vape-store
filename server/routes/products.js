@@ -161,7 +161,9 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const product = await prisma.product.findUnique({ where: { id: req.params.id } });
-    if (!product) return res.status(404).json({ error: 'Товар не найден' });
+    if (!product || product.isActive === false || (product.stock != null && product.stock <= 0)) {
+      return res.status(404).json({ error: 'Товар не найден' });
+    }
     res.json(product);
   } catch (e) {
     res.status(500).json({ error: e.message });

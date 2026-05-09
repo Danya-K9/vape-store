@@ -21,9 +21,18 @@ export default function ProductCard({ product, index = 0, isFavorite = false, on
     ? `${product.strength}%`
     : (product.category === 'disposables' ? '20%' : product.category === 'liquids' ? '20%' : null);
 
+  const stock = product?.stock;
+  const hasStockLimit = typeof stock === 'number' && Number.isFinite(stock);
+  const maxQty = hasStockLimit ? Math.max(0, stock) : null;
+  const clampQty = (next) => {
+    const n = Math.max(1, parseInt(next, 10) || 1);
+    if (!hasStockLimit) return n;
+    return Math.min(n, Math.max(1, maxQty));
+  };
+
   const handleAddToCart = (e) => {
     e.preventDefault();
-    addToCart(product, qty);
+    addToCart(product, hasStockLimit ? clampQty(qty) : qty);
   };
 
   const handleFavorite = async (e) => {
@@ -90,21 +99,40 @@ export default function ProductCard({ product, index = 0, isFavorite = false, on
         <div className="product-price">{product.price} руб.</div>
       </Link>
       <div className="product-quantity">
-        <button type="button" className="qty-btn" onClick={(e) => { e.preventDefault(); setQty((x) => Math.max(1, x - 1)); }}>−</button>
+        <button
+          type="button"
+          className="qty-btn"
+          onClick={(e) => { e.preventDefault(); setQty((x) => Math.max(1, x - 1)); }}
+          disabled={hasStockLimit && maxQty <= 0}
+        >
+          −
+        </button>
         <input
           className="qty-value-input"
           value={qty}
           inputMode="numeric"
           onChange={(e) => {
             const parsed = parseInt(e.target.value.replace(/[^\d]/g, ''), 10);
-            setQty(Number.isFinite(parsed) && parsed > 0 ? parsed : 1);
+            setQty(clampQty(Number.isFinite(parsed) && parsed > 0 ? parsed : 1));
           }}
           onClick={(e) => e.preventDefault()}
         />
-        <button type="button" className="qty-btn" onClick={(e) => { e.preventDefault(); setQty((x) => x + 1); }}>+</button>
+        <button
+          type="button"
+          className="qty-btn"
+          onClick={(e) => { e.preventDefault(); setQty((x) => clampQty(x + 1)); }}
+          disabled={hasStockLimit && maxQty <= qty}
+        >
+          +
+        </button>
       </div>
+      {hasStockLimit && (
+        <div className="product-stock-hint">Осталось: {Math.max(0, maxQty)} шт.</div>
+      )}
       <div className="product-actions">
-        <button className="btn-book" onClick={handleAddToCart}>Добавить в корзину</button>
+        <button className="btn-book" onClick={handleAddToCart} disabled={hasStockLimit && maxQty <= 0}>
+          Добавить в корзину
+        </button>
       </div>
     </motion.article>
   );

@@ -167,6 +167,12 @@
   text-align: center;
 }
 
+.product-stock-hint {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #777;
+}
+
 .product-full-desc {
   margin-top: 20px;
 }

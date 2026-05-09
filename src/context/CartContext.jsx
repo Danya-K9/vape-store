@@ -16,15 +16,23 @@ export function CartProvider({ children }) {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
+  const clampToStock = (product, desiredQty) => {
+    const stock = product?.stock;
+    if (typeof stock !== 'number' || !Number.isFinite(stock)) return desiredQty;
+    return Math.min(desiredQty, Math.max(0, stock));
+  };
+
   const addToCart = (product, quantity = 1) => {
     setCart((prev) => {
       const exists = prev.find((x) => x.id === product.id);
       if (exists) {
-        return prev.map((x) =>
-          x.id === product.id ? { ...x, quantity: x.quantity + quantity } : x
-        );
+        const nextQty = clampToStock(product, (exists.quantity || 0) + quantity);
+        return prev.map((x) => (
+          x.id === product.id ? { ...x, quantity: Math.max(1, nextQty) } : x
+        ));
       }
-      return [...prev, { ...product, quantity }];
+      const nextQty = clampToStock(product, quantity);
+      return nextQty <= 0 ? prev : [...prev, { ...product, quantity: Math.max(1, nextQty) }];
     });
   };
 
@@ -35,7 +43,12 @@ export function CartProvider({ children }) {
   const updateQuantity = (productId, quantity) => {
     if (quantity < 1) return removeFromCart(productId);
     setCart((prev) =>
-      prev.map((x) => (x.id === productId ? { ...x, quantity } : x))
+      prev.map((x) => {
+        if (x.id !== productId) return x;
+        const nextQty = clampToStock(x, quantity);
+        if (nextQty <= 0) return { ...x, quantity: 1 };
+        return { ...x, quantity: nextQty };
+      })
     );
   };
 

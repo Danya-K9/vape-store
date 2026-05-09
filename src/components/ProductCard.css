@@ -129,6 +129,12 @@
   visibility: hidden;
 }
 
+.product-stock-hint {
+  padding: 0 12px 6px;
+  font-size: 11px;
+  color: #777;
+}
+
 .product-price {
   font-size: 17px;
   font-weight: 700;
