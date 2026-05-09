@@ -15,7 +15,8 @@ const MAIN_SLIDE_LINKS = [
   '/catalog/disposables',  // 4) Одноразовые парогенераторы
 ];
 
-function getMainSlideLink(index) {
+function getMainSlideLink(index, firstBlogLink) {
+  if (index === 0 && firstBlogLink) return firstBlogLink;
   return MAIN_SLIDE_LINKS[index] || '/catalog';
 }
 
@@ -63,7 +64,8 @@ const sideBanners = [
 
 export default function HeroCarousel() {
   const [mainSlidesData, setMainSlidesData] = useState(mainSlides);
-  const [sideBannersData] = useState(sideBanners);
+  const [sideBannersData, setSideBannersData] = useState(sideBanners);
+  const [firstBlogLink, setFirstBlogLink] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [sideState, setSideState] = useState(() => ({
@@ -84,7 +86,30 @@ export default function HeroCarousel() {
           discountText: b.discountText || '',
         }));
       if (main.length > 0) setMainSlidesData(main);
+
+      const sideTop = data
+        .filter((b) => b.zone === 'side-top' && b.image)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((b) => b.image);
+      const sideBottom = data
+        .filter((b) => b.zone === 'side-bottom' && b.image)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((b) => b.image);
+      if (sideTop.length > 0 || sideBottom.length > 0) {
+        setSideBannersData([
+          { id: 'side1', slides: sideTop.length > 0 ? sideTop : sideBanners[0].slides },
+          { id: 'side2', slides: sideBottom.length > 0 ? sideBottom : sideBanners[1].slides },
+        ]);
+      }
     }).catch(() => {});
+
+    contentApi.blogPosts()
+      .then((posts) => {
+        const first = Array.isArray(posts) ? posts[0] : null;
+        const slugOrId = first?.slug || first?.id;
+        if (slugOrId) setFirstBlogLink(`/blog/${slugOrId}`);
+      })
+      .catch(() => {});
   }, []);
 
   const goToSlide = useCallback((index) => {
@@ -141,7 +166,7 @@ export default function HeroCarousel() {
     <section className="hero-carousel">
       <div className="hero-carousel-inner">
         <div className="hero-main-area">
-          <Link to={getMainSlideLink(activeIndex)} className="hero-main-slide-wrap">
+          <Link to={getMainSlideLink(activeIndex, firstBlogLink)} className="hero-main-slide-wrap">
             <button
               type="button"
               className="hero-arrow hero-arrow-left"
