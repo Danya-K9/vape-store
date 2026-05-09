@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
 
 const API_BASE = '/api';
+const SUPPLIER_OPTIONS = ['Частное предприятие "ВП Импорт"', 'ЧП Лох'];
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -890,11 +891,7 @@ export default function AdminPanel() {
                           if (cat === 'liquids') {
                             return (
                               <>
-                                <input
-                                  placeholder="Поставщик"
-                                  value={form.supplier ?? ''}
-                                  onChange={(e) => setForm({ ...form, supplier: e.target.value })}
-                                />
+                                <select value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                 <select
                                   value={form.nicotineType ?? ''}
                                   onChange={(e) => setForm({ ...form, nicotineType: e.target.value })}
@@ -932,11 +929,7 @@ export default function AdminPanel() {
                           if (cat === 'disposables') {
                             return (
                               <>
-                                <input
-                                  placeholder="Поставщик"
-                                  value={form.supplier ?? ''}
-                                  onChange={(e) => setForm({ ...form, supplier: e.target.value })}
-                                />
+                                <select value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                 <input
                                   placeholder="Производитель"
                                   value={form.manufacturer ?? ''}
@@ -1001,11 +994,7 @@ export default function AdminPanel() {
                           if (cat === 'pouches') {
                             return (
                               <>
-                                <input
-                                  placeholder="Поставщик"
-                                  value={form.supplier ?? ''}
-                                  onChange={(e) => setForm({ ...form, supplier: e.target.value })}
-                                />
+                                <select value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                 <input
                                   placeholder="Производитель"
                                   value={form.manufacturer ?? ''}
@@ -1037,11 +1026,7 @@ export default function AdminPanel() {
                           if (cat === 'pod-systems') {
                             return (
                               <>
-                                <input
-                                  placeholder="Поставщик"
-                                  value={form.supplier ?? ''}
-                                  onChange={(e) => setForm({ ...form, supplier: e.target.value })}
-                                />
+                                <select value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                 <input
                                   placeholder="Производитель"
                                   value={form.manufacturer ?? ''}
@@ -1074,7 +1059,7 @@ export default function AdminPanel() {
                           if (cat === 'accessories') {
                             return (
                               <>
-                                <input placeholder="Поставщик" value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                <select value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                 <input placeholder="Производитель" value={form.manufacturer ?? ''} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />
                                 <input placeholder="Сопротивление" value={form.resistance ?? ''} onChange={(e) => setForm({ ...form, resistance: e.target.value })} />
                                 <input placeholder="Ватты" value={form.watts ?? ''} onChange={(e) => setForm({ ...form, watts: e.target.value })} />
@@ -1085,7 +1070,7 @@ export default function AdminPanel() {
                           if (cat === 'hookah-mix') {
                             return (
                               <>
-                                <input placeholder="Поставщик" value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                <select value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                 <input placeholder="Крепость" type="number" value={form.strength ?? ''} onChange={(e) => setForm({ ...form, strength: e.target.value })} />
                                 <input placeholder="Наличие табака" value={form.tobacco ?? ''} onChange={(e) => setForm({ ...form, tobacco: e.target.value })} />
                                 <input placeholder="Вес" value={form.weight ?? ''} onChange={(e) => setForm({ ...form, weight: e.target.value })} />
@@ -1095,7 +1080,7 @@ export default function AdminPanel() {
                           if (cat === 'hookah-coals') {
                             return (
                               <>
-                                <input placeholder="Поставщик" value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                <select value={form.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                 <input placeholder="Тип углей" value={form.coalType ?? ''} onChange={(e) => setForm({ ...form, coalType: e.target.value })} />
                                 <input placeholder="Кол-во в пачке" value={form.packCount ?? ''} onChange={(e) => setForm({ ...form, packCount: e.target.value })} />
                                 <input placeholder="Производитель" value={form.manufacturer ?? ''} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />
@@ -1172,7 +1157,7 @@ export default function AdminPanel() {
                             if (cat === 'liquids') {
                               return (
                                 <>
-                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                  <select value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                   <select
                                     value={form.nicotineType ?? p.nicotineType ?? ''}
                                     onChange={(e) => setForm({ ...form, nicotineType: e.target.value })}
@@ -1210,7 +1195,7 @@ export default function AdminPanel() {
                             if (cat === 'disposables') {
                               return (
                                 <>
-                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                  <select value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                   <input
                                     placeholder="Производитель"
                                     value={form.manufacturer ?? p.manufacturer ?? ''}
@@ -1275,7 +1260,7 @@ export default function AdminPanel() {
                             if (cat === 'pouches') {
                               return (
                                 <>
-                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                  <select value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                   <input
                                     placeholder="Производитель"
                                     value={form.manufacturer ?? p.manufacturer ?? ''}
@@ -1307,7 +1292,7 @@ export default function AdminPanel() {
                             if (cat === 'pod-systems') {
                               return (
                                 <>
-                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                  <select value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                   <input
                                     placeholder="Производитель"
                                     value={form.manufacturer ?? p.manufacturer ?? ''}
@@ -1332,7 +1317,7 @@ export default function AdminPanel() {
                             if (cat === 'accessories') {
                               return (
                                 <>
-                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                  <select value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                   <input placeholder="Производитель" value={form.manufacturer ?? p.manufacturer ?? ''} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />
                                   <input placeholder="Сопротивление" value={form.resistance ?? p.resistance ?? ''} onChange={(e) => setForm({ ...form, resistance: e.target.value })} />
                                   <input placeholder="Ватты" value={form.watts ?? p.watts ?? ''} onChange={(e) => setForm({ ...form, watts: e.target.value })} />
@@ -1343,7 +1328,7 @@ export default function AdminPanel() {
                             if (cat === 'hookah-mix') {
                               return (
                                 <>
-                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                  <select value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                   <input placeholder="Крепость" type="number" value={form.strength ?? p.strength ?? ''} onChange={(e) => setForm({ ...form, strength: e.target.value })} />
                                   <input placeholder="Наличие табака" value={form.tobacco ?? p.tobacco ?? ''} onChange={(e) => setForm({ ...form, tobacco: e.target.value })} />
                                   <input placeholder="Вес" value={form.weight ?? p.weight ?? ''} onChange={(e) => setForm({ ...form, weight: e.target.value })} />
@@ -1353,7 +1338,7 @@ export default function AdminPanel() {
                             if (cat === 'hookah-coals') {
                               return (
                                 <>
-                                  <input placeholder="Поставщик" value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+                                  <select value={form.supplier ?? p.supplier ?? ''} onChange={(e) => setForm({ ...form, supplier: e.target.value })}><option value="">Поставщик</option>{SUPPLIER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                                   <input placeholder="Тип углей" value={form.coalType ?? p.coalType ?? ''} onChange={(e) => setForm({ ...form, coalType: e.target.value })} />
                                   <input placeholder="Кол-во в пачке" value={form.packCount ?? p.packCount ?? ''} onChange={(e) => setForm({ ...form, packCount: e.target.value })} />
                                   <input placeholder="Производитель" value={form.manufacturer ?? p.manufacturer ?? ''} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />

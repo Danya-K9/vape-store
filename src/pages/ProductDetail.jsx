@@ -80,7 +80,9 @@ export default function ProductDetail() {
     weight: 'Вес',
     coalType: 'Тип углей',
     packCount: 'Кол-во в пачке',
-    strength: 'Крепость (%)',
+    strength: product?.category === 'pouches' || product?.category === 'hookah-mix'
+      ? 'Крепость (мг)'
+      : 'Крепость (%)',
     volume: 'Объём (мл)',
     vgpg: 'VG/PG',
     color: 'Цвет',
@@ -94,6 +96,10 @@ export default function ProductDetail() {
   );
   const formatSpecValue = (key, val) => {
     if (key === 'charging' || key === 'powerAdj') return val === 'yes' || val === 'есть' ? 'Есть' : val === 'no' || val === 'нет' ? 'Нет' : val;
+    if (key === 'strength') {
+      if (product?.category === 'pouches' || product?.category === 'hookah-mix') return `${val} мг`;
+      return `${val}%`;
+    }
     return val;
   };
 

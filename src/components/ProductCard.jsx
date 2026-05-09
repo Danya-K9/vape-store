@@ -17,8 +17,9 @@ export default function ProductCard({ product, index = 0, isFavorite = false, on
 
   const nicotineType = product.nicotineType
     || (product.category === 'liquids' ? 'Солевой' : product.category === 'disposables' ? 'Солевой' : null);
+  const isMgStrengthCategory = product.category === 'pouches' || product.category === 'hookah-mix';
   const strength = product.strength != null
-    ? `${product.strength}%`
+    ? `${product.strength}${isMgStrengthCategory ? ' мг' : '%'}`
     : (product.category === 'disposables' ? '20%' : product.category === 'liquids' ? '20%' : null);
 
   const stock = product?.stock;
