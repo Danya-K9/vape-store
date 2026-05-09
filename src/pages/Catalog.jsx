@@ -83,6 +83,57 @@ export default function Catalog() {
     displayValues: [],
   });
   const prevCategoryRef = useRef(category);
+  const DEFAULT_PRICE_MIN = 0;
+  const DEFAULT_PRICE_MAX = 200;
+
+  const resetAllFiltersState = () => {
+    setPriceMin(DEFAULT_PRICE_MIN);
+    setPriceMax(DEFAULT_PRICE_MAX);
+    setManufacturers([]);
+    setPuffCounts([]);
+    setNicotineTypes([]);
+    setFlavors([]);
+    setCountries([]);
+    setStrengths([]);
+    setVolumes([]);
+    setVgpgValues([]);
+    setChargingValues([]);
+    setPowerValues([]);
+    setBatteryValues([]);
+    setWattsValues([]);
+    setResistanceValues([]);
+    setSupplierValues([]);
+    setTobaccoValues([]);
+    setWeightValues([]);
+    setCoalTypeValues([]);
+    setPackCountValues([]);
+    setColorValues([]);
+    setDisplayValues([]);
+    setAppliedFilters({
+      priceMin: DEFAULT_PRICE_MIN,
+      priceMax: DEFAULT_PRICE_MAX,
+      manufacturers: [],
+      puffCounts: [],
+      nicotineTypes: [],
+      flavors: [],
+      countries: [],
+      strengths: [],
+      volumes: [],
+      vgpgValues: [],
+      chargingValues: [],
+      powerValues: [],
+      batteryValues: [],
+      wattsValues: [],
+      resistanceValues: [],
+      supplierValues: [],
+      tobaccoValues: [],
+      weightValues: [],
+      coalTypeValues: [],
+      packCountValues: [],
+      colorValues: [],
+      displayValues: [],
+    });
+  };
 
   useEffect(() => {
     contentApi.categories().then((data) => {
@@ -96,6 +147,7 @@ export default function Catalog() {
   useEffect(() => {
     if (prevCategoryRef.current !== category) {
       prevCategoryRef.current = category;
+      resetAllFiltersState();
       setApiProducts(null);
     }
     const params = { category: category || undefined, search: search || undefined, priceMin: appliedFilters.priceMin, priceMax: appliedFilters.priceMax };
