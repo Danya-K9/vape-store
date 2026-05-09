@@ -24,12 +24,31 @@ const SEARCH_SPEC_FIELDS = [
   'color',
   'display',
 ];
+const NUMERIC_SEARCH_FIELDS = new Set(['puffCount', 'strength', 'volume', 'battery']);
 
 const normalizeSearchTokens = (searchValue) => String(searchValue || '')
   .toLowerCase()
   .split(/\s+/)
   .map((token) => token.trim())
   .filter(Boolean);
+
+const buildTokenSearchConditions = (token) => {
+  const conditions = [
+    { name: { contains: token } },
+    { shortDescription: { contains: token } },
+    { fullDescription: { contains: token } },
+    { description: { contains: token } },
+  ];
+  SEARCH_SPEC_FIELDS.forEach((field) => {
+    if (NUMERIC_SEARCH_FIELDS.has(field)) {
+      const parsed = Number.parseInt(token, 10);
+      if (Number.isFinite(parsed)) conditions.push({ [field]: parsed });
+      return;
+    }
+    conditions.push({ [field]: { contains: token } });
+  });
+  return conditions;
+};
 
 const calculateSearchScore = (product, tokens) => {
   if (tokens.length === 0) return 0;
@@ -88,13 +107,7 @@ router.get('/', async (req, res) => {
       // Smart search for MySQL: each token can match name/description/specs.
       // Avoid Prisma `mode: 'insensitive'` because it's not supported on MySQL.
       where.AND = searchTokens.map((token) => ({
-        OR: [
-          { name: { contains: token } },
-          { shortDescription: { contains: token } },
-          { fullDescription: { contains: token } },
-          { description: { contains: token } },
-          ...SEARCH_SPEC_FIELDS.map((field) => ({ [field]: { contains: token } })),
-        ],
+        OR: buildTokenSearchConditions(token),
       }));
     }
     if (newOnly === 'true') where.showInNew = true;
