@@ -83,14 +83,19 @@ router.get('/', async (req, res) => {
     const minPriceParsed = Number.parseFloat(priceMin);
     const maxPriceParsed = Number.parseFloat(priceMax);
     if (category) where.category = category;
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { shortDescription: { contains: search, mode: 'insensitive' } },
-        { fullDescription: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        ...SEARCH_SPEC_FIELDS.map((field) => ({ [field]: { contains: search, mode: 'insensitive' } })),
-      ];
+    const searchTokens = normalizeSearchTokens(search);
+    if (searchTokens.length > 0) {
+      // Smart search for MySQL: each token can match name/description/specs.
+      // Avoid Prisma `mode: 'insensitive'` because it's not supported on MySQL.
+      where.AND = searchTokens.map((token) => ({
+        OR: [
+          { name: { contains: token } },
+          { shortDescription: { contains: token } },
+          { fullDescription: { contains: token } },
+          { description: { contains: token } },
+          ...SEARCH_SPEC_FIELDS.map((field) => ({ [field]: { contains: token } })),
+        ],
+      }));
     }
     if (newOnly === 'true') where.showInNew = true;
     if (bestsellers === 'true') where.showInBestsellers = true;
@@ -120,8 +125,8 @@ router.get('/', async (req, res) => {
       where,
       orderBy: { createdAt: 'desc' },
     });
-    if (search) {
-      const tokens = normalizeSearchTokens(search);
+    if (searchTokens.length > 0) {
+      const tokens = searchTokens;
       products = products
         .map((product) => ({ product, score: calculateSearchScore(product, tokens) }))
         .sort((a, b) => b.score - a.score || new Date(b.product.createdAt) - new Date(a.product.createdAt))

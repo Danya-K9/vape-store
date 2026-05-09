@@ -34,7 +34,7 @@ export default function Catalog() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(150);
+  const [priceMax, setPriceMax] = useState(200);
   const [manufacturers, setManufacturers] = useState([]);
   const [puffCounts, setPuffCounts] = useState([]);
   const [nicotineTypes, setNicotineTypes] = useState([]);
@@ -60,7 +60,7 @@ export default function Catalog() {
   const [applyCounter, setApplyCounter] = useState(0);
   const [appliedFilters, setAppliedFilters] = useState({
     priceMin: 0,
-    priceMax: 150,
+    priceMax: 200,
     manufacturers: [],
     puffCounts: [],
     nicotineTypes: [],
@@ -186,7 +186,7 @@ export default function Catalog() {
 
   const handleReset = () => {
     setPriceMin(0);
-    setPriceMax(150);
+    setPriceMax(200);
     setManufacturers([]);
     setPuffCounts([]);
     setNicotineTypes([]);
@@ -209,7 +209,7 @@ export default function Catalog() {
     setDisplayValues([]);
     const resetFilters = {
       priceMin: 0,
-      priceMax: 150,
+      priceMax: 200,
       manufacturers: [],
       puffCounts: [],
       nicotineTypes: [],
