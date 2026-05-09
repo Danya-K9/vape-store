@@ -71,7 +71,7 @@ export default function ProductDetail() {
     weight: 'Вес',
     coalType: 'Тип углей',
     packCount: 'Кол-во в пачке',
-    strength: 'Крепость (мг/мл)',
+    strength: 'Крепость (%)',
     volume: 'Объём (мл)',
     vgpg: 'VG/PG',
     color: 'Цвет',

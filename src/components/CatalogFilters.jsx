@@ -89,7 +89,7 @@ export default function CatalogFilters({
     puffCount: 'Количество затяжек',
     nicotineType: 'Тип никотина',
     flavor: 'Вкус',
-    strength: 'Крепость',
+    strength: 'Крепость (%)',
     volume: 'Объем',
     vgpg: 'VG/PG',
     charging: 'Зарядка',
