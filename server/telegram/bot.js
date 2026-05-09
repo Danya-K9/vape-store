@@ -1,7 +1,9 @@
 import TelegramBot from 'node-telegram-bot-api';
+import { prisma } from '../lib/prisma.js';
 
 let bot = null;
 const ADMIN_TELEGRAM_ID = '7004487732';
+const ORDER_ACTION_RE = /^(order_confirm|order_cancel):(.+)$/;
 
 export function startTelegramBot() {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -22,6 +24,84 @@ export function startTelegramBot() {
   bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
     await bot.sendMessage(chatId, 'Бот "Облако пара" работает в режиме уведомлений. Сюда приходят новые бронирования и сообщения директору.');
+  });
+
+  bot.on('callback_query', async (q) => {
+    try {
+      const fromChatId = String(q?.message?.chat?.id ?? '');
+      if (!fromChatId || fromChatId !== String(ADMIN_TELEGRAM_ID)) {
+        await bot.answerCallbackQuery(q.id, { text: 'Недостаточно прав', show_alert: true });
+        return;
+      }
+
+      const data = String(q?.data ?? '');
+      const match = data.match(ORDER_ACTION_RE);
+      if (!match) {
+        await bot.answerCallbackQuery(q.id);
+        return;
+      }
+      const action = match[1]; // order_confirm | order_cancel
+      const orderId = match[2];
+
+      const result = await prisma.$transaction(async (tx) => {
+        const order = await tx.order.findUnique({
+          where: { id: orderId },
+          include: { store: true, items: { include: { product: true } } },
+        });
+        if (!order) return { ok: false, code: 'not_found' };
+        if (order.status !== 'pending') return { ok: false, code: 'already_processed', status: order.status };
+
+        if (action === 'order_confirm') {
+          // Check & decrement stock where stock is set.
+          for (const item of order.items) {
+            if (!item.productId) continue;
+            const p = item.product;
+            if (!p) continue;
+            if (p.stock == null) continue;
+            if (item.quantity > p.stock) {
+              return { ok: false, code: 'out_of_stock', productName: p.name, have: p.stock, need: item.quantity };
+            }
+          }
+
+          for (const item of order.items) {
+            if (!item.productId) continue;
+            const p = item.product;
+            if (!p) continue;
+            if (p.stock == null) continue;
+            const nextStock = Math.max(0, p.stock - item.quantity);
+            await tx.product.update({
+              where: { id: p.id },
+              data: { stock: nextStock, isActive: nextStock > 0 },
+            });
+          }
+        }
+
+        const status = action === 'order_confirm' ? 'confirmed' : 'cancelled';
+        const updated = await tx.order.update({ where: { id: orderId }, data: { status } });
+        return { ok: true, status: updated.status, shortId: String(updated.id).slice(0, 8) };
+      });
+
+      if (!result.ok) {
+        const msg = result.code === 'out_of_stock'
+          ? `Нет остатков: ${result.productName} (нужно ${result.need}, есть ${result.have})`
+          : result.code === 'already_processed'
+            ? `Заказ уже обработан: ${result.status}`
+            : 'Заказ не найден';
+        await bot.answerCallbackQuery(q.id, { text: msg, show_alert: true });
+        return;
+      }
+
+      await bot.answerCallbackQuery(q.id, { text: result.status === 'confirmed' ? 'Подтверждено' : 'Отменено' });
+      if (q?.message?.chat?.id && q?.message?.message_id) {
+        await bot.editMessageReplyMarkup({ inline_keyboard: [] }, {
+          chat_id: q.message.chat.id,
+          message_id: q.message.message_id,
+        });
+      }
+    } catch (e) {
+      console.error('Telegram callback error:', e?.message || e);
+      try { await bot.answerCallbackQuery(q.id, { text: 'Ошибка обработки', show_alert: true }); } catch (_) {}
+    }
   });
 
   console.log('Telegram bot started');
@@ -69,7 +149,14 @@ export async function sendTelegramOrderNotification(order) {
     ...order.items.map((i) => `• ${i.product?.name || i.productId} x${i.quantity} — ${i.price * i.quantity} BYN`),
   ];
   try {
-    await bot.sendMessage(ADMIN_TELEGRAM_ID, lines.join('\n'));
+    await bot.sendMessage(ADMIN_TELEGRAM_ID, lines.join('\n'), {
+      reply_markup: {
+        inline_keyboard: [[
+          { text: '✅ Подтвердить', callback_data: `order_confirm:${order.id}` },
+          { text: '❌ Отменить', callback_data: `order_cancel:${order.id}` },
+        ]],
+      },
+    });
   } catch (e) {
     console.error('Telegram notification error:', e.message);
   }
