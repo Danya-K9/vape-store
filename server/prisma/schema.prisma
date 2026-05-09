@@ -36,6 +36,8 @@ model Product {
   images          Json? // Multiple images for pod-systems (different colors)
   price           Float
   category        String
+  stock           Int?
+  isActive        Boolean   @default(true)
   badge           String?   // Новинка, Хит, Советуем
   blurImage       Boolean   @default(false)
   showInNew       Boolean   @default(false) // Новинки и акции
