@@ -20,6 +20,12 @@ function getMainSlideLink(index, firstBlogLink) {
   return MAIN_SLIDE_LINKS[index] || '/catalog';
 }
 
+function getSideBannerLink(bannerId) {
+  if (bannerId === 'side1') return '/blog/vizitka';
+  if (bannerId === 'side2') return '/catalog/hookah-coals';
+  return '/catalog';
+}
+
 const mainSlides = [
   {
     id: 1,
@@ -224,7 +230,7 @@ export default function HeroCarousel() {
         </div>
         <div className="hero-side-banners">
           {sideBannersData.map((banner) => (
-            <Link key={banner.id} to="/catalog" className="hero-side-banner">
+            <Link key={banner.id} to={getSideBannerLink(banner.id)} className="hero-side-banner">
               {banner.slides.map((img, index) => (
                 <div
                   key={img}
