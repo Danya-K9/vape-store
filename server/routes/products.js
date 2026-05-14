@@ -83,22 +83,49 @@ const calculateSearchScore = (product, tokens) => {
   return score;
 };
 
-/** Narrow liquids search: each token must appear in name, flavor or short description (avoids false positives from long SEO text / other specs). */
-const filterLiquidsSearchStrict = (products, tokens) => {
+/** Текстовые поля, по которым разумно искать слова (без «левых» совпадений в числовых/служебных полях). */
+const PRIMARY_SEARCH_TEXT_FIELDS = [
+  'name',
+  'flavor',
+  'shortDescription',
+  'manufacturer',
+  'color',
+  'display',
+  'country',
+  'nicotineType',
+  'charging',
+  'powerAdj',
+  'vgpg',
+  'resistance',
+  'watts',
+];
+
+function buildPrimarySearchBlob(p) {
+  return PRIMARY_SEARCH_TEXT_FIELDS.map((f) => String(p[f] ?? '').toLowerCase()).join('\n');
+}
+
+/** Токен целиком в «человеческих» полях или точное совпадение числа (ёмкость, крепость и т.д.). */
+function productMatchesSearchToken(p, token) {
+  const t = String(token || '').toLowerCase().trim();
+  if (!t) return true;
+  const blob = buildPrimarySearchBlob(p);
+  if (blob.includes(t)) return true;
+  if (/^\d+$/.test(t)) {
+    const n = Number.parseInt(t, 10);
+    const fields = [p.puffCount, p.strength, p.volume, p.battery];
+    return fields.some((v) => v != null && Number(v) === n);
+  }
+  return false;
+}
+
+function filterProductsBySearchTokens(products, tokens) {
   if (!tokens.length) return products;
-  return products.filter((p) =>
-    tokens.every((token) => {
-      const t = token.toLowerCase();
-      const name = (p.name || '').toLowerCase();
-      const flavor = (p.flavor || '').toLowerCase();
-      const short = (p.shortDescription || '').toLowerCase();
-      return name.includes(t) || flavor.includes(t) || short.includes(t);
-    }),
-  );
-};
+  return products.filter((p) => tokens.every((tok) => productMatchesSearchToken(p, tok)));
+}
 
 function applyProductFilters(where, q) {
   const {
+    category,
     newOnly,
     bestsellers,
     priceMin,
@@ -149,8 +176,46 @@ function applyProductFilters(where, q) {
   if (weight) where.weight = { in: weight.split(',') };
   if (coalType) where.coalType = { in: coalType.split(',') };
   if (packCount) where.packCount = { in: packCount.split(',') };
-  if (color) pushAnd(where, stringContainsAnyOr('color', color));
-  if (display) pushAnd(where, stringContainsAnyOr('display', display));
+  if (color) {
+    const vals = String(color)
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (vals.length) {
+      if (category === 'pod-systems' || category === 'disposables') {
+        pushAnd(where, {
+          OR: vals.map((v) => ({
+            OR: [
+              { color: { contains: v } },
+              { name: { contains: v } },
+            ],
+          })),
+        });
+      } else {
+        pushAnd(where, stringContainsAnyOr('color', color));
+      }
+    }
+  }
+  if (display) {
+    const vals = String(display)
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (vals.length) {
+      if (category === 'pod-systems' || category === 'disposables') {
+        pushAnd(where, {
+          OR: vals.map((v) => ({
+            OR: [
+              { display: { contains: v } },
+              { name: { contains: v } },
+            ],
+          })),
+        });
+      } else {
+        pushAnd(where, stringContainsAnyOr('display', display));
+      }
+    }
+  }
 }
 
 let supportsStockFields = true;
@@ -182,13 +247,10 @@ router.get('/', async (req, res) => {
       where,
       orderBy: { createdAt: 'desc' },
     });
-    if (category === 'liquids' && searchTokens.length > 0) {
-      products = filterLiquidsSearchStrict(products, searchTokens);
-    }
     if (searchTokens.length > 0) {
-      const tokens = searchTokens;
+      products = filterProductsBySearchTokens(products, searchTokens);
       products = products
-        .map((product) => ({ product, score: calculateSearchScore(product, tokens) }))
+        .map((product) => ({ product, score: calculateSearchScore(product, searchTokens) }))
         .sort((a, b) => b.score - a.score || new Date(b.product.createdAt) - new Date(a.product.createdAt))
         .map((entry) => entry.product);
     }
@@ -207,10 +269,8 @@ router.get('/', async (req, res) => {
         applyProductFilters(fallbackWhere, req.query);
 
         let products = await prisma.product.findMany({ where: fallbackWhere, orderBy: { createdAt: 'desc' } });
-        if (category === 'liquids' && searchTokens.length > 0) {
-          products = filterLiquidsSearchStrict(products, searchTokens);
-        }
         if (searchTokens.length > 0) {
+          products = filterProductsBySearchTokens(products, searchTokens);
           products = products
             .map((product) => ({ product, score: calculateSearchScore(product, searchTokens) }))
             .sort((a, b) => b.score - a.score || new Date(b.product.createdAt) - new Date(a.product.createdAt))

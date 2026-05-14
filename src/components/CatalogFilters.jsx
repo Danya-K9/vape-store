@@ -216,9 +216,17 @@ export default function CatalogFilters({
   const renderedSections = filterKeys.map((key) => {
     const config = selectionMap[key];
     if (!config || !Array.isArray(dynamicOptions?.[key]) || dynamicOptions[key].length === 0) return null;
-    const options = NUMERIC_FILTER_KEYS.has(key)
-      ? dynamicOptions[key].map((value) => (typeof value === 'string' ? parseInt(value, 10) : value))
-      : dynamicOptions[key];
+    let options;
+    if (NUMERIC_FILTER_KEYS.has(key)) {
+      options = dynamicOptions[key]
+        .map((value) => (typeof value === 'string' ? parseInt(value, 10) : value))
+        .filter((n) => Number.isFinite(n))
+        .sort((a, b) => a - b);
+    } else {
+      options = [...dynamicOptions[key]].sort((a, b) =>
+        String(a).localeCompare(String(b), 'ru', { sensitivity: 'base', numeric: true }),
+      );
+    }
     return (
       <FilterSection key={key} title={SECTION_TITLES[key] || key} open={isOpen(key)} onToggle={() => toggleSection(key)}>
         {renderCheckbox(options, config.selected || [], config.onToggle)}
