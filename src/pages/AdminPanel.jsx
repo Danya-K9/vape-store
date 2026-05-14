@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Seo from '../components/Seo';
 import './AdminPanel.css';
 
 const API_BASE = '/api';
@@ -7,6 +8,23 @@ const SUPPLIER_OPTIONS = ['Частное предприятие "ВП Импо�
 const FAQ_QUESTION_MAX = 1000;
 const FAQ_ANSWER_MAX = 2000;
 const PARTNER_DESCRIPTION_MAX = 2000;
+
+function ymd(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function defaultAnalyticsTo() {
+  return ymd(new Date());
+}
+
+function defaultAnalyticsFrom() {
+  const x = new Date();
+  x.setDate(x.getDate() - 30);
+  return ymd(x);
+}
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -63,6 +81,11 @@ export default function AdminPanel() {
   const [cashierQuery, setCashierQuery] = useState('');
   const [cashierDiscount, setCashierDiscount] = useState('');
   const [cashierSubmitting, setCashierSubmitting] = useState(false);
+  const [analyticsFrom, setAnalyticsFrom] = useState(defaultAnalyticsFrom);
+  const [analyticsTo, setAnalyticsTo] = useState(defaultAnalyticsTo);
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [bookingPickerOpen, setBookingPickerOpen] = useState(false);
 
   const headers = () => ({ Authorization: `Bearer ${token}` });
 
@@ -88,9 +111,42 @@ export default function AdminPanel() {
     if (tab === 'partners') fetchPartners();
     if (tab === 'faq') fetchFaqItems();
     if (tab === 'license-docs') fetchLicenseDocs();
-    if (tab === 'analytics') fetchOrders();
-    if (tab === 'cashier') fetchProducts();
+    if (tab === 'cashier') {
+      fetchProducts();
+      fetchOrders();
+    }
   }, [token, tab]);
+
+  useEffect(() => {
+    if (!token || tab !== 'analytics') return;
+    let cancelled = false;
+    (async () => {
+      setAnalyticsLoading(true);
+      try {
+        const u = new URLSearchParams({ from: analyticsFrom, to: analyticsTo });
+        const r = await fetch(`${API_BASE}/admin/analytics/sales?${u.toString()}`, { headers: headers() });
+        const data = await r.json().catch(() => null);
+        if (cancelled) return;
+        if (r.ok) setAnalyticsData(data);
+        else setAnalyticsData(null);
+      } catch {
+        if (!cancelled) setAnalyticsData(null);
+      } finally {
+        if (!cancelled) setAnalyticsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [token, tab, analyticsFrom, analyticsTo]);
+
+  useEffect(() => {
+    if (!bookingPickerOpen) return;
+    const onDoc = (e) => {
+      if (e.target.closest('.admin-booking-picker')) return;
+      setBookingPickerOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [bookingPickerOpen]);
 
   async function fetchUsers() {
     try {
@@ -349,6 +405,10 @@ export default function AdminPanel() {
   };
 
   const addToCashierCart = (p) => {
+    if (cashierCart.some((l) => l.sourceOrderId)) {
+      alert('В чеке загружена неподтверждённая бронь. Оформите продажу или очистите чек, затем добавляйте товары вручную.');
+      return;
+    }
     if (cashierCart.some((x) => x.id === p.id)) return;
     if (p.stock === null || p.stock === undefined) {
       alert('У этого товара не указан остаток на складе — продажа через кассу недоступна. Укажите остаток в карточке товара.');
@@ -359,6 +419,23 @@ export default function AdminPanel() {
       return;
     }
     setCashierCart((c) => [...c, { id: p.id, name: p.name, price: p.price, qty: 1 }]);
+  };
+
+  const applyPendingOrderToCart = (order) => {
+    const lines = (order.items || [])
+      .filter((i) => i.productId && i.product)
+      .map((i) => ({
+        id: i.productId,
+        name: i.product.name || 'Товар',
+        price: Number(i.price) || 0,
+        qty: i.quantity || 1,
+        sourceOrderId: order.id,
+      }));
+    if (!lines.length) {
+      alert('В брони нет позиций с товарами');
+      return;
+    }
+    setCashierCart(lines);
   };
 
   const setCashierLineQty = (productId, rawQty) => {
@@ -391,7 +468,12 @@ export default function AdminPanel() {
         method: 'POST',
         headers: { ...headers(), 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: cashierCart.map((l) => ({ productId: l.id, quantity: l.qty })),
+          items: cashierCart.map((l) => ({
+            productId: l.id,
+            quantity: l.qty,
+            unitPrice: l.price,
+            sourceOrderId: l.sourceOrderId || undefined,
+          })),
           discountPercent: cashierDiscountNum,
         }),
       });
@@ -404,6 +486,7 @@ export default function AdminPanel() {
       setCashierCart([]);
       setCashierDiscount('');
       fetchProducts();
+      fetchOrders();
     } finally {
       setCashierSubmitting(false);
     }
@@ -420,10 +503,10 @@ export default function AdminPanel() {
     );
   })();
 
-  const ordersConfirmedTotal = orders
-    .filter((o) => o.status === 'confirmed')
-    .reduce((s, o) => s + (Number(o.total) || 0), 0);
-  const ordersPendingCount = orders.filter((o) => o.status === 'pending').length;
+  const pendingOrders = useMemo(
+    () => orders.filter((o) => o.status === 'pending'),
+    [orders],
+  );
 
   const deleteFaq = async (id) => {
     if (!confirm('Удалить вопрос?')) return;
@@ -606,9 +689,16 @@ export default function AdminPanel() {
 
   if (!token) {
     return (
-      <div className="admin-login-page">
-        <form className="admin-login-form" onSubmit={handleLogin}>
-          <h1>Админ-панель</h1>
+      <>
+        <Seo
+          noindex
+          title="Вход — админ-панель"
+          canonicalPath="/vapeAdminDanik"
+          description="Служебная страница администратора."
+        />
+        <div className="admin-login-page">
+          <form className="admin-login-form" onSubmit={handleLogin}>
+            <h1>Админ-панель</h1>
           <input
             placeholder="Логин"
             value={login}
@@ -626,11 +716,18 @@ export default function AdminPanel() {
           <button type="submit">Войти</button>
         </form>
       </div>
+      </>
     );
   }
 
   return (
     <div className="admin-panel">
+      <Seo
+        noindex
+        title="Админ-панель"
+        canonicalPath="/vapeAdminDanik"
+        description="Служебная панель управления сайтом, не для клиентов."
+      />
       <header className="admin-header">
         <h1>Админ-панель</h1>
         <button type="button" onClick={() => navigate('/')}>На сайт</button>
@@ -651,37 +748,50 @@ export default function AdminPanel() {
 
       {tab === 'analytics' && (
         <section className="admin-section">
-          <h2>Аналитика</h2>
+          <h2>Аналитика продаж</h2>
           <p style={{ margin: '0 0 12px', color: '#555' }}>
-            Сводка по бронированиям из базы (заказы со всех каналов). Обновите страницу вкладки — данные подтягиваются при открытии «Аналитика».
+            Учитываются только подтверждённые брони. Период — по дате подтверждения (поле «обновлено» у заказа).
           </p>
-          <div className="admin-form-row" style={{ marginBottom: 16, gap: 24 }}>
-            <span><strong>Всего заказов:</strong> {orders.length}</span>
-            <span><strong>В ожидании:</strong> {ordersPendingCount}</span>
-            <span><strong>Сумма подтверждённых:</strong> {ordersConfirmedTotal.toFixed(2)} BYN</span>
+          <div className="admin-form-row" style={{ marginBottom: 14, flexWrap: 'wrap', gap: 16, alignItems: 'flex-end' }}>
+            <label>С
+              <input type="date" value={analyticsFrom} onChange={(e) => setAnalyticsFrom(e.target.value)} style={{ display: 'block', marginTop: 4 }} />
+            </label>
+            <label>По
+              <input type="date" value={analyticsTo} onChange={(e) => setAnalyticsTo(e.target.value)} style={{ display: 'block', marginTop: 4 }} />
+            </label>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Клиент</th>
-                <th>Магазин</th>
-                <th>Сумма</th>
-                <th>Статус</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.slice(0, 50).map((o) => (
-                <tr key={o.id}>
-                  <td>{o.createdAt ? new Date(o.createdAt).toLocaleString('ru-RU') : '—'}</td>
-                  <td>{o.customerName || o.user?.login || '—'}</td>
-                  <td>{o.store?.address || '—'}</td>
-                  <td>{Number(o.total || 0).toFixed(2)} BYN</td>
-                  <td>{o.status}</td>
-                </tr>
+          {analyticsLoading && <p style={{ color: '#666' }}>Загрузка…</p>}
+          {!analyticsLoading && analyticsData && (
+            <>
+              <p style={{ margin: '0 0 16px' }}>
+                <strong>Подтверждённых заказов за период:</strong> {analyticsData.ordersCount ?? 0}
+              </p>
+              {(analyticsData.byCategory || []).map((row) => (
+                <div key={row.category} style={{ marginBottom: 28, borderBottom: '1px solid #eee', paddingBottom: 16 }}>
+                  <h3 style={{ margin: '0 0 8px', fontSize: 17 }}>{row.categoryName}</h3>
+                  <p style={{ margin: '0 0 10px' }}>
+                    <strong>Штук:</strong> {row.quantity} &nbsp;|&nbsp; <strong>Сумма:</strong> {Number(row.sum).toFixed(2)} BYN
+                  </p>
+                  <p style={{ margin: '0 0 6px', fontWeight: 600, fontSize: 14 }}>Топ-5 товаров по количеству</p>
+                  <table style={{ maxWidth: 720 }}>
+                    <thead><tr><th>Товар</th><th>Шт.</th><th>Сумма</th></tr></thead>
+                    <tbody>
+                      {(row.topProducts || []).map((tp) => (
+                        <tr key={tp.productId}>
+                          <td>{tp.name}</td>
+                          <td>{tp.quantity}</td>
+                          <td>{Number(tp.sum).toFixed(2)} BYN</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ))}
-            </tbody>
-          </table>
+              {!(analyticsData.byCategory || []).length && (
+                <p style={{ color: '#666' }}>Нет продаж за выбранный период.</p>
+              )}
+            </>
+          )}
         </section>
       )}
 
@@ -690,8 +800,36 @@ export default function AdminPanel() {
           <h2>Кассир</h2>
           <p style={{ margin: '0 0 12px', color: '#555' }}>
             Списание остатка сразу после продажи. Товары без поля «остаток» здесь не продаются — задайте число в карточке товара. При нуле остатка позиция скрывается с витрины, в админке остаётся.
+            Загрузка неподтверждённой брони подставляет в чек все позиции — после «Продать» бронь станет подтверждённой, остаток спишется один раз.
           </p>
-          <div className="admin-form-row" style={{ marginBottom: 12, flexWrap: 'wrap' }}>
+          <div className="admin-form-row" style={{ marginBottom: 12, flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+            <div className="admin-booking-picker">
+              <button type="button" onClick={() => setBookingPickerOpen((v) => !v)}>
+                Неподтверждённая бронь ({pendingOrders.length})
+              </button>
+              {bookingPickerOpen && (
+                <div className="admin-booking-dropdown" role="listbox">
+                  {pendingOrders.length === 0 && (
+                    <div className="admin-booking-dropdown-empty">Нет ожидающих броней</div>
+                  )}
+                  {pendingOrders.map((o) => (
+                    <button
+                      key={o.id}
+                      type="button"
+                      className="admin-booking-dropdown-item"
+                      onClick={() => {
+                        applyPendingOrderToCart(o);
+                        setBookingPickerOpen(false);
+                      }}
+                    >
+                      <span className="admin-booking-line1">{new Date(o.createdAt).toLocaleString('ru-RU')}</span>
+                      <span className="admin-booking-line2">{o.customerName || 'Клиент'} — {Number(o.total).toFixed(2)} BYN</span>
+                      <span className="admin-booking-line3">{(o.items || []).length} поз.</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <input
               type="search"
               placeholder="Поиск по названию / вкусу / производителю"
@@ -725,11 +863,14 @@ export default function AdminPanel() {
             <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, padding: 14, background: '#fafafa' }}>
               <h3 style={{ margin: '0 0 10px', fontSize: 16 }}>Чек</h3>
               {!cashierCart.length && <p style={{ color: '#666', margin: 0 }}>Выберите товары слева.</p>}
-              {cashierCart.map((line) => {
+              {cashierCart.map((line, idx) => {
                 const max = stockMaxForProduct(line.id);
                 return (
-                  <div key={line.id} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #eee' }}>
+                  <div key={`${line.sourceOrderId || 'x'}-${line.id}-${idx}`} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #eee' }}>
                     <div style={{ fontWeight: 600, fontSize: 13 }}>{line.name}</div>
+                    {line.sourceOrderId && (
+                      <div style={{ fontSize: 11, color: '#666', marginTop: 2 }}>Из брони #{String(line.sourceOrderId).slice(0, 8)}…</div>
+                    )}
                     <div className="admin-form-row" style={{ marginTop: 6 }}>
                       <label style={{ fontSize: 12 }}>Кол-во (макс. {max})
                         <input

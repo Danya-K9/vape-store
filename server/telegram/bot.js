@@ -1,5 +1,6 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { prisma } from '../lib/prisma.js';
+import { decrementStockForOrderInTx } from '../lib/orderStock.js';
 
 let bot = null;
 const ADMIN_TELEGRAM_ID = '7004487732';
@@ -52,28 +53,8 @@ export function startTelegramBot() {
         if (order.status !== 'pending') return { ok: false, code: 'already_processed', status: order.status };
 
         if (action === 'order_confirm') {
-          // Check & decrement stock where stock is set.
-          for (const item of order.items) {
-            if (!item.productId) continue;
-            const p = item.product;
-            if (!p) continue;
-            if (p.stock == null) continue;
-            if (item.quantity > p.stock) {
-              return { ok: false, code: 'out_of_stock', productName: p.name, have: p.stock, need: item.quantity };
-            }
-          }
-
-          for (const item of order.items) {
-            if (!item.productId) continue;
-            const p = item.product;
-            if (!p) continue;
-            if (p.stock == null) continue;
-            const nextStock = Math.max(0, p.stock - item.quantity);
-            await tx.product.update({
-              where: { id: p.id },
-              data: { stock: nextStock, isActive: nextStock > 0 },
-            });
-          }
+          const dec = await decrementStockForOrderInTx(tx, order);
+          if (!dec.ok) return dec;
         }
 
         const status = action === 'order_confirm' ? 'confirmed' : 'cancelled';

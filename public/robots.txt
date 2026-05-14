@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /vapeAdminDanik
 
 Sitemap: https://oblakopara.by/sitemap.xml

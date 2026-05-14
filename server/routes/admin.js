@@ -6,6 +6,10 @@ import { fileURLToPath } from 'url';
 import { authAdmin } from '../middleware/auth.js';
 import { prisma } from '../lib/prisma.js';
 import { sendTelegramOrderStatusToUser } from '../telegram/bot.js';
+import {
+  decrementStockForOrderInTx,
+  restoreStockForOrderInTx,
+} from '../lib/orderStock.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = Router();
@@ -334,6 +338,103 @@ const FAQ_QUESTION_MAX = 1000;
 const FAQ_ANSWER_MAX = 2000;
 const PARTNER_DESCRIPTION_MAX = 2000;
 
+function parseAnalyticsDateStart(iso) {
+  const s = String(iso || '').trim();
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]) - 1;
+  const d = Number(m[3]);
+  return new Date(y, mo, d, 0, 0, 0, 0);
+}
+
+function parseAnalyticsDateEnd(iso) {
+  const s = String(iso || '').trim();
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]) - 1;
+  const d = Number(m[3]);
+  return new Date(y, mo, d, 23, 59, 59, 999);
+}
+
+/** Продажи: подтверждённые брони, дата — по времени подтверждения (updatedAt). */
+router.get('/analytics/sales', async (req, res) => {
+  try {
+    const from = parseAnalyticsDateStart(req.query.from);
+    const to = parseAnalyticsDateEnd(req.query.to);
+    if (!from || !to || from > to) {
+      return res.status(400).json({ error: 'Укажите период: from и to в формате YYYY-MM-DD' });
+    }
+    const categories = await prisma.category.findMany({ orderBy: { sortOrder: 'asc' } });
+    const categoryNames = Object.fromEntries(categories.map((c) => [c.slug, c.name]));
+
+    const orders = await prisma.order.findMany({
+      where: {
+        status: 'confirmed',
+        updatedAt: { gte: from, lte: to },
+      },
+      include: {
+        items: { include: { product: true } },
+      },
+    });
+
+    const byCat = {};
+    for (const order of orders) {
+      for (const item of order.items) {
+        const pr = item.product;
+        if (!pr) continue;
+        const slug = pr.category || 'unknown';
+        if (!byCat[slug]) {
+          byCat[slug] = { quantity: 0, sum: 0, products: new Map() };
+        }
+        const lineSum = (Number(item.price) || 0) * (Number(item.quantity) || 0);
+        byCat[slug].quantity += Number(item.quantity) || 0;
+        byCat[slug].sum += lineSum;
+        const cur = byCat[slug].products.get(pr.id) || {
+          productId: pr.id,
+          name: pr.name,
+          quantity: 0,
+          sum: 0,
+        };
+        cur.quantity += Number(item.quantity) || 0;
+        cur.sum += lineSum;
+        byCat[slug].products.set(pr.id, cur);
+      }
+    }
+
+    const byCategory = Object.entries(byCat)
+      .map(([slug, v]) => {
+        const topProducts = Array.from(v.products.values())
+          .sort((a, b) => b.quantity - a.quantity || b.sum - a.sum)
+          .slice(0, 5)
+          .map((p) => ({
+            productId: p.productId,
+            name: p.name,
+            quantity: p.quantity,
+            sum: Math.round(p.sum * 100) / 100,
+          }));
+        return {
+          category: slug,
+          categoryName: categoryNames[slug] || slug,
+          quantity: v.quantity,
+          sum: Math.round(v.sum * 100) / 100,
+          topProducts,
+        };
+      })
+      .sort((a, b) => b.sum - a.sum);
+
+    res.json({
+      from: req.query.from,
+      to: req.query.to,
+      ordersCount: orders.length,
+      byCategory,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 /** Списание остатков с полки (касса): только товары с числовым stock. */
 router.post('/cashier/sell', async (req, res) => {
   try {
@@ -342,15 +443,62 @@ router.post('/cashier/sell', async (req, res) => {
     if (!items.length) {
       return res.status(400).json({ error: 'Добавьте товары в чек' });
     }
+
+    const normalized = items.map((raw) => ({
+      productId: String(raw.productId || '').trim(),
+      quantity: Number.parseInt(String(raw.quantity ?? '1'), 10),
+      sourceOrderId: raw.sourceOrderId ? String(raw.sourceOrderId).trim() : null,
+      unitPrice: raw.unitPrice != null && Number.isFinite(Number(raw.unitPrice)) ? Number(raw.unitPrice) : null,
+    }));
+
+    for (const line of normalized) {
+      if (!line.productId || !Number.isFinite(line.quantity) || line.quantity < 1) {
+        return res.status(400).json({ error: 'Некорректная позиция в чеке' });
+      }
+    }
+
+    const orderIds = [...new Set(normalized.map((i) => i.sourceOrderId).filter(Boolean))];
+
     const result = await prisma.$transaction(async (tx) => {
-      let subtotal = 0;
-      const lines = [];
-      for (const raw of items) {
-        const productId = String(raw.productId || '').trim();
-        const quantity = Number.parseInt(String(raw.quantity ?? '1'), 10);
-        if (!productId || !Number.isFinite(quantity) || quantity < 1) {
-          throw Object.assign(new Error('Некорректная позиция в чеке'), { status: 400 });
+      for (const oid of orderIds) {
+        const order = await tx.order.findUnique({
+          where: { id: oid },
+          include: { items: true },
+        });
+        if (!order || order.status !== 'pending') {
+          throw Object.assign(new Error('Бронь не найдена или уже обработана'), { status: 400 });
         }
+        for (const oi of order.items) {
+          if (!oi.productId) continue;
+          const sumInCart = normalized
+            .filter((i) => i.sourceOrderId === oid && i.productId === oi.productId)
+            .reduce((a, i) => a + i.quantity, 0);
+          if (sumInCart !== oi.quantity) {
+            throw Object.assign(
+              new Error(
+                `Чек должен совпадать с бронью #${String(oid).slice(0, 8)}: товар ${oi.productId.slice(0, 8)}… — нужно ${oi.quantity} шт. в чеке`,
+              ),
+              { status: 400 },
+            );
+          }
+        }
+      }
+
+      const qtyByProduct = new Map();
+      for (const line of normalized) {
+        qtyByProduct.set(line.productId, (qtyByProduct.get(line.productId) || 0) + line.quantity);
+      }
+
+      let subtotal = 0;
+      for (const line of normalized) {
+        const p = await tx.product.findUnique({ where: { id: line.productId } });
+        if (!p) throw Object.assign(new Error('Товар не найден'), { status: 400 });
+        const unit = line.unitPrice != null ? line.unitPrice : p.price;
+        subtotal += unit * line.quantity;
+      }
+
+      const lines = [];
+      for (const [productId, totalQty] of qtyByProduct) {
         const p = await tx.product.findUnique({ where: { id: productId } });
         if (!p) throw Object.assign(new Error('Товар не найден'), { status: 400 });
         if (p.stock === null || p.stock === undefined) {
@@ -359,27 +507,36 @@ router.post('/cashier/sell', async (req, res) => {
             { status: 400 },
           );
         }
-        if (quantity > p.stock) {
+        if (totalQty > p.stock) {
           throw Object.assign(
-            new Error(`«${p.name}»: недостаточно (в наличии ${p.stock})`),
+            new Error(`«${p.name}»: недостаточно (в наличии ${p.stock}, в чеке ${totalQty})`),
             { status: 400 },
           );
         }
-        const nextStock = p.stock - quantity;
+        const nextStock = p.stock - totalQty;
         await tx.product.update({
           where: { id: productId },
-          data: { stock: nextStock },
+          data: { stock: nextStock, isActive: nextStock > 0 },
         });
-        subtotal += p.price * quantity;
-        lines.push({ productId, quantity, price: p.price, name: p.name });
+        const unitPrice = p.price;
+        lines.push({ productId, quantity: totalQty, price: unitPrice, name: p.name });
       }
+
+      for (const oid of orderIds) {
+        await tx.order.update({
+          where: { id: oid, status: 'pending' },
+          data: { status: 'confirmed' },
+        });
+      }
+
       const total = Math.round(subtotal * (1 - discountPercent / 100) * 100) / 100;
-      return { subtotal, total, discountPercent, lines };
+      return { subtotal, total, discountPercent, lines, completedOrderIds: orderIds };
     });
+
     res.json({ ok: true, ...result });
   } catch (e) {
     const msg = String(e.message || '');
-    if (e.status === 400 || /недостаточно|не найден|некорректн|не ведётся остаток/i.test(msg)) {
+    if (e.status === 400 || /недостаточно|не найден|некорректн|не ведётся остаток|совпадать|обработана/i.test(msg)) {
       return res.status(400).json({ error: msg || 'Ошибка' });
     }
     res.status(500).json({ error: msg });
@@ -459,15 +616,55 @@ router.patch('/orders/:id', async (req, res) => {
     if (!['pending', 'confirmed', 'cancelled'].includes(status)) {
       return res.status(400).json({ error: 'Недопустимый статус' });
     }
+
     const prev = await prisma.order.findUnique({
       where: { id: req.params.id },
-      include: { user: true },
+      include: { user: true, items: { include: { product: true } } },
     });
-    const order = await prisma.order.update({
+    if (!prev) return res.status(404).json({ error: 'Не найден' });
+    if (prev.status === 'cancelled') {
+      return res.status(400).json({ error: 'Заказ уже отменён' });
+    }
+    if (prev.status === status) {
+      const unchanged = await prisma.order.findUnique({
+        where: { id: req.params.id },
+        include: { user: true, store: true, items: { include: { product: true } } },
+      });
+      return res.json(unchanged);
+    }
+
+    if (status === 'confirmed' && prev.status === 'pending') {
+      try {
+        await prisma.$transaction(async (tx) => {
+          const dec = await decrementStockForOrderInTx(tx, prev);
+          if (!dec.ok) {
+            const msg = dec.code === 'out_of_stock'
+              ? `Нет остатков: ${dec.productName} (нужно ${dec.need}, есть ${dec.have})`
+              : 'Ошибка списания';
+            throw Object.assign(new Error(msg), { status: 400 });
+          }
+          await tx.order.update({ where: { id: prev.id }, data: { status } });
+        });
+      } catch (e) {
+        if (e.status === 400) return res.status(400).json({ error: e.message });
+        throw e;
+      }
+    } else if (status === 'cancelled' && prev.status === 'confirmed') {
+      await prisma.$transaction(async (tx) => {
+        await restoreStockForOrderInTx(tx, prev);
+        await tx.order.update({ where: { id: prev.id }, data: { status } });
+      });
+    } else if (status === 'cancelled' && prev.status === 'pending') {
+      await prisma.order.update({ where: { id: prev.id }, data: { status } });
+    } else {
+      return res.status(400).json({ error: `Смена статуса ${prev.status} → ${status} не поддерживается` });
+    }
+
+    const order = await prisma.order.findUnique({
       where: { id: req.params.id },
-      data: { status },
       include: { user: true, store: true, items: { include: { product: true } } },
     });
+
     if ((status === 'confirmed' || status === 'cancelled') && prev?.user?.telegram) {
       await sendTelegramOrderStatusToUser(prev.user.telegram, order.id, status);
     }
