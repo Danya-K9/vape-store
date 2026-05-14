@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { PHONE, SOCIAL_ICONS_FOOTER } from '../constants/socialIcons';
 import { contentApi } from '../lib/api';
 import './Footer.css';
@@ -8,6 +8,7 @@ const PHONE_DISPLAY = '+375 (29) 539-75-10';
 const VIBER_LINK = `https://viber.click/${PHONE.replace(/\D/g, '')}`;
 
 export default function Footer() {
+  const location = useLocation();
   const [categories, setCategories] = useState([
     { slug: 'liquids', name: 'Жидкости для электронных парогенераторов' },
     { slug: 'disposables', name: 'Одноразовые/многоразовые парогенераторы' },
@@ -71,7 +72,9 @@ export default function Footer() {
             <Link to="/contacts">Контакты</Link>
             <Link to="/delivery">Доставка</Link>
             <Link to="/payment">Оплата</Link>
-            <Link to="/vapeAdminDanik" className="footer-admin">Админ-панель</Link>
+            {location.pathname === '/contacts' && (
+              <Link to="/vapeAdminDanik" className="footer-admin">Админ-панель</Link>
+            )}
           </div>
         </div>
       </div>

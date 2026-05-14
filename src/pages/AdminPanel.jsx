@@ -35,6 +35,7 @@ export default function AdminPanel() {
   const [editingCategory, setEditingCategory] = useState(null);
   const [categoryError, setCategoryError] = useState('');
   const [productError, setProductError] = useState('');
+  const [productNameSearch, setProductNameSearch] = useState('');
   const [productFieldErrors, setProductFieldErrors] = useState({});
   const [blogPosts, setBlogPosts] = useState([]);
   const [blogForm, setBlogForm] = useState({ title: '', slug: '', dateLabel: '', teaser: '', description: '', image: '', showOnHome: true, sortOrder: 0 });
@@ -57,6 +58,11 @@ export default function AdminPanel() {
   const [editingLicenseDoc, setEditingLicenseDoc] = useState(null);
 
   const headers = () => ({ Authorization: `Bearer ${token}` });
+
+  const productSearchLower = productNameSearch.trim().toLowerCase();
+  const productsFilteredByName = productSearchLower
+    ? products.filter((p) => (p.name || '').toLowerCase().includes(productSearchLower))
+    : products;
 
   useEffect(() => {
     if (!token) return;
@@ -854,7 +860,17 @@ export default function AdminPanel() {
 
       {tab === 'products' && (
         <section className="admin-section">
-          <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'liquids', stock: '', isActive: true, image: '', images: [], description: '', manufacturer: '', supplier: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', watts: '', resistance: '', battery: '', tobacco: '', weight: '', coalType: '', packCount: '', color: '', display: '', badge: '', blurImage: false }); setImageFile(null); setImageFiles([]); }}>Добавить товар</button>
+          <div className="admin-products-toolbar">
+            <button onClick={() => { setEditing('new'); setForm({ name: '', price: 0, category: 'liquids', stock: '', isActive: true, image: '', images: [], description: '', manufacturer: '', supplier: '', puffCount: '', nicotineType: '', flavor: '', country: '', strength: '', volume: '', vgpg: '', charging: '', powerAdj: '', watts: '', resistance: '', battery: '', tobacco: '', weight: '', coalType: '', packCount: '', color: '', display: '', badge: '', blurImage: false }); setImageFile(null); setImageFiles([]); }}>Добавить товар</button>
+            <input
+              type="search"
+              className="admin-product-search"
+              placeholder="Поиск по названию товара"
+              value={productNameSearch}
+              onChange={(e) => setProductNameSearch(e.target.value)}
+              aria-label="Поиск по названию товара"
+            />
+          </div>
           {productError && <p className="admin-error" style={{ marginBottom: 8 }}>{productError}</p>}
           <table>
             <thead>
@@ -1126,7 +1142,7 @@ export default function AdminPanel() {
                   </td>
                 </tr>
               )}
-              {products.map((p) => (
+              {productsFilteredByName.map((p) => (
                 <tr key={p.id}>
                   {editing?.id === p.id ? (
                     <td colSpan="10" className="admin-product-edit-cell">

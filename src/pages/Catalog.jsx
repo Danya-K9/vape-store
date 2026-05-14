@@ -415,8 +415,8 @@ export default function Catalog() {
       {filtered.length === 0 && (
         <div className="catalog-empty">
           <img
-            src="https://images.unsplash.com/photo-1584735175097-719d848f8449?w=400"
-            alt="Пусто"
+            src="/catalog-empty.png?v=1"
+            alt="Облако пара"
             className="catalog-empty-image"
           />
           <p>В данной категории пока нет товаров</p>

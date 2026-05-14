@@ -103,6 +103,20 @@
   margin-bottom: 12px;
 }
 
+.admin-products-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.admin-product-search {
+  flex: 1;
+  min-width: 200px;
+  max-width: 420px;
+}
+
 .admin-section table {
   width: 100%;
   border-collapse: collapse;
