@@ -330,6 +330,62 @@ router.delete('/products/:id', async (req, res) => {
   }
 });
 
+const FAQ_QUESTION_MAX = 1000;
+const FAQ_ANSWER_MAX = 2000;
+const PARTNER_DESCRIPTION_MAX = 2000;
+
+/** Списание остатков с полки (касса): только товары с числовым stock. */
+router.post('/cashier/sell', async (req, res) => {
+  try {
+    const items = Array.isArray(req.body.items) ? req.body.items : [];
+    const discountPercent = Math.min(100, Math.max(0, Number.parseFloat(req.body.discountPercent) || 0));
+    if (!items.length) {
+      return res.status(400).json({ error: 'Добавьте товары в чек' });
+    }
+    const result = await prisma.$transaction(async (tx) => {
+      let subtotal = 0;
+      const lines = [];
+      for (const raw of items) {
+        const productId = String(raw.productId || '').trim();
+        const quantity = Number.parseInt(String(raw.quantity ?? '1'), 10);
+        if (!productId || !Number.isFinite(quantity) || quantity < 1) {
+          throw Object.assign(new Error('Некорректная позиция в чеке'), { status: 400 });
+        }
+        const p = await tx.product.findUnique({ where: { id: productId } });
+        if (!p) throw Object.assign(new Error('Товар не найден'), { status: 400 });
+        if (p.stock === null || p.stock === undefined) {
+          throw Object.assign(
+            new Error(`«${p.name}»: не ведётся остаток на складе — списание через кассу недоступно`),
+            { status: 400 },
+          );
+        }
+        if (quantity > p.stock) {
+          throw Object.assign(
+            new Error(`«${p.name}»: недостаточно (в наличии ${p.stock})`),
+            { status: 400 },
+          );
+        }
+        const nextStock = p.stock - quantity;
+        await tx.product.update({
+          where: { id: productId },
+          data: { stock: nextStock },
+        });
+        subtotal += p.price * quantity;
+        lines.push({ productId, quantity, price: p.price, name: p.name });
+      }
+      const total = Math.round(subtotal * (1 - discountPercent / 100) * 100) / 100;
+      return { subtotal, total, discountPercent, lines };
+    });
+    res.json({ ok: true, ...result });
+  } catch (e) {
+    const msg = String(e.message || '');
+    if (e.status === 400 || /недостаточно|не найден|некорректн|не ведётся остаток/i.test(msg)) {
+      return res.status(400).json({ error: msg || 'Ошибка' });
+    }
+    res.status(500).json({ error: msg });
+  }
+});
+
 router.get('/orders', async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
@@ -640,10 +696,14 @@ router.post('/partners', (req, res, next) => {
   try {
     const name = String(req.body.name || '').trim();
     if (!name) return res.status(400).json({ error: 'Название партнера обязательно' });
+    const descRaw = req.body.description ? String(req.body.description).trim() : '';
+    if (descRaw.length > PARTNER_DESCRIPTION_MAX) {
+      return res.status(400).json({ error: `Описание не длиннее ${PARTNER_DESCRIPTION_MAX} символов` });
+    }
     const partner = await prisma.partner.create({
       data: {
         name,
-        description: req.body.description ? String(req.body.description).trim() : null,
+        description: descRaw || null,
         website: req.body.website ? String(req.body.website).trim() : null,
         image: req.file ? `/uploads/${req.file.filename}` : (req.body.image || null),
         sortOrder: parseSortOrder(req.body.sortOrder, 0),
@@ -664,7 +724,13 @@ router.patch('/partners/:id', (req, res, next) => {
   try {
     const data = {};
     if (req.body.name !== undefined) data.name = String(req.body.name).trim();
-    if (req.body.description !== undefined) data.description = req.body.description ? String(req.body.description).trim() : null;
+    if (req.body.description !== undefined) {
+      const d = req.body.description ? String(req.body.description).trim() : '';
+      if (d.length > PARTNER_DESCRIPTION_MAX) {
+        return res.status(400).json({ error: `Описание не длиннее ${PARTNER_DESCRIPTION_MAX} символов` });
+      }
+      data.description = d || null;
+    }
     if (req.body.website !== undefined) data.website = req.body.website ? String(req.body.website).trim() : null;
     if (req.file) data.image = `/uploads/${req.file.filename}`;
     else if (req.body.image !== undefined) data.image = req.body.image || null;
@@ -699,6 +765,12 @@ router.post('/faq', async (req, res) => {
     const question = String(req.body.question || '').trim();
     const answer = String(req.body.answer || '').trim();
     if (!question || !answer) return res.status(400).json({ error: 'Вопрос и ответ обязательны' });
+    if (question.length > FAQ_QUESTION_MAX) {
+      return res.status(400).json({ error: `Вопрос не длиннее ${FAQ_QUESTION_MAX} символов` });
+    }
+    if (answer.length > FAQ_ANSWER_MAX) {
+      return res.status(400).json({ error: `Ответ не длиннее ${FAQ_ANSWER_MAX} символов` });
+    }
     const item = await prisma.faqItem.create({
       data: { question, answer, sortOrder: parseSortOrder(req.body.sortOrder, 0) },
     });
@@ -711,8 +783,20 @@ router.post('/faq', async (req, res) => {
 router.patch('/faq/:id', async (req, res) => {
   try {
     const data = {};
-    if (req.body.question !== undefined) data.question = String(req.body.question).trim();
-    if (req.body.answer !== undefined) data.answer = String(req.body.answer).trim();
+    if (req.body.question !== undefined) {
+      const q = String(req.body.question).trim();
+      if (q.length > FAQ_QUESTION_MAX) {
+        return res.status(400).json({ error: `Вопрос не длиннее ${FAQ_QUESTION_MAX} символов` });
+      }
+      data.question = q;
+    }
+    if (req.body.answer !== undefined) {
+      const a = String(req.body.answer).trim();
+      if (a.length > FAQ_ANSWER_MAX) {
+        return res.status(400).json({ error: `Ответ не длиннее ${FAQ_ANSWER_MAX} символов` });
+      }
+      data.answer = a;
+    }
     if (req.body.sortOrder !== undefined) data.sortOrder = parseSortOrder(req.body.sortOrder, 0);
     const item = await prisma.faqItem.update({ where: { id: req.params.id }, data });
     res.json(item);

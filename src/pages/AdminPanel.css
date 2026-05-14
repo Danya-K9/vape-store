@@ -56,11 +56,20 @@
   align-items: center;
   gap: 16px;
   margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
 .admin-header h1 {
   margin: 0;
   flex: 1;
+  min-width: 140px;
+}
+
+.admin-cashier-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+  align-items: start;
 }
 
 .admin-header button {
@@ -191,6 +200,10 @@
 }
 
 @media (max-width: 900px) {
+  .admin-cashier-grid {
+    grid-template-columns: 1fr;
+  }
+
   .admin-panel {
     padding: 16px;
   }

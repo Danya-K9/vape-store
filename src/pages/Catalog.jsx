@@ -415,7 +415,7 @@ export default function Catalog() {
       {filtered.length === 0 && (
         <div className="catalog-empty">
           <img
-            src="/catalog-empty.png?v=1"
+            src="/catalog-empty.png?v=2"
             alt="Облако пара"
             className="catalog-empty-image"
           />

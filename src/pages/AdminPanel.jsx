@@ -4,6 +4,9 @@ import './AdminPanel.css';
 
 const API_BASE = '/api';
 const SUPPLIER_OPTIONS = ['Частное предприятие "ВП Импорт"', 'ЧП Лох'];
+const FAQ_QUESTION_MAX = 1000;
+const FAQ_ANSWER_MAX = 2000;
+const PARTNER_DESCRIPTION_MAX = 2000;
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -56,6 +59,10 @@ export default function AdminPanel() {
   const [licenseForm, setLicenseForm] = useState({ title: '', fileUrl: '', sortOrder: 0 });
   const [licensePdfFile, setLicensePdfFile] = useState(null);
   const [editingLicenseDoc, setEditingLicenseDoc] = useState(null);
+  const [cashierCart, setCashierCart] = useState([]);
+  const [cashierQuery, setCashierQuery] = useState('');
+  const [cashierDiscount, setCashierDiscount] = useState('');
+  const [cashierSubmitting, setCashierSubmitting] = useState(false);
 
   const headers = () => ({ Authorization: `Bearer ${token}` });
 
@@ -81,6 +88,8 @@ export default function AdminPanel() {
     if (tab === 'partners') fetchPartners();
     if (tab === 'faq') fetchFaqItems();
     if (tab === 'license-docs') fetchLicenseDocs();
+    if (tab === 'analytics') fetchOrders();
+    if (tab === 'cashier') fetchProducts();
   }, [token, tab]);
 
   async function fetchUsers() {
@@ -318,15 +327,103 @@ export default function AdminPanel() {
 
   const saveFaq = async () => {
     const url = editingFaq ? `${API_BASE}/admin/faq/${editingFaq.id}` : `${API_BASE}/admin/faq`;
-    await fetch(url, {
+    const r = await fetch(url, {
       method: editingFaq ? 'PATCH' : 'POST',
       headers: { ...headers(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...faqForm, sortOrder: Number(faqForm.sortOrder || 0) }),
     });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      alert(data.error || 'Не удалось сохранить FAQ');
+      return;
+    }
     setEditingFaq(null);
     setFaqForm({ question: '', answer: '', sortOrder: 0 });
     fetchFaqItems();
   };
+
+  const stockMaxForProduct = (productId) => {
+    const p = products.find((x) => x.id === productId);
+    if (!p || p.stock === null || p.stock === undefined) return 0;
+    return Math.max(0, p.stock);
+  };
+
+  const addToCashierCart = (p) => {
+    if (cashierCart.some((x) => x.id === p.id)) return;
+    if (p.stock === null || p.stock === undefined) {
+      alert('У этого товара не указан остаток на складе — продажа через кассу недоступна. Укажите остаток в карточке товара.');
+      return;
+    }
+    if (p.stock < 1) {
+      alert('Нет в наличии.');
+      return;
+    }
+    setCashierCart((c) => [...c, { id: p.id, name: p.name, price: p.price, qty: 1 }]);
+  };
+
+  const setCashierLineQty = (productId, rawQty) => {
+    const max = stockMaxForProduct(productId);
+    if (max < 1) {
+      setCashierCart((lines) => lines.filter((l) => l.id !== productId));
+      return;
+    }
+    const n = Number.parseInt(String(rawQty), 10);
+    const qty = Number.isFinite(n) ? Math.min(Math.max(1, n), max) : 1;
+    setCashierCart((lines) => lines.map((l) => (l.id === productId ? { ...l, qty } : l)));
+  };
+
+  const cashierSubtotal = cashierCart.reduce((s, l) => s + l.price * l.qty, 0);
+  const cashierDiscountNum = Math.min(100, Math.max(0, Number.parseFloat(String(cashierDiscount).replace(',', '.')) || 0));
+  const cashierTotal = Math.round(cashierSubtotal * (1 - cashierDiscountNum / 100) * 100) / 100;
+
+  const completeCashierSale = async () => {
+    if (!cashierCart.length) return;
+    for (const line of cashierCart) {
+      const max = stockMaxForProduct(line.id);
+      if (line.qty > max) {
+        alert(`«${line.name}»: в наличии только ${max} шт. Обновите количество.`);
+        return;
+      }
+    }
+    setCashierSubmitting(true);
+    try {
+      const r = await fetch(`${API_BASE}/admin/cashier/sell`, {
+        method: 'POST',
+        headers: { ...headers(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cashierCart.map((l) => ({ productId: l.id, quantity: l.qty })),
+          discountPercent: cashierDiscountNum,
+        }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        alert(data.error || 'Ошибка продажи');
+        return;
+      }
+      alert(`Продажа оформлена. Сумма без скидки: ${data.subtotal?.toFixed?.(2) ?? cashierSubtotal.toFixed(2)} BYN, к оплате: ${data.total?.toFixed?.(2) ?? cashierTotal.toFixed(2)} BYN`);
+      setCashierCart([]);
+      setCashierDiscount('');
+      fetchProducts();
+    } finally {
+      setCashierSubmitting(false);
+    }
+  };
+
+  const cashierListFiltered = (() => {
+    const q = cashierQuery.trim().toLowerCase();
+    if (!q) return products;
+    return products.filter(
+      (p) =>
+        (p.name || '').toLowerCase().includes(q)
+        || (p.flavor || '').toLowerCase().includes(q)
+        || String(p.manufacturer || '').toLowerCase().includes(q),
+    );
+  })();
+
+  const ordersConfirmedTotal = orders
+    .filter((o) => o.status === 'confirmed')
+    .reduce((s, o) => s + (Number(o.total) || 0), 0);
+  const ordersPendingCount = orders.filter((o) => o.status === 'pending').length;
 
   const deleteFaq = async (id) => {
     if (!confirm('Удалить вопрос?')) return;
@@ -536,8 +633,10 @@ export default function AdminPanel() {
     <div className="admin-panel">
       <header className="admin-header">
         <h1>Админ-панель</h1>
-        <button onClick={() => navigate('/')}>На сайт</button>
-        <button onClick={logout}>Выход</button>
+        <button type="button" onClick={() => navigate('/')}>На сайт</button>
+        <button type="button" onClick={() => setTab('analytics')}>Аналитика</button>
+        <button type="button" onClick={() => setTab('cashier')}>Кассир</button>
+        <button type="button" onClick={logout}>Выход</button>
       </header>
       <nav className="admin-tabs">
         <button className={tab === 'products' ? 'active' : ''} onClick={() => setTab('products')}>Товары</button>
@@ -549,6 +648,129 @@ export default function AdminPanel() {
         <button className={tab === 'faq' ? 'active' : ''} onClick={() => setTab('faq')}>FAQ</button>
         <button className={tab === 'license-docs' ? 'active' : ''} onClick={() => setTab('license-docs')}>PDF лицензий</button>
       </nav>
+
+      {tab === 'analytics' && (
+        <section className="admin-section">
+          <h2>Аналитика</h2>
+          <p style={{ margin: '0 0 12px', color: '#555' }}>
+            Сводка по бронированиям из базы (заказы со всех каналов). Обновите страницу вкладки — данные подтягиваются при открытии «Аналитика».
+          </p>
+          <div className="admin-form-row" style={{ marginBottom: 16, gap: 24 }}>
+            <span><strong>Всего заказов:</strong> {orders.length}</span>
+            <span><strong>В ожидании:</strong> {ordersPendingCount}</span>
+            <span><strong>Сумма подтверждённых:</strong> {ordersConfirmedTotal.toFixed(2)} BYN</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Клиент</th>
+                <th>Магазин</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.slice(0, 50).map((o) => (
+                <tr key={o.id}>
+                  <td>{o.createdAt ? new Date(o.createdAt).toLocaleString('ru-RU') : '—'}</td>
+                  <td>{o.customerName || o.user?.login || '—'}</td>
+                  <td>{o.store?.address || '—'}</td>
+                  <td>{Number(o.total || 0).toFixed(2)} BYN</td>
+                  <td>{o.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {tab === 'cashier' && (
+        <section className="admin-section">
+          <h2>Кассир</h2>
+          <p style={{ margin: '0 0 12px', color: '#555' }}>
+            Списание остатка сразу после продажи. Товары без поля «остаток» здесь не продаются — задайте число в карточке товара. При нуле остатка позиция скрывается с витрины, в админке остаётся.
+          </p>
+          <div className="admin-form-row" style={{ marginBottom: 12, flexWrap: 'wrap' }}>
+            <input
+              type="search"
+              placeholder="Поиск по названию / вкусу / производителю"
+              value={cashierQuery}
+              onChange={(e) => setCashierQuery(e.target.value)}
+              style={{ minWidth: 260, flex: 1, maxWidth: 480 }}
+            />
+          </div>
+          <div className="admin-cashier-grid">
+            <div style={{ overflowX: 'auto' }}>
+              <table>
+                <thead>
+                  <tr><th>Название</th><th>Цена</th><th>Остаток</th><th></th></tr>
+                </thead>
+                <tbody>
+                  {cashierListFiltered.map((p) => (
+                    <tr key={p.id}>
+                      <td>{p.name}</td>
+                      <td>{p.price} BYN</td>
+                      <td>{p.stock === null || p.stock === undefined ? '—' : p.stock}</td>
+                      <td>
+                        <button type="button" onClick={() => addToCashierCart(p)} disabled={cashierCart.some((x) => x.id === p.id)}>
+                          Выбрать
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, padding: 14, background: '#fafafa' }}>
+              <h3 style={{ margin: '0 0 10px', fontSize: 16 }}>Чек</h3>
+              {!cashierCart.length && <p style={{ color: '#666', margin: 0 }}>Выберите товары слева.</p>}
+              {cashierCart.map((line) => {
+                const max = stockMaxForProduct(line.id);
+                return (
+                  <div key={line.id} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #eee' }}>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>{line.name}</div>
+                    <div className="admin-form-row" style={{ marginTop: 6 }}>
+                      <label style={{ fontSize: 12 }}>Кол-во (макс. {max})
+                        <input
+                          type="number"
+                          min={1}
+                          max={max}
+                          value={line.qty}
+                          onChange={(e) => setCashierLineQty(line.id, e.target.value)}
+                          style={{ width: 72, marginLeft: 6 }}
+                        />
+                      </label>
+                      <span style={{ fontSize: 12 }}>{(line.price * line.qty).toFixed(2)} BYN</span>
+                      <button type="button" onClick={() => setCashierCart((c) => c.filter((x) => x.id !== line.id))}>Убрать</button>
+                    </div>
+                  </div>
+                );
+              })}
+              {!!cashierCart.length && (
+                <>
+                  <div className="admin-form-row" style={{ marginTop: 8 }}>
+                    <label style={{ fontSize: 13 }}>Скидка, %
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={cashierDiscount}
+                        onChange={(e) => setCashierDiscount(e.target.value)}
+                        style={{ width: 64, marginLeft: 8 }}
+                      />
+                    </label>
+                  </div>
+                  <p style={{ margin: '8px 0 4px', fontSize: 14 }}>Без скидки: <strong>{cashierSubtotal.toFixed(2)} BYN</strong></p>
+                  <p style={{ margin: '0 0 12px', fontSize: 14 }}>К оплате: <strong>{cashierTotal.toFixed(2)} BYN</strong></p>
+                  <button type="button" disabled={cashierSubmitting} onClick={completeCashierSale}>
+                    {cashierSubmitting ? '…' : 'Продать'}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {tab === 'categories' && (
         <section className="admin-section">
@@ -669,11 +891,12 @@ export default function AdminPanel() {
             <input type="number" placeholder="Порядок" value={partnerForm.sortOrder} onChange={(e) => setPartnerForm({ ...partnerForm, sortOrder: e.target.value })} />
           </div>
           <div className="admin-form-row" style={{ marginBottom: 10 }}>
-            <input
+            <textarea
               placeholder="Описание"
               value={partnerForm.description}
-              onChange={(e) => setPartnerForm({ ...partnerForm, description: e.target.value.slice(0, 1000) })}
-              style={{ width: 420 }}
+              onChange={(e) => setPartnerForm({ ...partnerForm, description: e.target.value.slice(0, PARTNER_DESCRIPTION_MAX) })}
+              rows={5}
+              style={{ width: '100%', maxWidth: 560, resize: 'vertical' }}
             />
             <input type="file" accept="image/*" onChange={(e) => { setPartnerImageFile(e.target.files?.[0] || null); if (e.target.files?.[0]) setPartnerForm({ ...partnerForm, image: '' }); }} />
             <input placeholder="URL картинки" value={partnerForm.image} onChange={(e) => { setPartnerForm({ ...partnerForm, image: e.target.value }); if (e.target.value) setPartnerImageFile(null); }} disabled={!!partnerImageFile} />
@@ -681,7 +904,7 @@ export default function AdminPanel() {
             {editingPartner && <button onClick={() => { setEditingPartner(null); setPartnerImageFile(null); setPartnerForm({ name: '', description: '', website: '', image: '', sortOrder: 0 }); }}>Отмена</button>}
           </div>
           <p style={{ margin: '0 0 10px', color: '#666' }}>
-            Осталось символов для описания: {1000 - (partnerForm.description?.length || 0)}
+            Описание: {partnerForm.description?.length || 0}/{PARTNER_DESCRIPTION_MAX} символов
           </p>
           <table>
             <thead><tr><th>Название</th><th>Сайт</th><th>Порядок</th><th></th></tr></thead>
@@ -706,10 +929,13 @@ export default function AdminPanel() {
         <section className="admin-section">
           <h2>FAQ</h2>
           <div className="admin-form-row" style={{ marginBottom: 8 }}>
-            <input placeholder="Вопрос" value={faqForm.question} onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })} style={{ width: 420 }} />
+            <input placeholder="Вопрос" value={faqForm.question} onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value.slice(0, FAQ_QUESTION_MAX) })} style={{ width: 420 }} />
             <input type="number" placeholder="Порядок" value={faqForm.sortOrder} onChange={(e) => setFaqForm({ ...faqForm, sortOrder: e.target.value })} />
           </div>
-          <textarea value={faqForm.answer} onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })} rows={5} style={{ width: '100%', marginBottom: 8 }} placeholder="Ответ" />
+          <textarea value={faqForm.answer} onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value.slice(0, FAQ_ANSWER_MAX) })} rows={8} style={{ width: '100%', marginBottom: 8 }} placeholder="Ответ" />
+          <p style={{ margin: '0 0 8px', color: '#666', fontSize: 13 }}>
+            Вопрос: {faqForm.question.length}/{FAQ_QUESTION_MAX} · Ответ: {faqForm.answer.length}/{FAQ_ANSWER_MAX}
+          </p>
           <button onClick={saveFaq}>{editingFaq ? 'Сохранить' : 'Добавить вопрос'}</button>
           {editingFaq && <button onClick={() => { setEditingFaq(null); setFaqForm({ question: '', answer: '', sortOrder: 0 }); }}>Отмена</button>}
           <table style={{ marginTop: 12 }}>
