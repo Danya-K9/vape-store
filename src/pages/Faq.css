@@ -31,9 +31,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding: 16px 20px;
   font-size: 16px;
   cursor: pointer;
+}
+
+.faq-question > span:first-child {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .faq-plus {
@@ -43,7 +51,12 @@
 }
 
 .faq-answer {
-  padding: 0 20px 16px;
+  padding: 0 20px 20px;
   color: #4b5563;
   line-height: 1.55;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+  box-sizing: border-box;
 }
