@@ -5,7 +5,7 @@ import ProductCarousel from '../components/ProductCarousel';
 import HeroCarousel from '../components/HeroCarousel';
 import SocialCarousel from '../components/SocialCarousel';
 import Seo from '../components/Seo';
-import { blogPosts, reviews } from '../data/products';
+import { reviews } from '../data/products';
 import { productsApi, contentApi } from '../lib/api';
 import './Home.css';
 
@@ -30,7 +30,8 @@ export default function Home() {
   const [newProducts, setNewProducts] = useState([]);
   const [bestsellerProducts, setBestsellerProducts] = useState([]);
   const [blogSlide, setBlogSlide] = useState(0);
-  const [blogPostsData, setBlogPostsData] = useState(blogPosts);
+  const [blogPostsData, setBlogPostsData] = useState([]);
+  const [blogLoaded, setBlogLoaded] = useState(false);
   const [categoryFilters, setCategoryFilters] = useState(defaultCategoryFilters);
   const [visibleYandexReviews, setVisibleYandexReviews] = useState([]);
   const [yandexReviewsData, setYandexReviewsData] = useState([]);
@@ -55,8 +56,9 @@ export default function Home() {
   }, []);
   useEffect(() => {
     contentApi.blogPosts({ homeOnly: 'true' })
-      .then((data) => setBlogPostsData(Array.isArray(data) && data.length > 0 ? data : blogPosts))
-      .catch(() => setBlogPostsData(blogPosts));
+      .then((data) => setBlogPostsData(Array.isArray(data) ? data : []))
+      .catch(() => setBlogPostsData([]))
+      .finally(() => setBlogLoaded(true));
     contentApi.categories()
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
@@ -245,6 +247,7 @@ export default function Home() {
 
       <SocialCarousel />
 
+      {blogLoaded && blogCount > 0 && (
       <section className="section section-blog">
         <motion.h2
           className="section-title section-title-viking"
@@ -256,7 +259,6 @@ export default function Home() {
           Блог
         </motion.h2>
         <div className="blog-layout">
-          {blogFeatured ? (
           <div
             className="blog-featured-carousel"
             onPointerDown={onBlogSwipeStart}
@@ -285,9 +287,11 @@ export default function Home() {
                   )}
                   <span className="blog-link">Читать статью →</span>
                 </div>
+                {blogFeatured.image && (
                 <div className="blog-featured-image blog-card-image">
                   <img src={blogFeatured.image} alt="" loading="eager" decoding="async" />
                 </div>
+                )}
               </Link>
             </motion.article>
             <div className="blog-carousel-controls" aria-label="Навигация по блогу">
@@ -308,9 +312,9 @@ export default function Home() {
               <button type="button" className="blog-carousel-arrow" onClick={blogNext} aria-label="Следующая статья">›</button>
             </div>
           </div>
-          ) : <p>Посты блога пока не добавлены.</p>}
         </div>
       </section>
+      )}
 
       <section className="section section-reviews">
         <motion.h2

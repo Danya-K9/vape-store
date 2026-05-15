@@ -4,6 +4,16 @@
   border-bottom: 1px solid #eee;
 }
 
+.hero-carousel--loading {
+  min-height: 280px;
+  background: #f3f4f6;
+}
+
+.hero-carousel--loading {
+  min-height: 280px;
+  background: #f3f4f6;
+}
+
 .hero-carousel-inner {
   max-width: 1200px;
   margin: 0 auto;

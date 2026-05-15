@@ -2,17 +2,16 @@ import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Seo from '../components/Seo';
-import { blogPosts } from '../data/products';
 import { contentApi } from '../lib/api';
 import './Blog.css';
 
 export default function Blog() {
-  const [posts, setPosts] = useState(blogPosts);
+  const [posts, setPosts] = useState([]);
   const listRef = useRef(null);
   useEffect(() => {
     contentApi.blogPosts()
-      .then((data) => setPosts(Array.isArray(data) && data.length > 0 ? data : blogPosts))
-      .catch(() => setPosts(blogPosts));
+      .then((data) => setPosts(Array.isArray(data) ? data : []))
+      .catch(() => setPosts([]));
   }, []);
 
   const dragRef = useRef({ active: false, startX: 0, startScroll: 0 });
@@ -87,12 +86,11 @@ export default function Blog() {
             transition={{ delay: i * 0.1 }}
             whileHover={{ x: 4 }}
           >
-            <div className="blog-item-image">
-              <img
-                src={post.image || 'https://images.unsplash.com/photo-1566150960911-7c5e8d60b247?w=280'}
-                alt={post.title}
-              />
-            </div>
+            {post.image && (
+              <div className="blog-item-image">
+                <img src={post.image} alt={post.title} loading="lazy" decoding="async" />
+              </div>
+            )}
             <div className="blog-item-content">
               <span className="blog-item-date">{post.dateLabel || post.date}</span>
               <h2>{post.title}</h2>

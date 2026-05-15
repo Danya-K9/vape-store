@@ -510,7 +510,16 @@ export default function AdminPanel() {
 
   const deleteFaq = async (id) => {
     if (!confirm('Удалить вопрос?')) return;
-    await fetch(`${API_BASE}/admin/faq/${id}`, { method: 'DELETE', headers: headers() });
+    const r = await fetch(`${API_BASE}/admin/faq/${id}`, { method: 'DELETE', headers: headers() });
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      alert(data.error || 'Не удалось удалить');
+      return;
+    }
+    if (editingFaq?.id === id) {
+      setEditingFaq(null);
+      setFaqForm({ question: '', answer: '', sortOrder: 0 });
+    }
     fetchFaqItems();
   };
 
@@ -1079,21 +1088,28 @@ export default function AdminPanel() {
           </p>
           <button onClick={saveFaq}>{editingFaq ? 'Сохранить' : 'Добавить вопрос'}</button>
           {editingFaq && <button onClick={() => { setEditingFaq(null); setFaqForm({ question: '', answer: '', sortOrder: 0 }); }}>Отмена</button>}
-          <table style={{ marginTop: 12 }}>
-            <thead><tr><th>Вопрос</th><th>Порядок</th><th></th></tr></thead>
-            <tbody>
-              {faqItems.map((f) => (
-                <tr key={f.id}>
-                  <td>{f.question}</td>
-                  <td>{f.sortOrder}</td>
-                  <td>
-                    <button onClick={() => { setEditingFaq(f); setFaqForm({ question: f.question || '', answer: f.answer || '', sortOrder: f.sortOrder || 0 }); }}>Ред.</button>
-                    <button onClick={() => deleteFaq(f.id)}>Удалить</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="admin-faq-list">
+            {faqItems.map((f) => (
+              <div key={f.id} className="admin-faq-row">
+                <div className="admin-faq-row-body">
+                  <p className="admin-faq-row-question">{f.question}</p>
+                  <span className="admin-faq-row-order">Порядок: {f.sortOrder}</span>
+                </div>
+                <div className="admin-faq-row-actions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingFaq(f);
+                      setFaqForm({ question: f.question || '', answer: f.answer || '', sortOrder: f.sortOrder || 0 });
+                    }}
+                  >
+                    Ред.
+                  </button>
+                  <button type="button" onClick={() => deleteFaq(f.id)}>Удалить</button>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       )}
 

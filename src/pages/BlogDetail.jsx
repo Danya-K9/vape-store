@@ -2,18 +2,17 @@ import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Seo from '../components/Seo';
-import { blogPosts } from '../data/products';
 import { contentApi } from '../lib/api';
 import './BlogDetail.css';
 
 export default function BlogDetail() {
   const { id } = useParams();
-  const [posts, setPosts] = useState(blogPosts);
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
     contentApi.blogPosts()
-      .then((data) => setPosts(Array.isArray(data) && data.length > 0 ? data : blogPosts))
-      .catch(() => setPosts(blogPosts));
+      .then((data) => setPosts(Array.isArray(data) ? data : []))
+      .catch(() => setPosts([]));
   }, []);
 
   const post = posts.find((p) => String(p.id) === id || p.slug === id);
