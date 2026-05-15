@@ -336,7 +336,7 @@ router.delete('/products/:id', async (req, res) => {
 
 const FAQ_QUESTION_MAX = 1000;
 const FAQ_ANSWER_MAX = 2000;
-const PARTNER_DESCRIPTION_MAX = 2000;
+const PARTNER_DESCRIPTION_MAX = 190;
 
 function parseAnalyticsDateStart(iso) {
   const s = String(iso || '').trim();

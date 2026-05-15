@@ -7,7 +7,7 @@ const API_BASE = '/api';
 const SUPPLIER_OPTIONS = ['Частное предприятие "ВП Импорт"', 'ЧП Лох'];
 const FAQ_QUESTION_MAX = 1000;
 const FAQ_ANSWER_MAX = 2000;
-const PARTNER_DESCRIPTION_MAX = 2000;
+const PARTNER_DESCRIPTION_MAX = 190;
 
 function ymd(d) {
   const y = d.getFullYear();
