@@ -3,15 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function NotFound() {
   return (
-    <motion.div
-      className="not-found"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      style={{
-        textAlign: 'center',
-        padding: '80px 20px',
-      }}
-    >
+    <div className="not-found">
       <img
         src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400"
         alt="Страница не найдена"
@@ -29,6 +21,6 @@ export default function NotFound() {
       >
         Вернуться на главную
       </Link>
-    </motion.div>
+    </div>
   );
 }

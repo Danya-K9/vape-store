@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
+import PageTransition from './PageTransition';
 import Header from './Header';
 import Footer from './Footer';
 import AgeGate from './AgeGate';
@@ -20,11 +20,6 @@ export default function Layout() {
     () => [...sideChars, ...sideChars, ...sideChars],
     [sideChars]
   );
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, [location.pathname]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -110,15 +105,9 @@ export default function Layout() {
                 ))}
               </div>
             </aside>
-            <motion.div
-              className="layout-page-content"
-              key={location.pathname}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.55, ease: 'easeOut' }}
-            >
-              <Outlet />
-            </motion.div>
+            <div className="layout-page-content">
+              <PageTransition />
+            </div>
           </main>
         </div>
         <Footer />

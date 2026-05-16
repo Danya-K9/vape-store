@@ -113,12 +113,7 @@ export default function ProductDetail() {
   }
 
   return (
-    <motion.div
-      className="product-detail"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    >
+    <div className="product-detail">
       <Seo
         title={seoTitle}
         description={seoDescription}
@@ -252,6 +247,6 @@ export default function ProductDetail() {
           </div>
         </section>
       )}
-    </motion.div>
+    </div>
   );
 }

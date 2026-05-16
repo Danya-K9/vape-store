@@ -19,12 +19,7 @@ const VIBER_LINK = `viber://chat?number=${PHONE.replace(/\D/g, '')}`;
 
 export default function Contacts() {
   return (
-    <motion.div
-      className="contacts-page"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    >
+    <div className="contacts-page">
       <Seo
         title="Контакты вейп-шопа в Орше — Облако Пара"
         description="Контакты вейп шопа «Облако Пара» в Орше: адрес на ул. Владимира Ленина, карта, телефон, мессенджеры и режим работы."
@@ -105,6 +100,6 @@ export default function Contacts() {
       <div className="contacts-banner">
         <span>#ОБЛАКО ПАРА | ВЕЙП ШОП</span>
       </div>
-    </motion.div>
+    </div>
   );
 }

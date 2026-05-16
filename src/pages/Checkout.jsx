@@ -68,7 +68,7 @@ export default function Checkout() {
 
   if (done) {
     return (
-      <motion.div className="checkout-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <div className="checkout-page">
         <div className="checkout-done">
           <h1>Бронирование оформлено!</h1>
           <p>Мы уведомили вас о заказе. Ожидайте подтверждения.</p>
@@ -79,12 +79,7 @@ export default function Checkout() {
   }
 
   return (
-    <motion.div
-      className="checkout-page"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
+    <div className="checkout-page">
       <nav className="breadcrumb">
         <Link to="/">Главная</Link>
         <span> / </span>
@@ -205,6 +200,6 @@ export default function Checkout() {
           </div>
         </aside>
       </form>
-    </motion.div>
+    </div>
   );
 }

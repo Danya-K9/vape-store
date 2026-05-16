@@ -14,7 +14,7 @@ export default function Partners() {
   }, []);
 
   return (
-    <motion.div className="partners-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <div className="partners-page">
       <nav className="breadcrumb">
         <Link to="/">Главная</Link>
         <span> — </span>
@@ -38,6 +38,6 @@ export default function Partners() {
           </article>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import Seo from '../components/Seo';
 import { contentApi } from '../lib/api';
 import './BlogDetail.css';
@@ -23,20 +22,15 @@ export default function BlogDetail() {
 
   if (!post) {
     return (
-      <motion.div className="blog-detail" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <div className="blog-detail">
         <p>Статья не найдена.</p>
         <Link to="/blog">← Вернуться в блог</Link>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.article
-      className="blog-detail"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
+    <article className="blog-detail">
       <Seo
         title={seoTitle}
         description={seoDescription}
@@ -81,6 +75,6 @@ export default function BlogDetail() {
         })}
       </div>
       <Link to="/blog" className="blog-detail-back">← Вернуться в блог</Link>
-    </motion.article>
+    </article>
   );
 }

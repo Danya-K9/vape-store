@@ -48,12 +48,7 @@ export default function Blog() {
   };
 
   return (
-    <motion.div
-      className="blog-page"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    >
+    <div className="blog-page">
       <Seo
         title="Блог — Облако Пара"
         description="Новости, советы и статьи о вейпинге, устройствах и жидкостях. Обзоры и рекомендации от «Облако Пара»."
@@ -104,6 +99,6 @@ export default function Blog() {
           </motion.article>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }

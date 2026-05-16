@@ -26,7 +26,7 @@ export default function Favorites() {
 
   if (!user) {
     return (
-      <motion.div className="favorites-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <div className="favorites-page">
         <h1>Избранное</h1>
         <div className="favorites-empty">
           <p>Войдите в аккаунт, чтобы сохранять товары в избранное</p>
@@ -39,12 +39,7 @@ export default function Favorites() {
   if (loading) return <div className="favorites-page"><h1>Избранное</h1><p>Загрузка...</p></div>;
 
   return (
-    <motion.div
-      className="favorites-page"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    >
+    <div className="favorites-page">
       <h1>Избранное</h1>
       {favorites.length > 0 ? (
         <div className="favorites-grid">
@@ -65,6 +60,6 @@ export default function Favorites() {
           </Link>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }

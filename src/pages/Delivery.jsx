@@ -4,12 +4,7 @@ import './Delivery.css';
 
 export default function Delivery() {
   return (
-    <motion.div
-      className="delivery-page"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    >
+    <div className="delivery-page">
       <nav className="breadcrumb">
         <Link to="/">Главная</Link>
         <span> — </span>
@@ -17,6 +12,6 @@ export default function Delivery() {
       </nav>
       <h1>Способы и условия доставки</h1>
       <p className="delivery-unavailable">ДОСТАВКА ВРЕМЕННО НЕ ДОСТУПНА!</p>
-    </motion.div>
+    </div>
   );
 }

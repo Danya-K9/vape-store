@@ -35,6 +35,10 @@
   z-index: 1;
 }
 
+.page-transition {
+  width: 100%;
+}
+
 .side-marquee {
   position: fixed;
   top: var(--side-strip-top, 24px);

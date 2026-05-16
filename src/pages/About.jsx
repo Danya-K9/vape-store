@@ -1,15 +1,9 @@
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import './About.css';
 
 export default function About() {
   return (
-    <motion.div
-      className="about-page"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    >
+    <div className="about-page">
       <div className="about-content">
         <h1>О компании</h1>
         <p className="about-lead">
@@ -33,6 +27,6 @@ export default function About() {
           <Link to="/license" className="about-license-btn">Лицензия</Link>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

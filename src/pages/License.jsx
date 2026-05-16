@@ -21,12 +21,7 @@ export default function License() {
   }, []);
 
   return (
-    <motion.div
-      className="license-page"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.35 }}
-    >
+    <div className="license-page">
       <Seo
         title="Лицензия и сертификаты — Облако Пара"
         description="Лицензии, сертификаты и реквизиты вейп-шопа «Облако Пара». Официальные документы в PDF."
@@ -60,7 +55,7 @@ export default function License() {
           </a>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

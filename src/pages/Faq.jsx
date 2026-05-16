@@ -15,7 +15,7 @@ export default function Faq() {
   }, []);
 
   return (
-    <motion.div className="faq-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <div className="faq-page">
       <nav className="breadcrumb">
         <Link to="/">Главная</Link>
         <span> — </span>
@@ -36,6 +36,6 @@ export default function Faq() {
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 }

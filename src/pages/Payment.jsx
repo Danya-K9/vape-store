@@ -4,12 +4,7 @@ import './Payment.css';
 
 export default function Payment() {
   return (
-    <motion.div
-      className="payment-page"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    >
+    <div className="payment-page">
       <nav className="breadcrumb">
         <Link to="/">Главная</Link>
         <span> — </span>
@@ -25,6 +20,6 @@ export default function Payment() {
           <li>Apple Pay (в разработке)</li>
         </ul>
       </div>
-    </motion.div>
+    </div>
   );
 }
