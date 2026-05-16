@@ -25,21 +25,22 @@
   color: #fff;
 }
 
-.social-card-bg {
+.social-card-img {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-color: #1f2937;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 70%;
+  display: block;
 }
 
-.social-card-bg--telegram {
-  background-position: center 70%;
+.social-card-img--telegram {
+  object-position: center 70%;
 }
 
-.social-card-bg--instagram {
-  background-position: center 70%;
+.social-card-img--instagram {
+  object-position: center 70%;
 }
 
 .social-card-content {
@@ -75,5 +76,18 @@
 @media (max-width: 768px) {
   .social-carousel-viewport {
     grid-template-columns: 1fr;
+  }
+
+  .social-carousel-card {
+    filter: none;
+  }
+
+  .social-card-img {
+    filter: none;
+    opacity: 1;
+  }
+
+  .social-card-title {
+    text-shadow: none;
   }
 }
