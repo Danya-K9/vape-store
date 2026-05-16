@@ -74,7 +74,7 @@ export default function Checkout() {
           <p>Мы уведомили вас о заказе. Ожидайте подтверждения.</p>
           <Link to="/catalog">В каталог</Link>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
